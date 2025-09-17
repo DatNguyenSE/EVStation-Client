@@ -1,0 +1,28 @@
+<div class="relative w-full mt-[80px]"> 
+  <div class="overflow-hidden ">
+    <div class="flex transition-transform duration-700 ease-in-out"
+         [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+      <img *ngFor="let img of images"
+     [src]="img"
+     class="w-full h-[394px] object-cover flex-shrink-0" />
+
+    </div>
+  </div>
+<!-- Dots -->
+  <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+    <button *ngFor="let _ of images; let i = index"
+            
+            class="h-2 rounded-full transition-all"
+            [class.bg-white]="i === currentIndex"
+            [class.w-8]="i === currentIndex"
+            
+            [class.bg-white/40]= "i != currentIndex"
+            [class.w-4]="i !== currentIndex">
+    </button>
+  </div>
+  <!-- Nút điều hướng -->
+  <button (click)="prev()" 
+          class="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full">‹</button>
+  <button (click)="next()" 
+          class="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full">›</button>
+</div>
