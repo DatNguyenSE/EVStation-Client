@@ -1,8 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
-import { Result } from 'postcss';
-
 
 @Component({
   selector: 'app-nav',
@@ -15,12 +13,22 @@ export class Nav {
   protected creds: any = {}
   isloggin = false;
 
+  // thêm biến quản lý menu mobile
+  isMenuOpen = false;
+  isMobile = window.innerWidth < 640; // sm:640px trong Tailwind
+
+  // lắng nghe resize để cập nhật lại isMobile
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.isMobile = (event.target as Window).innerWidth < 640;
+    // nếu lên desktop thì auto đóng menu
+    if (!this.isMobile) {
+      this.isMenuOpen = false;
+    }
+  }
+
   lgoin() {
-    // this.account.login(this.creds).subscribe({
-    //   next: result =>  console.log(result),
-    //   error: error => alert(error.message)
-    // })
     console.log(this.creds);
-    this.isloggin = ! this.isloggin;
+    this.isloggin = !this.isloggin;
   }
 }
