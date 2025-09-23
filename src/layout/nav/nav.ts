@@ -1,6 +1,7 @@
 import { Component, inject, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
+import { User } from '../../_models/user';
 
 @Component({
   selector: 'app-nav',
@@ -9,10 +10,28 @@ import { AccountService } from '../../core/service/account-service';
   styleUrl: './nav.css'
 })
 export class Nav {
-  private account = inject(AccountService);
+  account = inject(AccountService);
   protected creds: any = {}
-  protected loggedIn = signal(false);
 
+  login() {
+    this.account.login(this.creds).subscribe({
+      next: result => {
+        console.log(result),
+        this.creds ={};
+      },
+      error: error => alert(error.error)
+    })
+
+  }
+
+
+
+  logout() {
+    this.account.logout();
+  }
+
+
+  
   // thêm biến quản lý menu mobile
   isMenuOpen = false;
   isMobile = window.innerWidth < 640; // sm:640px trong Tailwind
@@ -27,20 +46,5 @@ export class Nav {
     }
   }
 
-  login() {
-    this.account.login(this.creds).subscribe({
-      next: result => {
-        console.log(result),
-        this.loggedIn.update( x => !x ),
-        this.creds ={};
-      },
-      error: error => alert(error.error)
-    })
-    // console.log(this.creds);
-    // this.loggedIn.update(x => !x);
-  }
 
-  logout() {
-    this.loggedIn.set(!this.loggedIn);
-  }
 }

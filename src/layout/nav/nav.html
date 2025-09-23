@@ -1,57 +1,66 @@
 <header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-700 via-blue-800 to-cyan-600 shadow-lg">
   <div class="flex items-center px-4 sm:px-10 mx-auto gap-6 h-full">
     <!-- Logo / Title -->
-    <a routerLink="/" class="flex items-center gap-3 sm:gap-5 text-lg sm:text-xl text-blue-300 pr-4 sm:pr-6 font-bold tracking-wide cursor-pointer">
-      <img src="https://www.svgrepo.com/show/297122/electric-station.svg" 
-           alt="EV charging station icon" width="28" height="28" class="sm:w-8 sm:h-8">
+    <a routerLink="/"
+      class="flex items-center gap-3 sm:gap-5 text-lg sm:text-xl text-blue-300 pr-4 sm:pr-6 font-bold tracking-wide cursor-pointer">
+      <img src="/assets/logo.png" alt="user avatar" class="w-12 h-12 rounded-full">
       Trạm Sạc Xe Điện
     </a>
 
     <!-- Nút hamburger (chỉ hiện trên mobile) -->
     <button class="sm:hidden ml-auto text-white focus:outline-none" (click)="isMenuOpen = !isMenuOpen">
-       ☰
+      ☰
     </button>
 
     <!-- Navigation (ẩn trên mobile, hiện trên desktop hoặc khi mở menu) -->
-    <nav 
-      class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium 
+    <nav class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium 
              absolute sm:static top-20 left-0 w-full sm:w-auto bg-blue-800 sm:bg-transparent px-6 py-4 sm:p-0 shadow-lg sm:shadow-none
-             transition-all duration-300"
-      [class.hidden]="!isMenuOpen && isMobile">
-      
-      <a routerLink="/dich-vu" routerLinkActive="text-blue-950" class="text-white hover:text-cyan-300 cursor-pointer">Dịch vụ</a>
-      <a routerLink="/thanh-toan" routerLinkActive="text-blue-950" class="text-white hover:text-cyan-300 cursor-pointer">Thanh toán</a>
-      <a routerLink="/thong-bao" routerLinkActive="text-blue-950" class="text-white hover:text-cyan-300 cursor-pointer">Thông báo</a>
-    </nav> 
+             transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
+
+      @if(account.currentUser()) {
+      <a routerLink="/dich-vu" routerLinkActive="text-blue-950"
+        class="text-white hover:text-cyan-300 cursor-pointer">Dịch vụ</a>
+      <a routerLink="/thanh-toan" routerLinkActive="text-blue-950"
+        class="text-white hover:text-cyan-300 cursor-pointer">Thanh toán</a>
+      <a routerLink="/thong-bao" routerLinkActive="text-blue-950"
+        class="text-white hover:text-cyan-300 cursor-pointer">Thông báo</a>
+      }
+    </nav>
 
     <!-- Login form / user menu -->
-    @if (!this.loggedIn()) {
-      <div class="hidden sm:flex items-center ml-auto gap-3">
-        <form #loginForm="ngForm" (ngSubmit)="login()" class="flex items-center gap-3">
-          <input [(ngModel)]="creds.email" name="email"
-            class="px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            type="text" placeholder="Email">
-          <input [(ngModel)]="creds.password" name="password"
-            class="px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            type="password" placeholder="Password">
-          <button class="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-white font-semibold shadow-md transition">
-            Đăng nhập
-          </button>
-        </form>
-      </div>
+    @if (!account.currentUser()) {
+    <div class="hidden sm:flex items-center ml-auto gap-3">
+      <form #loginForm="ngForm" (ngSubmit)="login()" class="flex items-center gap-3">
+        <input [(ngModel)]="creds.email" name="email"
+          class="px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          type="text" placeholder="Email">
+        <input [(ngModel)]="creds.password" name="password"
+          class="px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          type="password" placeholder="Password">
+        <button
+          class="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-white font-semibold shadow-md transition">
+          Đăng nhập
+        </button>
+      </form>
+    </div>
     }
     @else {
-      <div class="hidden sm:flex align-middle ml-auto gap-3">
-        <div class="dropdown dropdown-end">
-          <div tabindex="0" role="button" class="flex items-center text-white text-xl gap-3 cursor-pointer">
-            <img src="/assets/user.png" alt="user avatar" class="w-8 h-8 rounded-full">
-          </div>
-          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-            <li><a>Edit profile</a></li>
-            <li><a (click)="logout()">Logout</a></li>
-          </ul>
+    <div class="hidden sm:flex align-middle ml-auto gap-3">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="flex items-center text-white text-xl gap-3 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-9">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+
         </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+          <li><a>Edit profile</a></li>
+          <li><a (click)="logout()">Logout</a></li>
+        </ul>
       </div>
+    </div>
     }
   </div>
 </header>
