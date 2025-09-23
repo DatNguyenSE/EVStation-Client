@@ -1,4 +1,4 @@
-import { Component, inject, HostListener } from '@angular/core';
+import { Component, inject, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
 
@@ -11,7 +11,7 @@ import { AccountService } from '../../core/service/account-service';
 export class Nav {
   private account = inject(AccountService);
   protected creds: any = {}
-  isloggin = false;
+  protected loggedIn = signal(false);
 
   // thêm biến quản lý menu mobile
   isMenuOpen = false;
@@ -27,8 +27,20 @@ export class Nav {
     }
   }
 
-  lgoin() {
-    console.log(this.creds);
-    this.isloggin = !this.isloggin;
+  login() {
+    this.account.login(this.creds).subscribe({
+      next: result => {
+        console.log(result),
+        this.loggedIn.update( x => !x ),
+        this.creds ={};
+      },
+      error: error => alert(error.error)
+    })
+    // console.log(this.creds);
+    // this.loggedIn.update(x => !x);
+  }
+
+  logout() {
+    this.loggedIn.set(!this.loggedIn);
   }
 }
