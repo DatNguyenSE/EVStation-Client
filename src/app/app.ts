@@ -7,7 +7,7 @@ import { Router, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [Nav, RouterOutlet, Footer, RenterDashboardComponent, SlideCarouselComponent],
+  imports: [Nav, RouterOutlet, Footer, ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
