@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../core/_guards/auth.guard';
-import { Home } from '../features/home/home.component';
+import { Home } from '../layout/home/home.component';
+import { DichVu } from '../features/dich-vu/dich-vu';
 
 export const routes: Routes = [
      { path: '', component: Home },
@@ -9,7 +10,7 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard],
         children: [
-            
+            { path: 'dich-vu', component: DichVu }
         ]
     },
 
