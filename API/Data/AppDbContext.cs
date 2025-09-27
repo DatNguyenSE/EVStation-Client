@@ -16,6 +16,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
     {
         base.OnModelCreating(builder);
 
+        // Seed Roles
         List<IdentityRole> roles = new List<IdentityRole>
         {
             new IdentityRole {
@@ -35,5 +36,30 @@ public class AppDbContext : IdentityDbContext<AppUser>
             }
         };
         builder.Entity<IdentityRole>().HasData(roles);
+
+        // Seed Admin User
+        var hasher = new PasswordHasher<AppUser>();
+
+        var adminUser = new AppUser
+        {
+            Id = "100",
+            UserName = "admin",
+            NormalizedUserName = "ADMIN",
+            Email = "admin@gmail.com",
+            NormalizedEmail = "ADMIN@GMAIL.COM",
+            EmailConfirmed = true,
+            SecurityStamp = Guid.NewGuid().ToString("D")
+        };
+
+        adminUser.PasswordHash = hasher.HashPassword(adminUser, "Admin@123");
+
+        builder.Entity<AppUser>().HasData(adminUser);
+
+        // Gan role Admin cho user nay
+        builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+        {
+            RoleId = "1",
+            UserId = "100"
+        });
     }
 }
