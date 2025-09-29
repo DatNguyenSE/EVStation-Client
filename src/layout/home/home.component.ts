@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { Register } from '../../features/account/register/register.component';
 import { SlideCarouselComponent } from "../slide-carousel/slide-carousel";
 
 import { AccountService } from '../../core/service/account-service';
@@ -8,12 +7,13 @@ import { Instruction } from '../more-information/instruction/instruction';
 import { Contact } from '../more-information/contact/contact';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from '../../features/vehicle/vehicle';
+import { Login } from "../../features/account/login/login";
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [Register, SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule,],
+  imports: [SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule, Login],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

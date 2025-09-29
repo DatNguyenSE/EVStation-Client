@@ -1,7 +1,6 @@
 import { Component, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
-import { User } from '../../_models/user';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 
@@ -12,28 +11,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './nav.css'
 })
 export class Nav {
-  account = inject(AccountService);
+  accountService = inject(AccountService);
   protected creds: any = {}
 
-  login() {
-    this.account.login(this.creds).subscribe({
-      next: result => {
-        console.log(result),
-        this.creds ={};
-      },
-      error: error => alert(error.error)
-    })
-
-  }
-
-
-
   logout() {
-    this.account.logout();
+    this.accountService.logout();
   }
 
-
-  
   // thêm biến quản lý menu mobile
   isMenuOpen = false;
   isMobile = window.innerWidth < 640; // sm:640px trong Tailwind

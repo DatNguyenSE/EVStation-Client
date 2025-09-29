@@ -14,16 +14,21 @@ import { RegisterCreds } from '../../../_models/user';
 })
 export class Register{
   private accountService = inject(AccountService)
-
+  acceptedTerms: boolean = false;
   // @Output() cancelRegister = new EventEmitter();
   cancelRegister = output<boolean>();   //out event         // <! pratice load data 'child to parent' -->
   protected creds = {} as RegisterCreds;
 
   register(){
+
+    if (!this.acceptedTerms) {
+    alert("Bạn phải đồng ý với điều khoản trước khi đăng ký!");
+    return;
+  }
+
     this.accountService.register(this.creds).subscribe({
       next: response => {
         console.log(response);
-        this.cancel(); // if success -> rollback 
       },
          error: (error: any) => console.log(error)
     })
@@ -32,4 +37,10 @@ export class Register{
   cancel() {
    this.cancelRegister.emit(false);
   }
+
+    openTerms(event: Event) {
+  event.preventDefault();
+  alert("Điều khoản sử dụng: ..."); 
+  // hoặc bạn có thể mở modal riêng để hiển thị chi tiết
+}
 }
