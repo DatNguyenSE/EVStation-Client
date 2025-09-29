@@ -28,13 +28,13 @@
                 <div class="flex border-b mb-4">
 
                     <button (click)="changeTab('news')"
-                        [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='news'}"
+                        [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='news','text-gray-500':activeTab!=='news'}"
                         class="px-4 py-2">Tin tức</button>
                     <button (click)="changeTab('contact')"
-                        [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='contact'}"
+                        [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='contact','text-gray-500':activeTab!=='contact'}"
                         class="px-4 py-2">Liên hệ</button>
                     <button (click)="changeTab('instruction')"
-                        [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='instruction'}"
+                        [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='instruction','text-gray-500':activeTab!=='instruction'}"
                         class="px-4 py-2">Hướng dẫn sử dụng</button>
                 </div>
 
