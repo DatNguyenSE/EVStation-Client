@@ -1,6 +1,0 @@
-+class AppDbContext là sử dụng entity framework dùng để ánh xạ, gọi dữ liệu,gọi hà(đọc id, xóa id,...), chỉnh sửa, thêm,xóa table trong db,...
-    nhưng thuộc tính trong này như là 1 table trong database
-
-+class seed  là để nạp dữ liệu nhanh thông qua file.json
-
-+trong folder Data nên có nhưng repository để nạp method lên cho controller

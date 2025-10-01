@@ -1,4 +1,0 @@
-để tạo ra migration thì -> dotnet ef migrations add InitialCreate (với InitialCreate là tên)
-
-để cập nhật database thông qua class AppDbContext.cs  -> dotnet ef database update 
-*trước khi cập nhật db thì phải tạo 1 tên migraiont mới -> dotnet ef migrations add updateDb 

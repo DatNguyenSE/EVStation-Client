@@ -1,1 +1,0 @@
-nhưng class entity này để cho AppDbcontext có thể lấy làm thành các thuộc tính, mỗi thuộc tính như 1 table trong datebase

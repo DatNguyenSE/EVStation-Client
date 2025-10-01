@@ -1,15 +1,12 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace API.Entities;
 
-public class AppUser
+public class AppUser : IdentityUser
 {
-    public String Id { get; set; } = Guid.NewGuid().ToString(); // random & consistent if adding manually
-    public required String UserName { get; set; }
-    public required String Email { get; set; }
-    public required byte[] PasswordHash { get; set; }   // save encryption
-    public required byte[] PasswordSalt { get; set; }   // key to decryption
+    public string FullName { get; set; } = string.Empty;
+    public int Age { get; set; }
 
-
-    //navigation property   
-    // public EVCars car { get; set; } = null!;
-
+    // 1 tài xế có thể có nhiều xe
+    public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }

@@ -1,2 +1,0 @@
-những class này để cho system sử dụng để 'trao đổi dữ liệu'
-ví dụ login cần loginDto để có thể lưu tạm giá trị của email & password

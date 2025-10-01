@@ -1,9 +1,0 @@
-controller dùng để chuyển hướng url ví dụ:
-+ trong class Account : ta có 
-
-[HttpPost("register")] 
-    public User Register(String email, password){}
-
-thì chỉ cần đổi url  //...api/account/register thì tự động nhảy trang
-
-

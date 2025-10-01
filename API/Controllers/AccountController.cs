@@ -1,87 +1,131 @@
-using System.Security.Cryptography;
-using System.Text;
-using API.Data;
-using API.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using API.DTOs.Account;
 using API.Entities;
 using API.Interfaces;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-namespace API.Controllers;
-// url: http/api/account
-public class AccountController(AppDbContext context, ITokenService tokenService) : BaseApiController
+using Microsoft.EntityFrameworkCore.Storage;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
+
+namespace API.Controllers
 {
-
-    [HttpPost("login")] //account/login
-    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto) //login by email & password
+    [Route("api/account")]
+    [ApiController]
+    public class AccountController : ControllerBase
     {
-        var user = await context.Users.SingleOrDefaultAsync(x =>
-        x.Email == loginDto.Email);         //FirstOrDefaultAsync-> return User if true, else null
-                                            // tìm user theo tên sau đó mới xét tới password
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenService _tokenService;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        if (user == null) return Unauthorized("Invalid email or password"); // néu sai ten -> obj user = null
-
-        using var hmac = new HMACSHA512(user.PasswordSalt);            //tim dung cthuc da ma khoa ->  
-
-        var ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));//tim duoc cthuc, thi ma khoa again rồi ss , ss password de sosanh chuoi password trong db
-
-        for (int i = 0; i < ComputeHash.Length; i++)
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
         {
-            if (ComputeHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password"); // nếu 1 ký tự nào khác
+            _userManager = userManager;
+            _tokenService = tokenService;
+            _signInManager = signInManager;
         }
-        var userDto = new UserDto
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            Id = user.Id,
-            Username = user.UserName,
-            Email = user.Email,
-            Token = tokenService.CreateToken(user)
-        };
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        return userDto;
-    }
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
 
+            if (user == null)
+            {
+                return Unauthorized("Invalid username!");
+            }
 
-    [HttpPost("register")] // account/register
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
-    public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
-    {
-        if (await EmailExists(registerDto.Email)) return BadRequest("Email has been registered");
-        if (await UserExists(registerDto.Username)) return BadRequest("Username is taken");
-        if (this.validPassword(registerDto.Password)) return BadRequest("Password length must be greater than or equal to 12");
+            if (!result.Succeeded)
+            {
+                return Unauthorized("Username not found and/or password incorrect");
+            }
 
-
-        using var hmac = new HMACSHA512();
-
-        var user = new AppUser
+            return Ok(
+                new NewUserDto
+                {
+                    Username = user.UserName,
+                    Email = user.Email,
+                    Token = await _tokenService.CreateToken(user)
+                }
+            );
+        }
+        
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            UserName = registerDto.Username.ToLower(),
-            Email = registerDto.Email,
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-            PasswordSalt = hmac.Key
-        };
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-        var userDto = new UserDto
-        {
-            Id = user.Id,
-            Username = user.UserName,
-            Email = user.Email,
-            Token = tokenService.CreateToken(user)
-        };
-        return userDto;
-    }
+                if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
+                {
+                    return BadRequest("Email already in use");
+                }
 
-    private async Task<bool> UserExists(string UserName)
-    {
-        return await context.Users.AnyAsync(x => x.UserName.ToLower() == UserName.ToLower());
-    }
-     private async Task<bool> EmailExists(string Email)
-    {
-        return await context.Users.AnyAsync(x => x.Email.ToLower() == Email.ToLower());
-    }
-    
-    private bool validPassword(string password)
-    {
-        return password.Length < 4;
+                // Tạo user
+                var appUser = new AppUser
+                {
+                    UserName = registerDto.Username,
+                    Email = registerDto.Email,
+                    FullName = registerDto.FullName,
+                    Age = registerDto.Age
+                };
+
+                // Thêm danh sách xe
+                foreach (var v in registerDto.Vehicles)
+                {
+                    appUser.Vehicles.Add(new Vehicle
+                    {
+                        Model = v.Model,
+                        Type = v.Type,
+                        BatteryCapacityKWh = v.BatteryCapacityKWh,
+                        MaxChargingPowerKW = v.MaxChargingPowerKW,
+                        ConnectorType = v.ConnectorType
+                    });
+                }
+
+                // Tạo user trong Identity
+                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+
+                if (!createdUser.Succeeded)
+                {
+                    return BadRequest(createdUser.Errors);
+                }
+
+                // Gán role mặc định
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+
+                if (!roleResult.Succeeded)
+                {
+                    return BadRequest(roleResult.Errors);
+                }
+
+                // Trả về dữ liệu user và token
+                return Ok(new NewUserDto
+                {
+                    Username = appUser.UserName,
+                    Email = appUser.Email,
+                    Token = await _tokenService.CreateToken(appUser)
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
