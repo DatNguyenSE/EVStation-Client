@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace API.Controllers
@@ -55,7 +56,7 @@ namespace API.Controllers
                 {
                     Username = user.UserName,
                     Email = user.Email,
-                    Token = _tokenService.CreateToken(user)
+                    Token = await _tokenService.CreateToken(user)
                 }
             );
         }
@@ -65,43 +66,63 @@ namespace API.Controllers
         {
             try
             {
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
+                if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
+                {
+                    return BadRequest("Email already in use");
+                }
+
+                // Tạo user
                 var appUser = new AppUser
                 {
                     UserName = registerDto.Username,
-                    Email = registerDto.Email
+                    Email = registerDto.Email,
+                    FullName = registerDto.FullName,
+                    Age = registerDto.Age
                 };
 
+                // Thêm danh sách xe
+                foreach (var v in registerDto.Vehicles)
+                {
+                    appUser.Vehicles.Add(new Vehicle
+                    {
+                        Model = v.Model,
+                        Type = v.Type,
+                        BatteryCapacityKWh = v.BatteryCapacityKWh,
+                        MaxChargingPowerKW = v.MaxChargingPowerKW,
+                        ConnectorType = v.ConnectorType
+                    });
+                }
+
+                // Tạo user trong Identity
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
-                if(createdUser.Succeeded)
+                if (!createdUser.Succeeded)
                 {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-                    if(roleResult.Succeeded)
-                    {
-                        return Ok(
-                            new NewUserDto
-                            {
-                                Username = appUser.UserName,
-                                Email = appUser.Email,
-                                Token = _tokenService.CreateToken(appUser)
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
+                    return BadRequest(createdUser.Errors);
                 }
-                else
+
+                // Gán role mặc định
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+
+                if (!roleResult.Succeeded)
                 {
-                    return StatusCode(500, createdUser.Errors);
+                    return BadRequest(roleResult.Errors);
                 }
-            } catch (Exception ex)
+
+                // Trả về dữ liệu user và token
+                return Ok(new NewUserDto
+                {
+                    Username = appUser.UserName,
+                    Email = appUser.Email,
+                    Token = await _tokenService.CreateToken(appUser)
+                });
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

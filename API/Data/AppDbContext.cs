@@ -7,14 +7,23 @@ using Microsoft.AspNetCore.Identity;
 
 public class AppDbContext : IdentityDbContext<AppUser>
 {
-    public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
-    {
+    public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { } 
 
-    }
+    public DbSet<Vehicle> Vehicles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<Vehicle>()
+            .HasIndex(v => v.Plate)
+            .IsUnique();
+
+        builder.Entity<Vehicle>()
+            .HasOne(v => v.Owner)
+            .WithMany(u => u.Vehicles)
+            .HasForeignKey(v => v.OwnerId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Seed Roles
         List<IdentityRole> roles = new List<IdentityRole>
@@ -38,28 +47,29 @@ public class AppDbContext : IdentityDbContext<AppUser>
         builder.Entity<IdentityRole>().HasData(roles);
 
         // Seed Admin User
-        var hasher = new PasswordHasher<AppUser>();
+        // var hasher = new PasswordHasher<AppUser>();
 
-        var adminUser = new AppUser
-        {
-            Id = "100",
-            UserName = "admin",
-            NormalizedUserName = "ADMIN",
-            Email = "admin@gmail.com",
-            NormalizedEmail = "ADMIN@GMAIL.COM",
-            EmailConfirmed = true,
-            SecurityStamp = Guid.NewGuid().ToString("D")
-        };
+        // var adminUser = new AppUser
+        // {
+        //     Id = "100",
+        //     UserName = "admin",
+        //     NormalizedUserName = "ADMIN",
+        //     Email = "admin@gmail.com",
+        //     NormalizedEmail = "ADMIN@GMAIL.COM",
+        //     EmailConfirmed = true,
+        //     FullName = "System Administrator",
+        //     Age = 30   
+        // };
 
-        adminUser.PasswordHash = hasher.HashPassword(adminUser, "Admin@123");
+        // adminUser.PasswordHash = hasher.HashPassword(adminUser, "Admin@123");
 
-        builder.Entity<AppUser>().HasData(adminUser);
+        // builder.Entity<AppUser>().HasData(adminUser);
 
         // Gan role Admin cho user nay
-        builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-        {
-            RoleId = "1",
-            UserId = "100"
-        });
+        // builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+        // {
+        //     RoleId = "1",
+        //     UserId = "100"
+        // });
     }
 }

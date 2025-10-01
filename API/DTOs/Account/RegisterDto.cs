@@ -3,19 +3,31 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using API.DTOs.Vehicle;
 
 namespace API.DTOs.Account
 {
     public class RegisterDto
     {
         [Required]
-        public string? Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string? Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
-        public string? Password { get; set; }
+        public string Password { get; set; } = string.Empty;
+
+        // Thông tin cá nhân
+        [Required]
+        public string FullName { get; set; } = string.Empty;
+        [Required]
+        [Range(16,100,ErrorMessage = "Age must greater than 16")]
+        public int Age { get; set; }
+
+        // Danh sách xe
+        [Required]
+        public List<VehicleDto> Vehicles { get; set; } = new();
     }
 }
