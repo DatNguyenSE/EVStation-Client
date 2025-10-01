@@ -9,8 +9,8 @@ import { RegisterCreds } from '../../../_models/user';
   selector: 'app-register',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  templateUrl: './register.html',
+  styleUrl: './register.css'
 })
 export class Register{
   private accountService = inject(AccountService)
@@ -30,7 +30,11 @@ export class Register{
       next: response => {
         console.log(response);
       },
-         error: (error: any) => console.log(error)
+         error: (error: any) =>{
+          console.log('Error details:', error.error);
+          console.log('Form data:', this.creds);
+         }
+         
     })
   }
 

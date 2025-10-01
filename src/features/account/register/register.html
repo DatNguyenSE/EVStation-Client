@@ -3,7 +3,7 @@
 
     <!-- Left side -->
     <div class="hidden md:flex w-1/2 bg-gradient-to-b from-purple-600 to-purple-800 flex-col items-center justify-center text-white p-10">
-      <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
+       <img src="/assets/logo3.png" alt="user avatar" class="w-19 h-13 sm:w-19 sm:h-13 mb-6">
       <h2 class="text-3xl font-bold mb-4">Chào mừng</h2>
       <p class="text-center text-blue-100 text-lg">
         Tạo tài khoản để trải nghiệm dịch vụ trạm sạc xe điện nhanh chóng và tiện lợi!
@@ -15,7 +15,7 @@
       <h3 class="text-2xl font-bold text-center text-gray-700 mb-6">Tạo tài khoản mới</h3>
       <form #registerForm="ngForm" class="flex flex-col gap-4" (ngSubmit)="register()">
 
-        <input type="text" name="displayName"
+        <input type="text" name="username"
           [(ngModel)]="creds.username"
           placeholder="Tên hiển thị"
           autocomplete="off"
@@ -24,6 +24,18 @@
         <input type="email" name="email"
           [(ngModel)]="creds.email"
           placeholder="Email"
+          autocomplete="off"
+          class="input input-bordered w-full rounded-lg font-medium">
+
+         <input type="number" name="age"
+          [(ngModel)]="creds.age"
+          placeholder="Tuổi"
+          autocomplete="off"
+          class="input input-bordered w-full rounded-lg font-medium">
+
+        <input type="text" name="fullname"
+          [(ngModel)]="creds.fullname"
+          placeholder="Họ và tên"
           autocomplete="off"
           class="input input-bordered w-full rounded-lg font-medium">
 

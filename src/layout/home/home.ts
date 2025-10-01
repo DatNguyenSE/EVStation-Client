@@ -14,8 +14,8 @@ import { Login } from "../../features/account/login/login";
   selector: 'app-home',
   standalone: true,
   imports: [SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule, Login],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  templateUrl: './home.html',
+  styleUrl: './home.css'
 })
 export class Home {
   protected registerMode = signal(false);

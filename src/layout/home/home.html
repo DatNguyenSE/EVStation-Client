@@ -6,7 +6,7 @@
         <app-slide-carousel></app-slide-carousel>
 
         <!-- Dashboard -->
-        <div class="pb-5 bg-gray-50 mt-6 px-15">
+        <div class="pb-5 bg-gray-50 mt-6 px-15 ">
             <div class="max-w-full">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white rounded-xl shadow p-6 lg:col-span-2">
@@ -15,7 +15,7 @@
                     <!-- Quick Actions -->
                     <div class="bg-white rounded-xl shadow p-6 space-y-2">
                         <img class="w-full h-10/12 rounded-lg" src="/assets/map.png">
-                        <button class="mt-1.5 w-full bg-blue-400 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">🔍
+                        <button class="mt-1.5 w-full bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg">🔍
                             Tìm
                             trạm
                             sạc</button>
@@ -27,17 +27,17 @@
         <div class="mb-20 bg-gray-50 px-15">
             <!-- More information -->
 
-            <div class="flex border-b mb-4">
+            <div class="flex border-b mb-4 ">
 
                 <button (click)="changeTab('news')"
                     [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='news','text-gray-500':activeTab!=='news'}"
-                    class="px-4 py-2">Tin tức</button>
+                    class="px-4 py-2 cursor-pointer">Tin tức</button>
                 <button (click)="changeTab('contact')"
                     [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='contact','text-gray-500':activeTab!=='contact'}"
-                    class="px-4 py-2">Liên hệ</button>
+                    class="px-4 py-2 cursor-pointer">Liên hệ</button>
                 <button (click)="changeTab('instruction')"
                     [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='instruction','text-gray-500':activeTab!=='instruction'}"
-                    class="px-4 py-2">Hướng dẫn sử dụng</button>
+                    class="px-4 py-2 cursor-pointer">Hướng dẫn sử dụng</button>
             </div>
 
             <!-- contact -->

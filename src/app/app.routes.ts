@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../core/_guards/auth.guard';
-import { Home } from '../layout/home/home.component';
+import { Home } from '../layout/home/home';
 import { Notification } from '../features/notification/notification';
 import { Payment } from '../features/payment/payment';
 import { ServiceList } from '../features/service-list/service-list';
