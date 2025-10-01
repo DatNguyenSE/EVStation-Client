@@ -1,0 +1,58 @@
+<div class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white shadow-2xl rounded-2xl flex w-full max-w-5xl overflow-hidden">
+
+    <!-- Left side -->
+    <div class="hidden md:flex w-1/2 bg-gradient-to-b from-purple-600 to-purple-800 flex-col items-center justify-center text-white p-10">
+      <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
+      <h2 class="text-3xl font-bold mb-4">Chào mừng</h2>
+      <p class="text-center text-blue-100 text-lg">
+        Tạo tài khoản để trải nghiệm dịch vụ trạm sạc xe điện nhanh chóng và tiện lợi!
+      </p>
+    </div>
+
+    <!-- Right side: Register form -->
+    <div class="w-full md:w-1/2 p-10">
+      <h3 class="text-2xl font-bold text-center text-gray-700 mb-6">Tạo tài khoản mới</h3>
+      <form #registerForm="ngForm" class="flex flex-col gap-4" (ngSubmit)="register()">
+
+        <input type="text" name="displayName"
+          [(ngModel)]="creds.username"
+          placeholder="Tên hiển thị"
+          autocomplete="off"
+          class="input input-bordered w-full rounded-lg font-medium">
+
+        <input type="email" name="email"
+          [(ngModel)]="creds.email"
+          placeholder="Email"
+          autocomplete="off"
+          class="input input-bordered w-full rounded-lg font-medium">
+
+        <input type="password" name="password"
+          [(ngModel)]="creds.password"
+          placeholder="Mật khẩu"
+          autocomplete="off"
+          class="input input-bordered w-full rounded-lg font-medium">
+
+             <div class="flex justify-between items-center mt-2">
+          <label class="flex items-center gap-2 text-sm text-gray-600">
+            <input type="checkbox" name="terms" [(ngModel)]="acceptedTerms" class="checkbox checkbox-primary">
+            Tôi đồng ý với 
+            <a href="#" (click)="openTerms($event)" class="text-purple-600 font-semibold hover:underline">
+              Điều khoản dịch vụ
+            </a>
+          </label>
+        </div>
+
+        <button type="submit"
+          class="w-full mt-4 py-3 rounded-lg text-lg font-bold text-white bg-purple-700 hover:bg-purple-800">
+          Đăng ký
+        </button>
+
+        <p class="text-sm text-center text-gray-600 mt-4">
+          Bạn đã có tài khoản?
+          <a (click)="cancel()" class="text-blue-700 font-semibold hover:underline cursor-pointer">Đăng nhập</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
