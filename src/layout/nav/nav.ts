@@ -18,18 +18,6 @@ export class Nav {
     this.accountService.logout();
   }
 
-  // thêm biến quản lý menu mobile
-  isMenuOpen = false;
-  isMobile = window.innerWidth < 640; // sm:640px trong Tailwind
-
-  // lắng nghe resize để cập nhật lại isMobile
-  @HostListener('window:resize', ['$event'])
-  onResize(event: Event) {
-    this.isMobile = (event.target as Window).innerWidth < 640;
-    // nếu lên desktop thì auto đóng menu
-    if (!this.isMobile) {
-      this.isMenuOpen = false;
-    }
-  }
+  
 
 }
