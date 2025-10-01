@@ -1,4 +1,11 @@
 <app-nav></app-nav> 
-<app-slide-carousel></app-slide-carousel>
-<app-renter-dashboard></app-renter-dashboard>
+
+<div 
+    [class.mt-24]="router.url !== '/'"
+    [class.container]="router.url !== '/'"
+    [class.mx-auto]="router.url !== '/'"
+>
+    <router-outlet ></router-outlet>
+</div>
+
 <app-footer></app-footer>
