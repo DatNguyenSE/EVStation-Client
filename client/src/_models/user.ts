@@ -14,5 +14,7 @@ export type LoginCreds = {
 export type RegisterCreds = {
     email: string;
     username: string;
+    fullname: string;
+    age: number;
     password: string;
 }

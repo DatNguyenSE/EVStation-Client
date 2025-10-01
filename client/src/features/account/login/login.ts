@@ -2,7 +2,7 @@ import { Component, inject, output, signal } from '@angular/core';
 import { AccountService } from '../../../core/service/account-service';
 import { LoginCreds } from '../../../_models/user';
 import { FormsModule } from '@angular/forms';
-import { Register } from "../register/register.component";
+import { Register } from "../register/register";
 
 @Component({
   selector: 'app-login',

@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Identity;
 
 public class AppDbContext : IdentityDbContext<AppUser>
 {
-    public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { } 
+    public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+    {
+        
+    } 
 
     public DbSet<Vehicle> Vehicles { get; set; }
 
