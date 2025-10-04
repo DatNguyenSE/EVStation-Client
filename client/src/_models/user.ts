@@ -1,9 +1,17 @@
-export type User = {
+export type Account = {
     id: string;
     username: string;
     email: string;
     token: string;
-    imageUrl?: string;
+}
+
+export type User = {
+    id: string
+    userName: string;
+    email: string;
+    age: number;
+    fullName: string;
+    roles: string[];
 }
 
 export type LoginCreds = {

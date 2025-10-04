@@ -54,6 +54,7 @@ namespace API.Controllers
             return Ok(
                 new NewUserDto
                 {
+                    Id = user.Id,
                     Username = user.UserName,
                     Email = user.Email,
                     Token = await _tokenService.CreateToken(user)
@@ -117,6 +118,7 @@ namespace API.Controllers
                 // Trả về dữ liệu user và token
                 return Ok(new NewUserDto
                 {
+                    Id = appUser.Id,
                     Username = appUser.UserName,
                     Email = appUser.Email,
                     Token = await _tokenService.CreateToken(appUser)
