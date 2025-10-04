@@ -5,6 +5,7 @@ using API.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
+
 public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
@@ -13,6 +14,8 @@ public class AppDbContext : IdentityDbContext<AppUser>
     } 
 
     public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<Station> Stations { get; set; }
+    public DbSet<ChargingPost> Posts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -27,6 +30,10 @@ public class AppDbContext : IdentityDbContext<AppUser>
             .WithMany(u => u.Vehicles)
             .HasForeignKey(v => v.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ChargingPost>()
+            .Property(p => p.PowerKW)
+            .HasPrecision(5, 2);
 
         // Seed Roles
         List<IdentityRole> roles = new List<IdentityRole>

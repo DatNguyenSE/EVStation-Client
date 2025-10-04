@@ -98,6 +98,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IStationRepository, StationRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 
 var app = builder.Build();
 

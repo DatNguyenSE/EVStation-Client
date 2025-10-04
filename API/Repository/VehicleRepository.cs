@@ -24,6 +24,13 @@ namespace API.Repository
             return vehicleModel;
         }
 
+        public async Task<bool> DeactivateVehicleAsync(Vehicle vehicle)
+        {
+            vehicle.IsActive = false;
+            _context.Vehicles.Update(vehicle);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
         public async Task<Vehicle?> GetVehicleByIdAsync(int id)
         {
             return await _context.Vehicles.FindAsync(id);
@@ -32,7 +39,7 @@ namespace API.Repository
         public async Task<IEnumerable<Vehicle>> GetVehiclesByUserAsync(string userId)
         {
             return await _context.Vehicles
-                        .Where(v => v.OwnerId == userId)
+                        .Where(v => v.OwnerId == userId && v.IsActive)
                         .ToListAsync();
         }
 
@@ -51,7 +58,7 @@ namespace API.Repository
         // kiểm tra user đã có loại xe đó chưa
         public async Task<bool> UserHasVehicleTypeAsync(string userId, string type)
         {
-            return await _context.Vehicles.AnyAsync(v => v.OwnerId == userId && v.Type == type);
+            return await _context.Vehicles.AnyAsync(v => v.OwnerId == userId && v.Type == type && v.IsActive);
         }
-    }
+    } 
 }

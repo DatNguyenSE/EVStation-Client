@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
@@ -101,7 +102,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateVehicle([FromRoute] int id, [FromBody] VehicleUpdateDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            
+
             var username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return Unauthorized();
@@ -137,12 +138,41 @@ namespace API.Controllers
 
             var success = await _vehicleRepo.UpdateVehicleAsync(vehicle);
             if (!success) return BadRequest("Cập nhật xe thất bại.");
-            
+
             return Ok(new
             {
                 message = "Cập nhật xe thành công",
                 vehicle = vehicle.ToVehicleResponseDto()
             });
+        }
+
+        [HttpDelete("my/{id}")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> DeactivateVehicle([FromRoute] int id)
+        {
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null) return Unauthorized();
+
+            var vehicle = await _vehicleRepo.GetVehicleByIdAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound("Không tìm thấy xe");
+            }
+
+            if (vehicle.OwnerId != appUser.Id)
+            {
+                return Forbid("Bạn không có quyền thao tác trên xe này.");
+            }
+
+            if (!vehicle.IsActive)
+            {
+                return BadRequest("Xe này đã bị vô hiệu hóa trước đó.");
+            }
+
+            var success = await _vehicleRepo.DeactivateVehicleAsync(vehicle);
+            if (!success) return BadRequest("Vô hiệu hóa xe thất bại.");
+            return Ok(new { message = "Xe đã được vô hiệu hóa (inactive)." });
         }
     }
 }
