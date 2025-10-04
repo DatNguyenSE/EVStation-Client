@@ -14,5 +14,6 @@ namespace API.Interfaces
         Task<Vehicle?> GetVehicleByIdAsync(int id);
         Task<bool> UpdateVehicleAsync(Vehicle vehicle);
         Task<bool> PlateExistsAsync(string plate, int? excludeVehicleId = null);
+        Task<bool> DeactivateVehicleAsync(Vehicle vehicle);
     }
 }
