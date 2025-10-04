@@ -4,6 +4,9 @@ import { Home } from '../layout/home/home';
 import { Notification } from '../features/notification/notification';
 import { Payment } from '../features/payment/payment';
 import { ServiceList } from '../features/service-list/service-list';
+import { Contact } from '../layout/more-information/contact/contact';
+import { Instruction } from '../layout/more-information/instruction/instruction';
+import { News } from '../layout/more-information/news/news';
 
 export const routes: Routes = [
      { path: '', component: Home },
@@ -17,6 +20,9 @@ export const routes: Routes = [
             {path:'thong-bao',component:Notification},
         ]
     },
+        {path: 'lien-he',component:Contact},
+        {path: 'huong-dan',component:Instruction},
+        {path: 'tin-tuc',component:News},
 
     // { path :'errors', component: TestErrors},
     // { path :'server-error', component: ServerErrorComponent},
