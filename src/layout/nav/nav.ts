@@ -13,7 +13,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class Nav {
   accountService = inject(AccountService);
   protected creds: any = {}
-
+  
   logout() {
     this.accountService.logout();
   }

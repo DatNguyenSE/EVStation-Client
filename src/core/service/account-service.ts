@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../../_models/user';
 import { map } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   private http = inject(HttpClient);
-  
+  protected router = inject(Router);
   baseUrl = 'https://localhost:5001/api/';
   currentUser = signal<User | null>(null);
 
@@ -38,6 +39,7 @@ export class AccountService {
   logout() {
     localStorage.removeItem("user");
     this.currentUser.set(null);
+      this.router.navigate(['/']);
   }
 
 }
