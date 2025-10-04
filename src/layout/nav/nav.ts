@@ -1,7 +1,9 @@
-import { Component, inject, HostListener } from '@angular/core';
+import { Component, inject, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { UserService } from '../../core/service/user-service';
+import { User } from '../../_models/user';
 
 
 @Component({
@@ -13,9 +15,25 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class Nav {
   accountService = inject(AccountService);
   protected creds: any = {}
+
+    userService = inject(UserService); 
+    routers = inject(Router);
   
   logout() {
     this.accountService.logout();
+    this.routers.navigateByUrl('/' );
+  }
+
+  profile() {
+    const id = this.accountService.currentAccount()?.id;
+    if (!id) return; // không có id thì không gọi API
+
+    this.userService.profile(id).subscribe({
+      next: user => {
+        this.userService.currentUser.set(user);
+         this.routers.navigateByUrl('/tai-khoan');
+      }  
+    })
   }
 
    // thêm biến quản lý menu mobile

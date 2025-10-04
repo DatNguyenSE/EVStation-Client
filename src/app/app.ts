@@ -10,6 +10,7 @@ import { Router, RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+
 export class App {
   protected router = inject(Router);
 

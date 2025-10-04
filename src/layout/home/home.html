@@ -1,5 +1,5 @@
 <div class="hero bg-base-200 min-h-screen">
-    @if(account.currentUser()) {
+    @if(account.currentAccount()) {
     <!-- Layout khi đã login -->
     <div class="pt-20">
         <!-- Slider -->
@@ -59,7 +59,12 @@
     </div>
 
     }@else{
-        <app-login></app-login>
+    <div class="relative hero min-h-screen bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950 overflow-hidden">
+        <!-- Pattern background -->
+        <div class="absolute inset-0 bg-[url('/assets/bank-note.svg')] bg-cover  opacity-20"></div>
+        <app-login class="relative z-10"></app-login>
+    </div>
+
     }
 
 </div>

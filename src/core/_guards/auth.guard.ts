@@ -7,7 +7,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const accountService = inject(AccountService);
   // const toastr = inject(ToastrService);
 
-  if(accountService.currentUser()) {
+  if(accountService.currentAccount()) {
     return true;
   }else{
     // toastr.error('You shall not pass!');

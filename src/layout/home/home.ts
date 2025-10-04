@@ -20,7 +20,7 @@ import { Login } from "../../features/account/login/login";
 export class Home {
   protected registerMode = signal(false);
   account = inject(AccountService);
-  currentUser = this.account.currentUser;
+  currentAccount = this.account.currentAccount;
 
   showRegister(value: boolean) {
     this.registerMode.set(value);
