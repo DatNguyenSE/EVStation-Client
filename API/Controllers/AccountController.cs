@@ -51,19 +51,26 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            
+            // Tìm user theo username
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
 
             if (user == null)
             {
-                return Unauthorized("Invalid username!");
+                return Unauthorized("Tên đăng nhập không hợp lệ.");
+            }
+
+            // Kiểm tra đã xác thực email chưa
+            if (!user.EmailConfirmed)
+            {
+                return Unauthorized("Bạn cần xác thực email trước khi đăng nhập.");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!result.Succeeded)
             {
-                return Unauthorized("Username not found and/or password incorrect");
+                return Unauthorized("Tên đăng nhập hoặc mật khẩu không chính xác.");
             }
 
             return Ok(
@@ -72,7 +79,8 @@ namespace API.Controllers
                     Id = user.Id,
                     Username = user.UserName,
                     Email = user.Email,
-                    Token = await _tokenService.CreateToken(user)
+                    Token = await _tokenService.CreateToken(user),
+                    EmailConfirmed = user.EmailConfirmed
                 }
             );
         }
@@ -85,11 +93,36 @@ namespace API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }   
+
+                // Kiểm tra username đã tồn tại chưa
+                var existingUserByUsername = await _userManager.FindByNameAsync(registerDto.Username);
+                if (existingUserByUsername != null)
+                {
+                    if (!existingUserByUsername.EmailConfirmed)
+                    {
+                        // Xóa user cũ chưa xác thực
+                        await _userManager.DeleteAsync(existingUserByUsername);
+                    }
+                    else
+                    {
+                        return BadRequest("Username is already in use");
+                    }
                 }
 
-                if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
+                // Kiểm tra email đã tồn tại chưa
+                var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
+                if (existingUserByEmail != null)
                 {
-                    return BadRequest("Email already in use");
+                    if (!existingUserByEmail.EmailConfirmed)
+                    {
+                        // Xóa user cũ chưa xác thực
+                        await _userManager.DeleteAsync(existingUserByEmail);
+                    }
+                    else
+                    {
+                        return BadRequest("Email is already in use");
+                    }
                 }
 
                 // Tạo user
@@ -151,22 +184,9 @@ namespace API.Controllers
                 {
                     _logger.LogError(ex, $"Failed to send confirmation email to {appUser.Email}");
                     
-                    // Xóa user nếu không gửi được email (tùy chọn)
+                    // Xóa user nếu không gửi được email 
                     await _userManager.DeleteAsync(appUser);
                     return StatusCode(500, new { message = "Failed to send confirmation email. Please try again." });
-                    
-                    // Hoặc cho phép user tồn tại nhưng báo lỗi
-                    // return Ok(new
-                    // {
-                    //     message = "User created successfully but failed to send confirmation email. Please use resend confirmation endpoint.",
-                    //     user = new
-                    //     {
-                    //         id = appUser.Id,
-                    //         username = appUser.UserName,
-                    //         email = appUser.Email,
-                    //         emailConfirmed = false
-                    //     }
-                    // });
                 }
 
                 // Trả về dữ liệu user và token
