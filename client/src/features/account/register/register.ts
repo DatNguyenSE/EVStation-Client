@@ -2,13 +2,14 @@ import { Component, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../core/service/account-service';
 import { RegisterCreds } from '../../../_models/user';
+import { CommonModule } from '@angular/common';
 
 
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
@@ -18,7 +19,7 @@ export class Register{
   // @Output() cancelRegister = new EventEmitter();
   cancelRegister = output<boolean>();   //out event         // <! pratice load data 'child to parent' -->
   protected creds = {} as RegisterCreds;
-
+  showPassword: boolean = false;
   register(){
 
     if (!this.acceptedTerms) {
@@ -46,5 +47,9 @@ export class Register{
   event.preventDefault();
   alert("Điều khoản sử dụng: ..."); 
   // hoặc bạn có thể mở modal riêng để hiển thị chi tiết
+}
+
+togglePassword() {
+  this.showPassword = !this.showPassword;
 }
 }

@@ -1,10 +1,11 @@
 <div class="min-h-screen flex items-center justify-center p-4 pt-24">
-  <div class="bg-white shadow-2xl rounded-2xl flex w-full max-w-5xl overflow-hidden ">
+  <div class="bg-white shadow-2xl rounded-2xl flex w-full max-w-5xl overflow-hidden">
 
     <!-- Left side -->
-    <div class="hidden md:flex w-1/2 bg-gradient-to-b from-blue-600 to-blue-900 flex-col items-center justify-center text-white p-10">
-            <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
-      <h2 class="text-3xl font-bold mb-4">Chào mừng</h2>
+    <div
+      class="hidden md:flex w-1/2 bg-gradient-to-b from-blue-600 to-blue-900 flex-col items-center justify-center text-white p-10">
+      <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
+      <h2 class="text-3xl font-bold mb-4">Xin chào</h2>
       <p class="text-center text-blue-100 text-lg">
         Tạo tài khoản để trải nghiệm dịch vụ trạm sạc xe điện nhanh chóng và tiện lợi!
       </p>
@@ -15,40 +16,52 @@
       <h3 class="text-2xl font-bold text-center text-gray-700 mb-6">Tạo tài khoản mới</h3>
       <form #registerForm="ngForm" class="flex flex-col gap-4" (ngSubmit)="register()">
 
-        <input type="text" name="username"
-          [(ngModel)]="creds.username"
-          placeholder="Tên hiển thị"
-          autocomplete="off"
+        <input type="text" name="username" [(ngModel)]="creds.username" placeholder="Tên hiển thị" autocomplete="off"
           class="input input-bordered w-full rounded-lg font-medium">
 
-        <input type="email" name="email"
-          [(ngModel)]="creds.email"
-          placeholder="Email"
-          autocomplete="off"
+        <input type="email" name="email" [(ngModel)]="creds.email" placeholder="Email" autocomplete="off"
           class="input input-bordered w-full rounded-lg font-medium">
 
-         <input type="number" name="age"
-          [(ngModel)]="creds.age"
-          placeholder="Tuổi"
-          autocomplete="off"
+        <input type="text" name="fullname" [(ngModel)]="creds.fullname" placeholder="Họ và tên" autocomplete="off"
           class="input input-bordered w-full rounded-lg font-medium">
 
-        <input type="text" name="fullname"
-          [(ngModel)]="creds.fullname"
-          placeholder="Họ và tên"
-          autocomplete="off"
+        <!-- Ô nhập mật khẩu có nút hiện/ẩn -->
+        <div class="relative w-full">
+          <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="creds.password"
+            placeholder="Mật khẩu" autocomplete="off" class="input input-bordered w-full rounded-lg font-medium pr-10">
+
+          <!-- Nút con mắt -->
+          <button type="button" (click)="togglePassword()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+            <!-- Icon mắt đóng -->
+            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 
+                   9.542 7-1.274 4.057-5.065 7-9.542 7
+                   -4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+
+            <!-- Icon mắt mở -->
+            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19
+                   c-4.477 0-8.268-2.943-9.542-7
+                   a10.06 10.06 0 012.724-4.17m3.82-2.054
+                   A9.973 9.973 0 0112 5c4.477 0 8.268 2.943
+                   9.542 7a9.956 9.956 0 01-4.252 5.568M3 3l18 18" />
+            </svg>
+          </button>
+        </div>
+
+        <input type="number" name="age" [(ngModel)]="creds.age" placeholder="Tuổi" autocomplete="off"
           class="input input-bordered w-full rounded-lg font-medium">
 
-        <input type="password" name="password"
-          [(ngModel)]="creds.password"
-          placeholder="Mật khẩu"
-          autocomplete="off"
-          class="input input-bordered w-full rounded-lg font-medium">
-
-             <div class="flex justify-between items-center mt-2">
+        <div class="flex justify-between items-center mt-2">
           <label class="flex items-center gap-2 text-sm text-gray-600">
             <input type="checkbox" name="terms" [(ngModel)]="acceptedTerms" class="checkbox checkbox-primary">
-            Tôi đồng ý với 
+            Tôi đồng ý với
             <a href="#" (click)="openTerms($event)" class="text-blue-600 font-semibold hover:underline">
               Điều khoản dịch vụ
             </a>
