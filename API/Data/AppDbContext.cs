@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using API.Entities.Wallet;
 
 
 public class AppDbContext : IdentityDbContext<AppUser>
@@ -14,8 +15,10 @@ public class AppDbContext : IdentityDbContext<AppUser>
     } 
 
     public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<WalletTransaction> WalletTransactions { get; set; }
     public DbSet<Station> Stations { get; set; }
-    public DbSet<ChargingPost> Posts { get; set; }
+    public DbSet<ChargingPost> Posts { get; set; }  
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -30,6 +33,11 @@ public class AppDbContext : IdentityDbContext<AppUser>
             .WithMany(u => u.Vehicles)
             .HasForeignKey(v => v.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Wallet>()
+                .HasOne(w => w.appUser)
+                .WithOne()
+                .HasForeignKey<Wallet>(w => w.UserId);
 
         builder.Entity<ChargingPost>()
             .Property(p => p.PowerKW)

@@ -10,6 +10,7 @@ using API.Services;
 using API.Repository;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
+using API.Entities.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,13 +65,16 @@ builder.Services.AddCors();     //allow client connect to API
 // config for password
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
+    options.SignIn.RequireConfirmedEmail = true;
+
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 12;
 })
-.AddEntityFrameworkStores<AppDbContext>();
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -96,10 +100,20 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
 builder.Services.AddScoped<IStationRepository, StationRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
+
+// Cấu hình Email Settings
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+// Đăng ký Email Service
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Connect VnPay API
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 var app = builder.Build();
 
