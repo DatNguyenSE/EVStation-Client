@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../core/service/account-service';
 import { RegisterCreds } from '../../../_models/user';
 import { CommonModule } from '@angular/common';
+import { ToastService } from '../../../core/service/toast-service';
 
 
 
@@ -13,43 +14,46 @@ import { CommonModule } from '@angular/common';
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
-export class Register{
+export class Register {
   private accountService = inject(AccountService)
   acceptedTerms: boolean = false;
   // @Output() cancelRegister = new EventEmitter();
   cancelRegister = output<boolean>();   //out event         // <! pratice load data 'child to parent' -->
   protected creds = {} as RegisterCreds;
+  private toast = inject(ToastService);
   showPassword: boolean = false;
-  register(){
+
+  register() {
 
     if (!this.acceptedTerms) {
-    alert("Bạn phải đồng ý với điều khoản trước khi đăng ký!");
-    return;
-  }
+      this.toast.error("Bạn phải đồng ý với điều khoản trước khi đăng ký!");
+      return;
+    }
 
     this.accountService.register(this.creds).subscribe({
       next: response => {
         console.log(response);
       },
-         error: (error: any) =>{
-          console.log('Error details:', error.error);
+      error: (err: any) => {
+          this.toast.error(err.error);
+          console.log('Error details:', err.error);
           console.log('Form data:', this.creds);
-         }
-         
+      }
+
     })
   }
 
   cancel() {
-   this.cancelRegister.emit(false);
+    this.cancelRegister.emit(false);
   }
 
-    openTerms(event: Event) {
-  event.preventDefault();
-  alert("Điều khoản sử dụng: ..."); 
-  // hoặc bạn có thể mở modal riêng để hiển thị chi tiết
-}
+  openTerms(event: Event) {
+    event.preventDefault();
+    alert("Điều khoản sử dụng: Đồng ý rằng bạn phải tuân thủ các quy định và điều kiện của chúng tôi.");
+    // hoặc bạn có thể mở modal riêng để hiển thị chi tiết
+  }
 
-togglePassword() {
-  this.showPassword = !this.showPassword;
-}
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 }

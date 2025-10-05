@@ -1,17 +1,19 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AccountService } from '../service/account-service';
-// import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../service/toast-service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const accountService = inject(AccountService);
-  // const toastr = inject(ToastrService);
+  const toastr = inject(ToastService);
+  const routers = inject(Router);
 
   if(accountService.currentAccount()) {
     return true;
   }else{
-    // toastr.error('You shall not pass!');
+    toastr.error('You shall not pass!');
     console.log('You shall not pass!');
+    routers.navigateByUrl('/');
     return false;
   }
 };

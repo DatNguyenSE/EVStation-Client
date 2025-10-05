@@ -3,6 +3,7 @@ export type Account = {
     username: string;
     email: string;
     token: string;
+    emailConfirmed: boolean;
 }
 
 export type User = {
