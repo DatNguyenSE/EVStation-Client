@@ -3,10 +3,11 @@ import { AccountService } from '../../../core/service/account-service';
 import { LoginCreds } from '../../../_models/user';
 import { FormsModule } from '@angular/forms';
 import { Register } from "../register/register";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Register],
+  imports: [FormsModule, Register, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -16,7 +17,8 @@ export class Login {
 
     protected creds: any = {} as LoginCreds;
     protected registerMode = signal(false);
-  
+    showPassword: boolean = false;
+
   login() {
     this.accountService.login(this.creds).subscribe({
       next: result => {
@@ -32,6 +34,10 @@ export class Login {
     this.registerMode.set(value);
   }
 
+  togglePassword() {
+  this.showPassword = !this.showPassword;
+}
+  
 
 
 }

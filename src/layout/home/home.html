@@ -1,19 +1,19 @@
-<div class="hero bg-base-200 min-h-screen">
+<div class="">
     @if(account.currentAccount()) {
     <!-- Layout khi đã login -->
-    <div class="pt-20">
+    <div>
         <!-- Slider -->
         <app-slide-carousel></app-slide-carousel>
 
         <!-- Dashboard -->
-        <div class="pb-5 bg-gray-50 mt-6 px-15 ">
+        <div class="pb-5 mt-6 px-7 ">
             <div class="max-w-full">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white rounded-xl shadow p-6 lg:col-span-2">
-                        <app-renter-dashboard></app-renter-dashboard>
+                    <div class="bg-blue-50  rounded-xl shadow p-6 lg:col-span-2">
+                        <app-vehicle></app-vehicle>
                     </div>
                     <!-- Quick Actions -->
-                    <div class="bg-white rounded-xl shadow p-6 space-y-2">
+                    <div class="bg-blue-50  rounded-xl shadow p-6 space-y-2">
                         <img class="w-full h-10/12 rounded-lg" src="/assets/map.png">
                         <button class="mt-1.5 w-full bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg">🔍
                             Tìm
@@ -24,10 +24,10 @@
             </div>
         </div>
 
-        <div class="mb-20 bg-gray-50 px-15">
+        <div class="mb-5 px-6 ">
             <!-- More information -->
 
-            <div class="flex border-b mb-4 ">
+            <div class="flex border-b border-gray-300 mb-4 space-x-6">
 
                 <button (click)="changeTab('news')"
                     [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='news','text-gray-500':activeTab!=='news'}"
