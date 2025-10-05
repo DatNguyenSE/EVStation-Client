@@ -31,6 +31,7 @@ export class AccountService {
       map(account => {                                                     //map() dùng để biến đổi dữ liệu.
         if(account) {
           localStorage.setItem("user", JSON.stringify(account)); // đổi về dạng object -> txtjson sau đó muốn lấy thì JSON.parse(localStorage.getItem("user")) 
+          // if (!account.emailConfirmed) return; // Mặc định email chưa được xác nhận
           this.currentAccount.set(account);
         }
         return account;

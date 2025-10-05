@@ -4,6 +4,7 @@ import { LoginCreds } from '../../../_models/user';
 import { FormsModule } from '@angular/forms';
 import { Register } from "../register/register";
 import { CommonModule } from '@angular/common';
+import { ToastService } from '../../../core/service/toast-service';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ export class Login {
 
     protected creds: any = {} as LoginCreds;
     protected registerMode = signal(false);
+    private toast = inject(ToastService);
     showPassword: boolean = false;
 
   login() {
@@ -25,7 +27,7 @@ export class Login {
         console.log(result),
         this.creds ={};
       },
-      error: error => alert(error.error)
+      error: error => this.toast.error(error.error)
     })
 
   }
