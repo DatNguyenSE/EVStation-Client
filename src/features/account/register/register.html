@@ -4,140 +4,88 @@
     <!-- Left side -->
     <div
       class="hidden md:flex w-1/2 bg-gradient-to-b from-blue-600 to-blue-900 flex-col items-center justify-center text-white p-10">
-      <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
-      <h2 class="text-3xl font-bold mb-4">Xin chào</h2>
+      <div
+        class="flex items-center gap-3 text-xl font-bold tracking-wide text-white hover:text-accent transition-colors duration-200 cursor-pointer pb-8">
+        <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 rounded-full shadow-md">
+        <span>EVolt<span class="text-accent text-2xl">Station</span></span>
+      </div>
       <p class="text-center text-blue-100 text-lg">
         Tạo tài khoản để trải nghiệm dịch vụ trạm sạc xe điện nhanh chóng và tiện lợi!
       </p>
     </div>
 
-    <!-- Right side: Register form -->
-    <div class="w-full md:w-1/2 p-10">
+    <!-- Right side -->
+    <div class="w-full md:w-1/2 p-10 flex flex-col justify-center">
       <h3 class="text-2xl font-bold text-center text-gray-700 mb-6">Tạo tài khoản mới</h3>
-      <form #registerForm="ngForm" class="flex flex-col gap-4" (ngSubmit)="register()" novalidate>
 
-  <!-- Tên hiển thị -->
-  <input
-    type="text"
-    name="username"
-    required
-    [(ngModel)]="creds.username"
-    placeholder="Tên hiển thị"
-    autocomplete="off"
-    #username="ngModel"
-    class="input input-bordered w-full rounded-lg font-medium"
-  />
+      <!-- ✅ Form đăng ký -->
+      <form *ngIf="!showConfirmMessage" #registerForm="ngForm" (ngSubmit)="register()" class="flex flex-col gap-4" novalidate>
 
-  <!-- Email -->
-  <input
-    type="email"
-    name="email"
-    required
-    [(ngModel)]="creds.email"
-    placeholder="Email"
-    autocomplete="off"
-    #email="ngModel"
-    class="input input-bordered w-full rounded-lg font-medium"
-  />
+        <input type="text" name="username" required [(ngModel)]="creds.username" placeholder="Tên hiển thị"
+          class="input input-bordered w-full rounded-lg font-medium" />
 
-  <!-- Họ và tên -->
-  <input
-    type="text"
-    name="fullname"
-    required
-    [(ngModel)]="creds.fullname"
-    placeholder="Họ và tên"
-    autocomplete="off"
-    #fullname="ngModel"
-    class="input input-bordered w-full rounded-lg font-medium"
-  />
+        <input type="email" name="email" required [(ngModel)]="creds.email" placeholder="Email"
+          class="input input-bordered w-full rounded-lg font-medium" />
 
-  <!-- Mật khẩu -->
-  <div class="relative w-full">
-    <input
-      [type]="showPassword ? 'text' : 'password'"
-      name="password"
-      required
-      [(ngModel)]="creds.password"
-      placeholder="Mật khẩu"
-      autocomplete="off"
-      #password="ngModel"
-      class="input input-bordered w-full rounded-lg font-medium pr-10"
-    />
-    <button
-      type="button"
-      (click)="togglePassword()"
-      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-    >
-      <!-- Mắt đóng -->
-      <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5
+        <input type="text" name="fullname" required [(ngModel)]="creds.fullname" placeholder="Họ và tên"
+          class="input input-bordered w-full rounded-lg font-medium" />
+
+        <!-- Mật khẩu -->
+        <div class="relative">
+          <input [type]="showPassword ? 'text' : 'password'" name="password" required [(ngModel)]="creds.password"
+            placeholder="Mật khẩu" class="input input-bordered w-full rounded-lg font-medium pr-10" />
+          <button type="button" (click)="togglePassword()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5
                  c4.477 0 8.268 2.943 9.542 7
                  -1.274 4.057-5.065 7-9.542 7
-                 -4.477 0-8.268-2.943-9.542-7z"/>
-      </svg>
-      <!-- Mắt mở -->
-      <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13.875 18.825A10.05 10.05 0 0112 19
+                 -4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13.875 18.825A10.05 10.05 0 0112 19
                  c-4.477 0-8.268-2.943-9.542-7
                  a10.06 10.06 0 012.724-4.17m3.82-2.054
                  A9.973 9.973 0 0112 5c4.477 0 8.268 2.943
-                 9.542 7a9.956 9.956 0 01-4.252 5.568M3 3l18 18"/>
-      </svg>
-    </button>
-  </div>
+                 9.542 7a9.956 9.956 0 01-4.252 5.568M3 3l18 18" />
+            </svg>
+          </button>
+        </div>
 
-  <!-- Tuổi -->
-  <input
-    type="number"
-    name="age"
-    required
-    min="1"
-    [(ngModel)]="creds.age"
-    placeholder="Tuổi"
-    autocomplete="off"
-    #age="ngModel"
-    class="input input-bordered w-full rounded-lg font-medium"
-  />
+        <input type="number" name="age" required min="1" [(ngModel)]="creds.age" placeholder="Tuổi"
+          class="input input-bordered w-full rounded-lg font-medium" />
 
-  <!-- Checkbox điều khoản -->
-  <div class="flex justify-between items-center mt-2">
-    <label class="flex items-center gap-2 text-sm text-gray-600">
-      <input
-        type="checkbox"
-        name="terms"
-        required
-        [(ngModel)]="acceptedTerms"
-        #terms="ngModel"
-        class="checkbox checkbox-primary"
-      />
-      Tôi đồng ý với
-      <a href="#" (click)="openTerms($event)" class="text-blue-600 font-semibold hover:underline">
-        Điều khoản dịch vụ
-      </a>
-    </label>
-  </div>
+        <!-- Điều khoản -->
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" name="terms" required [(ngModel)]="acceptedTerms" class="checkbox checkbox-primary" />
+          Tôi đồng ý với
+          <a href="#" (click)="openTerms($event)" class="text-blue-600 font-semibold hover:underline">
+            Điều khoản dịch vụ
+          </a>
+        </label>
 
-  <!-- Nút đăng ký -->
-  <button
-    type="submit"
-    [disabled]="registerForm.invalid"
-    class="w-full mt-4 py-2 rounded-lg text-lg font-bold text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    Đăng ký
-  </button>
+        <button type="submit" [disabled]="registerForm.invalid"
+          class="w-full mt-4 py-2 rounded-lg text-lg font-bold text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed">
+          Đăng ký
+        </button>
 
-  <p class="text-sm text-center text-gray-600 mt-4">
-    Bạn đã có tài khoản?
-    <a (click)="cancel()" class="text-blue-700 font-semibold hover:underline cursor-pointer">Đăng nhập</a>
-  </p>
-</form>
+        <p class="text-sm text-center text-gray-600 mt-4">
+          Bạn đã có tài khoản?
+          <a (click)="cancel()" class="text-blue-700 font-semibold hover:underline cursor-pointer">Đăng nhập</a>
+        </p>
+      </form>
+
+      <!-- ✅ Thông báo xác nhận email -->
+      <div *ngIf="showConfirmMessage" class="animate-fade-in text-center mt-10 p-6 bg-blue-50 rounded-xl">
+        <div class="text-green-600 text-2xl font-bold mb-2">🎉 Đăng ký thành công!</div>
+        <p class="text-gray-700">Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập.</p>
+      </div>
 
     </div>
   </div>
