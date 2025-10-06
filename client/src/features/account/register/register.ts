@@ -1,11 +1,9 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AccountService } from '../../../core/service/account-service';
-import { RegisterCreds } from '../../../_models/user';
 import { CommonModule } from '@angular/common';
+import { AccountService } from '../../../core/service/account-service';
 import { ToastService } from '../../../core/service/toast-service';
-
-
+import { RegisterCreds } from '../../../_models/user';
 
 @Component({
   selector: 'app-register',
@@ -15,32 +13,35 @@ import { ToastService } from '../../../core/service/toast-service';
   styleUrl: './register.css'
 })
 export class Register {
-  private accountService = inject(AccountService)
-  acceptedTerms: boolean = false;
-  // @Output() cancelRegister = new EventEmitter();
-  cancelRegister = output<boolean>();   //out event         // <! pratice load data 'child to parent' -->
-  protected creds = {} as RegisterCreds;
+  private accountService = inject(AccountService);
   private toast = inject(ToastService);
-  showPassword: boolean = false;
+
+  acceptedTerms = false;
+  creds = {} as RegisterCreds;
+  showPassword = false;
+  showConfirmMessage = false;   // 👈 Hiện thông báo xác nhận email
+  cancelRegister = output<boolean>();
 
   register() {
-
     if (!this.acceptedTerms) {
-      this.toast.error("Bạn phải đồng ý với điều khoản trước khi đăng ký!");
+      this.toast.error('Bạn phải đồng ý với điều khoản trước khi đăng ký!');
       return;
     }
 
     this.accountService.register(this.creds).subscribe({
-      next: response => {
-        console.log(response);
+      next: (res: any) => {
+        if (res.requiresEmailConfirm || res.emailConfirmed === false) {
+          this.showConfirmMessage = true;
+          this.toast.success('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.');
+        } else {
+          this.toast.success('Đăng ký thành công!');
+        }
       },
       error: (err: any) => {
-          this.toast.error(err.error);
-          console.log('Error details:', err.error);
-          console.log('Form data:', this.creds);
+        console.error('Error:', err);
+        this.toast.error(err.error || 'Đăng ký thất bại, vui lòng thử lại.');
       }
-
-    })
+    });
   }
 
   cancel() {
@@ -49,8 +50,7 @@ export class Register {
 
   openTerms(event: Event) {
     event.preventDefault();
-    alert("Điều khoản sử dụng: Đồng ý rằng bạn phải tuân thủ các quy định và điều kiện của chúng tôi.");
-    // hoặc bạn có thể mở modal riêng để hiển thị chi tiết
+    alert('Điều khoản sử dụng: Bạn đồng ý tuân thủ các điều kiện dịch vụ của chúng tôi.');
   }
 
   togglePassword() {

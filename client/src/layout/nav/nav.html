@@ -1,11 +1,17 @@
 <header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-700 via-blue-800 to-cyan-600 shadow-lg">
   <div class="flex items-center px-4 sm:px-10 mx-auto gap-6 h-full  text-white">
     <!-- Logo - Title -->
-    <a routerLink="/" routerLinkActive="text-accent" (click)="isMenuOpen = false"[routerLinkActiveOptions]="{exact: true}"
-      class="flex items-center gap-3 sm:gap-5 text-lg sm:text-xlpr-4 sm:pr-6 font-bold tracking-wide cursor-pointer">
-      <img src="/assets/logo.png" alt="user avatar" class="w-12 h-12 rounded-full">
-      Trạm Sạc Xe Điện
-    </a>
+   <a
+  routerLink="/"
+  routerLinkActive="text-accent"
+  [routerLinkActiveOptions]="{ exact: true }"
+  (click)="isMenuOpen = false"
+  class="flex items-center gap-3 text-xl font-bold tracking-wide text-white hover:text-accent transition-colors duration-200"
+>
+  <img src="/assets/logo.png" alt="Logo" class="w-11 h-11 rounded-full shadow-md">
+  <span>EVolt<span class="text-accent">Station</span></span>
+</a>
+
 
     <!-- Navigation (ẩn trên mobile, hiện trên desktop hoặc khi mở menu) -->
     <nav class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium  text-white
@@ -49,6 +55,7 @@
               </span>
             </span>
           </div>
+          
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="size-11">
             <path stroke-linecap="round" stroke-linejoin="round"

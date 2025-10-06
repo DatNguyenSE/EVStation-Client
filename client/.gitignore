@@ -40,3 +40,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Ignore appsettings
+API/appsettings.json
+API/appsettings.Development.json
