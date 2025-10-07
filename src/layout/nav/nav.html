@@ -1,61 +1,57 @@
-<header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-700 via-blue-800 to-cyan-600 shadow-lg">
+<header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-800 via-cyan-600 to-cyan-700 shadow-lg">
   <div class="flex items-center px-4 sm:px-10 mx-auto gap-6 h-full  text-white">
     <!-- Logo - Title -->
-   <a
-  routerLink="/"
-  routerLinkActive="text-accent"
-  [routerLinkActiveOptions]="{ exact: true }"
-  (click)="isMenuOpen = false"
-  class="flex items-center gap-3 text-xl font-bold tracking-wide text-white hover:text-accent transition-colors duration-200"
->
-  <img src="/assets/logo.png" alt="Logo" class="w-11 h-11 rounded-full shadow-md">
-  <span>EVolt<span class="text-accent">Station</span></span>
-</a>
+    <a routerLink="/" routerLinkActive="text-accent" [routerLinkActiveOptions]="{ exact: true }"
+      (click)="isMenuOpen = false"
+      class="flex items-center gap-3 text-xl font-bold tracking-wide text-white hover:text-cyan-600 transition-colors duration-200">
+      <img src="/assets/logo.png" alt="Logo" class="w-11 h-11 rounded-full shadow-md">
+      <span>EVolt<span class="text-cyan-600">Station</span></span>
+    </a>
 
 
     <!-- Navigation (ẩn trên mobile, hiện trên desktop hoặc khi mở menu) -->
     <nav class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium  text-white
              absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0 shadow-lg sm:shadow-none
              transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
-      
-      @if(accountService.currentAccount()) {
-      <a routerLink="/dich-vu" routerLinkActive="text-blue-300 " (click)="isMenuOpen = false"  class=" hover:text-cyan-300 cursor-pointer">Dịch vụ
-      </a>
-      <a routerLink="/thanh-toan" routerLinkActive="text-blue-300" (click)="isMenuOpen = false"  class=" hover:text-cyan-300 cursor-pointer">Thanh
-        toán</a>
-      <a routerLink="/thong-bao" routerLinkActive="text-blue-300" (click)="isMenuOpen = false"  class=" hover:text-cyan-300 cursor-pointer">Thông
-        báo</a>
-      <a routerLink="/profile" (click)="isMenuOpen = false"  class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài khoản</a>
-      <a class="cursor-pointer hover:text-cyan-300 sm:hidden" (click)="logout()" (click)="isMenuOpen = false" >Đăng xuất</a>
-     }
-     @else {
-      <a routerLink="/lien-he" routerLinkActive="text-blue-300"  (click)="isMenuOpen = false" class=" hover:text-cyan-300 cursor-pointer ">Liên hệ</a>
-      <a routerLink="/huong-dan" routerLinkActive="text-blue-300"  (click)="isMenuOpen = false" class=" hover:text-cyan-300 cursor-pointer">Hướng dẫn</a>
-     }
-    </nav>
 
- <!-- Nút hamburger (chỉ hiện trên mobile) -->
-    <button class="sm:hidden ml-auto text-white focus:outline-none" (click)="isMenuOpen = !isMenuOpen">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
-        class="size-8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-      </svg>
-    </button>
+      
+      <a routerLink="/dang-nhap" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
+        class="hover:text-cyan-600 cursor-pointer text-lg font-medium block sm:hidden">
+        Đăng nhập
+      </a>
+
+      <a routerLink="/dich-vu" routerLinkActive="text-cyan-600 " (click)="isMenuOpen = false"
+        class=" hover:text-cyan-600 cursor-pointer">Dịch vụ
+      </a>
+      <a routerLink="/thanh-toan" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
+        class=" hover:text-cyan-600 cursor-pointer">Thanh
+        toán</a>
+      <a routerLink="/thong-bao" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
+        class=" hover:text-cyan-600 cursor-pointer">Thông
+        báo</a>
+      <a routerLink="/profile" (click)="isMenuOpen = false" class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài
+        khoản</a>
+      @if(accountService.currentAccount()) {
+      <a class="cursor-pointer hover:text-cyan-600 sm:hidden" (click)="logout()" (click)="isMenuOpen = false">Đăng
+        xuất</a>
+      }
+
+    </nav>
 
     @if (accountService.currentAccount(); as account) {
     <!-- User Logo (chỉ hiện khi đăng nhập) -->
     <div class="hidden sm:flex align-middle ml-auto gap-3">
- 
+
       <div class="dropdown dropdown-end ">
         <div tabindex="0" role="button" class="flex items-center text-white text-xl gap-3 cursor-pointer">
           <div class="flex flex-col items-start">
-            <span class="text-sm">Xin chào, 
+            <span class="text-sm">Xin chào,
               <span class="text-xl font-bold ">
                 {{account.username}}
               </span>
             </span>
           </div>
-          
+
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="size-11">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -64,10 +60,26 @@
 
         </div>
         <ul tabindex="0" class=" text-blue-950 dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-          <li><a class="" (click)="profile()" >Profile</a></li>
+          <li><a class="" (click)="profile()">Profile</a></li>
           <li><a class="" (click)="logout()">Logout</a></li>
         </ul>
       </div>
+    </div>
+    } @else {
+
+    <div class="ml-auto">
+      <!-- Nút hamburger (chỉ hiện trên mobile) -->
+      <button class="sm:hidden ml-auto text-white focus:outline-none" (click)="isMenuOpen = !isMenuOpen">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
+          class="size-8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+
+      <a routerLink="/dang-nhap" routerLinkActive="text-cyan-600" (click)="isMenuOpen = true"
+        class="hover:text-cyan-600 cursor-pointer text-lg font-medium hidden sm:block">
+        Đăng nhập
+      </a>
     </div>
     }
   </div>

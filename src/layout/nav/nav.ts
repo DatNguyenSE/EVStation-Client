@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UserService } from '../../core/service/user-service';
-import { User } from '../../_models/user';
+
 
 
 @Component({

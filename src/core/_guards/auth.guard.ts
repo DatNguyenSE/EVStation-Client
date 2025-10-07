@@ -11,9 +11,9 @@ export const authGuard: CanActivateFn = () => {
   if(accountService.currentAccount()) {
     return true;
   }else{
-    toastr.error('You shall not pass!');
+    toastr.error('Đăng nhập để sử dụng!');
     console.log('You shall not pass!');
-    routers.navigateByUrl('/');
+    routers.navigateByUrl('/dang-nhap');
     return false;
   }
 };

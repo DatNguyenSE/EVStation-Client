@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Register } from "../register/register";
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../core/service/toast-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -14,18 +15,20 @@ import { ToastService } from '../../../core/service/toast-service';
 })
 export class Login {
   
-  accountService = inject(AccountService);
-
+    accountService = inject(AccountService);
     protected creds: any = {} as LoginCreds;
     protected registerMode = signal(false);
     private toast = inject(ToastService);
     showPassword: boolean = false;
+    router = inject(Router);
 
   login() {
     this.accountService.login(this.creds).subscribe({
       next: result => {
         console.log(result),
         this.creds ={};
+        this.toast.success('Đăng nhập thành công!');
+        this.router.navigate(['/']);
       },
       error: error => this.toast.error(error.error)
     })
