@@ -45,7 +45,8 @@ namespace API.Services
             catch (Exception ex)
             {
                 // Log error
-                throw new InvalidOperationException($"Failed to send email: {ex.Message}");
+                Console.WriteLine($"[EmailService] SendEmailAsync error: {ex}");
+    throw new InvalidOperationException($"Failed to send email: {ex.Message}");
             }
         }
 

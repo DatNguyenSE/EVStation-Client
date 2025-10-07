@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AccountService } from '../../../core/service/account-service';
 import { ToastService } from '../../../core/service/toast-service';
 import { RegisterCreds } from '../../../_models/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -21,25 +22,33 @@ export class Register {
   showPassword = false;
   showConfirmMessage = false;   // 👈 Hiện thông báo xác nhận email
   cancelRegister = output<boolean>();
+  router = inject(Router);
 
   register() {
-    if (!this.acceptedTerms) {
-      this.toast.error('Bạn phải đồng ý với điều khoản trước khi đăng ký!');
-      return;
-    }
 
     this.accountService.register(this.creds).subscribe({
       next: (res: any) => {
-        if (res.requiresEmailConfirm || res.emailConfirmed === false) {
-          this.showConfirmMessage = true;
-          this.toast.success('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.');
-        } else {
-          this.toast.success('Đăng ký thành công!');
-        }
+        this.toast.success('Đăng ký thành công!');
+        console.log(res);
+        this.router.navigate(['/dang-nhap']);
       },
       error: (err: any) => {
-        console.error('Error:', err);
-        this.toast.error(err.error || 'Đăng ký thất bại, vui lòng thử lại.');
+        console.error('Error:', err.error);
+
+        if (err.error && err.error.errors) {
+          const validationErrors = err.error.errors;
+
+          for (const key in validationErrors) {
+            if (validationErrors.hasOwnProperty(key)) {
+              const messages = validationErrors[key];
+              messages.forEach((msg: string) => {
+                this.toast.error(msg); 
+              });
+            }
+          }
+        } else {
+          this.toast.error('Đã xảy ra lỗi không xác định');
+        }
       }
     });
   }

@@ -1,81 +1,82 @@
-@if (!registerMode()) {
+<div class="relative hero min-h-screen bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950 overflow-hidden">
+  <div class="absolute inset-0 bg-[url('/assets/bank-note.svg')] bg-cover  opacity-20"></div>
+  @if (!registerMode()) {
 
-<div class="min-h-screen flex items-center justify-center  p-4">
+  <div class="min-h-screen flex items-center justify-center p-4 pt-24 z-10 relative">
+    <div class="bg-white shadow-2xl rounded-2xl flex w-full max-w-5xl overflow-hidden">
 
-  <div class="bg-white shadow-2xl rounded-2xl flex w-full max-w-5xl overflow-hidden">
+      <!-- Left side -->
+      <div
+        class="hidden md:flex w-1/2 bg-gradient-to-b from-blue-600 to-blue-900 flex-col items-center justify-center text-white p-10">
 
-    <!-- Left side -->
-    <div
-      class="hidden md:flex w-1/2 bg-gradient-to-b from-blue-600 to-blue-900 flex-col items-center justify-center text-white p-10">
+        <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Xin chào bạn cũ!</h2>
+        <p class="text-center text-blue-100 text-lg">
+          Đăng nhập để tiếp tục sử dụng dịch vụ trạm sạc xe điện
+        </p>
+      </div>
 
-      <img src="/assets/logo.png" alt="Logo" class="w-20 h-20 mb-6">
-      <h2 class="text-2xl font-bold mb-4">Xin chào bạn cũ!</h2>
-      <p class="text-center text-blue-100 text-lg">
-        Đăng nhập để tiếp tục sử dụng dịch vụ trạm sạc xe điện
-      </p>
-    </div>
+      <!-- Right side-->
+      <div class="w-full md:w-1/2 p-10">
+        <h3 class="text-2xl font-bold text-center text-gray-700 mb-6">Đăng nhập tài khoản của bạn</h3>
+        <form #loginForm="ngForm" class="flex flex-col gap-4" (ngSubmit)="login()" novalidate>
 
-    <!-- Right side-->
-    <div class="w-full md:w-1/2 p-10">
-      <h3 class="text-2xl font-bold text-center text-gray-700 mb-6">Đăng nhập tài khoản của bạn</h3>
-      <form #loginForm="ngForm" class="flex flex-col gap-4" (ngSubmit)="login()" novalidate>
+          <!-- Tên đăng nhập -->
+          <input type="text" name="username" required [(ngModel)]="creds.username" placeholder="Tên đăng nhập"
+            autocomplete="on" class="input input-bordered w-full rounded-lg font-medium" />
 
-        <!-- Tên đăng nhập -->
-        <input type="text" name="username" required [(ngModel)]="creds.username" placeholder="Tên đăng nhập"
-          autocomplete="on" class="input input-bordered w-full rounded-lg font-medium" />
+          <!-- Mật khẩu -->
+          <div class="relative w-full">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" required [(ngModel)]="creds.password"
+              placeholder="Mật khẩu" autocomplete="off"
+              class="input input-bordered w-full rounded-lg font-medium pr-10" />
 
-        <!-- Mật khẩu -->
-        <div class="relative w-full">
-          <input [type]="showPassword ? 'text' : 'password'" name="password" required [(ngModel)]="creds.password"
-            placeholder="Mật khẩu" autocomplete="off"
-            class="input input-bordered w-full rounded-lg font-medium pr-10" />
-
-          <!-- Nút con mắt -->
-          <button type="button" (click)="togglePassword()"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-            <!-- Mắt đóng -->
-            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5
+            <!-- Nút con mắt -->
+            <button type="button" (click)="togglePassword()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+              <!-- Mắt đóng -->
+              <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5
              c4.477 0 8.268 2.943 9.542 7
              -1.274 4.057-5.065 7-9.542 7
              -4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+              </svg>
 
-            <!-- Mắt mở -->
-            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19
+              <!-- Mắt mở -->
+              <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19
              c-4.477 0-8.268-2.943-9.542-7
              a10.06 10.06 0 012.724-4.17m3.82-2.054
              A9.973 9.973 0 0112 5c4.477 0 8.268 2.943
              9.542 7a9.956 9.956 0 01-4.252 5.568M3 3l18 18" />
-            </svg>
+              </svg>
+            </button>
+          </div>
+
+          <div class="flex justify-end mt-2 text-sm">
+            <a href="#" class="text-blue-600 hover:underline font-medium">
+              Quên mật khẩu?
+            </a>
+          </div>
+
+          <!-- Nút đăng nhập -->
+          <button type="submit" [disabled]="loginForm.invalid"
+            class="w-full mt-4 py-2 rounded-lg text-lg font-bold text-white bg-blue-600 focus:bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed">
+            Đăng nhập
           </button>
-        </div>
 
-        <div class="flex justify-end mt-2 text-sm">
-          <a href="#" class="text-blue-600 hover:underline font-medium">
-            Quên mật khẩu?
-          </a>
-        </div>
+          <!-- Link đăng ký -->
+          <p class="text-sm text-center text-black mt-4">
+            Bạn chưa có tài khoản?
+            <a (click)="showRegister(true)" class="text-blue-600 hover:underline cursor-pointer font-medium">Đăng ký</a>
+          </p>
+        </form>
 
-        <!-- Nút đăng nhập -->
-        <button type="submit" [disabled]="loginForm.invalid"
-          class="w-full mt-4 py-2 rounded-lg text-lg font-bold text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed">
-          Đăng nhập
-        </button>
-
-        <!-- Link đăng ký -->
-        <p class="text-sm text-center text-black mt-4">
-          Bạn chưa có tài khoản?
-          <a (click)="showRegister(true)" class="text-blue-600 hover:underline cursor-pointer font-medium">Đăng ký</a>
-        </p>
-      </form>
-
-      <div class="flex flex-col items-center mt-4 ">
+        <!-- <div class="flex flex-col items-center mt-4 ">
         <p class="text-center text-gray-500  text-xs">
           Đăng nhập
           <a href="#" class="underline hover:text-blue-300">Quản trị</a>
@@ -83,13 +84,15 @@
           <a href="#" class="underline hover:text-blue-300">Nhân viên</a>
           tại đây.
         </p>
+      </div> -->
       </div>
     </div>
   </div>
+  <!-- link register  -->
+  } @else {
+  <div class="w-full text-2xl text-center flex justify-center">
+    <app-register class="w-full" (cancelRegister)="showRegister($event)"></app-register>
+  </div>
+  }
+
 </div>
-<!-- link register  -->
-} @else {
-<div class="w-full text-2xl text-center flex justify-center">
-  <app-register class="w-full" (cancelRegister)="showRegister($event)"></app-register>
-</div>
-}

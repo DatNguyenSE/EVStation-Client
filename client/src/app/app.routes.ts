@@ -8,6 +8,7 @@ import { Contact } from '../layout/more-information/contact/contact';
 import { Instruction } from '../layout/more-information/instruction/instruction';
 import { News } from '../layout/more-information/news/news';
 import { Profile } from '../layout/profile/profile';
+import { Login } from '../features/account/login/login';
 
 export const routes: Routes = [
      { path: '', component: Home },
@@ -23,6 +24,7 @@ export const routes: Routes = [
             
         ]
     },
+        {path: 'dang-nhap', component: Login},
         {path: 'lien-he',component:Contact},
         {path: 'huong-dan',component:Instruction},
         {path: 'tin-tuc',component:News},

@@ -1,7 +1,7 @@
-<div >
-    @if(account.currentAccount()) {
+<div>
+
     <!-- Layout khi đã login -->
-    <div>
+    <div class="background-home">
         <!-- Slider -->
         <app-slide-carousel></app-slide-carousel>
 
@@ -9,11 +9,11 @@
         <div class="pb-5 mt-6 px-7 ">
             <div class="max-w-full">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-blue-50  rounded-xl shadow p-6 lg:col-span-2">
+                    <div class="bg-gray-50 rounded-xl shadow p-6 lg:col-span-2">
                         <app-vehicle></app-vehicle>
                     </div>
                     <!-- Quick Actions -->
-                    <div class="bg-blue-50  rounded-xl shadow p-6 space-y-2">
+                    <div class="bg-gray-50 rounded-xl shadow p-6 space-y-2">
                         <img class="w-full h-10/12 rounded-lg" src="/assets/map.png">
                         <button class="mt-1.5 w-full bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg">🔍
                             Tìm
@@ -23,8 +23,65 @@
                 </div>
             </div>
         </div>
+        <section id="about" class="flex flex-col md:flex-row items-center justify-between px-8 md:px-10 py-16 bg-white">
+            <!-- Bản đồ Việt Nam -->
+            <div class="w-full md:w-1/2 flex justify-center mb-10 md:mb-0 ">
+                <img src="/assets/allofstation.png" alt="Bản đồ trạm sạc" class="w-4/5 max-w-md object-contain">
+            </div>
 
-        <div class="mb-5 px-6 ">
+            <!-- Nội dung -->
+            <div class="w-full md:w-1/2 text-center md:text-left">
+                <p class="text-green-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-2">
+                    ⚡ Về Chúng Tôi
+                </p>
+                <h2 class="text-4xl font-bold mb-6 leading-tight text-gray-900">
+                    Giải pháp sạc điện toàn diện<br />cho người dùng Việt
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div>
+                        <div class="flex justify-center md:justify-start">
+                            <div class="bg-green-500 text-white p-3 rounded-full mb-3">
+                                <i class="fa-solid fa-charging-station text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">Sạc mọi dòng xe</h3>
+                        <p class="text-gray-600">
+                            Sạc dễ dàng với mọi dòng xe điện – từ xe máy đến ô tô, không cần lo ngại về chuẩn kết nối.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div>
+                        <div class="flex justify-center md:justify-start">
+                            <div class="bg-green-500 text-white p-3 rounded-full mb-3">
+                                <i class="fa-solid fa-car-side text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">Thuận tiện</h3>
+                        <p class="text-gray-600">
+                            Sạc tại mọi nơi bạn sống, làm việc và thư giãn – tiết kiệm thời gian, chủ động di chuyển.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div>
+                        <div class="flex justify-center md:justify-start">
+                            <div class="bg-green-500 text-white p-3 rounded-full mb-3">
+                                <i class="fa-solid fa-leaf text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">Giảm thải CO₂</h3>
+                        <p class="text-gray-600">
+                            Sử dụng năng lượng sạch, góp phần giảm đến 80% lượng khí thải CO₂ – vì một tương lai xanh.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="mb-5 px-6 bg-white">
             <!-- More information -->
 
             <div class="flex border-b border-gray-300 mb-4 space-x-6">
@@ -58,13 +115,14 @@
         </div>
     </div>
 
-    }@else{
+    
+    <!-- @else{
     <div class="relative hero min-h-screen bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950 overflow-hidden">
-        <!-- Pattern background -->
+        
         <div class="absolute inset-0 bg-[url('/assets/bank-note.svg')] bg-cover  opacity-20"></div>
         <app-login class="relative z-10"></app-login>
     </div>
 
-    }
+    } -->
 
 </div>
