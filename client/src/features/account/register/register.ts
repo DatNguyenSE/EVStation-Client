@@ -20,7 +20,7 @@ export class Register {
   acceptedTerms = false;
   creds = {} as RegisterCreds;
   showPassword = false;
-  showConfirmMessage = false;   // 👈 Hiện thông báo xác nhận email
+  showConfirmMessage = false;   //  Hiện thông báo xác nhận email
   cancelRegister = output<boolean>();
   router = inject(Router);
 
@@ -30,23 +30,38 @@ export class Register {
       next: (res: any) => {
         this.toast.success('Đăng ký thành công!');
         console.log(res);
+        this.cancelRegister.emit(false);
         this.router.navigate(['/dang-nhap']);
       },
       error: (err: any) => {
         console.error('Error:', err.error);
 
-        if (err.error && err.error.errors) {
+        if (err.error?.errors) {
           const validationErrors = err.error.errors;
-
           for (const key in validationErrors) {
             if (validationErrors.hasOwnProperty(key)) {
               const messages = validationErrors[key];
-              messages.forEach((msg: string) => {
-                this.toast.error(msg); 
-              });
+              messages.forEach((msg: string) => this.toast.error(msg));
             }
           }
-        } else {
+        }
+        else if (Array.isArray(err.error)) {
+          // ASP.NET Identity trả về mảng lỗi password
+          err.error.forEach((e: any) => {
+            if (e.description) {
+              this.toast.error(e.description);
+            } else {
+              this.toast.error(JSON.stringify(e));
+            }
+          });
+        }
+        else if (typeof err.error === 'object' && err.error.message) {
+          this.toast.error(err.error.message);
+        }
+        else if (typeof err.error === 'string') {
+          this.toast.error(err.error);
+        }
+        else {
           this.toast.error('Đã xảy ra lỗi không xác định');
         }
       }
