@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { GgMap } from "../gg-map/gg-map";
 
 @Component({
   selector: 'app-service-list',
   standalone:true,
-  imports: [CommonModule],
+  imports: [CommonModule, GgMap],
   templateUrl: './service-list.html',
   styleUrl: './service-list.css'
 })
