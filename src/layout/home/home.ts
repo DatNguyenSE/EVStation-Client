@@ -7,12 +7,15 @@ import { Instruction } from '../more-information/instruction/instruction';
 import { Contact } from '../more-information/contact/contact';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from '../../features/vehicle/vehicle';
+import { Login } from "../../features/account/login/login";
+import { RouterLink } from '@angular/router';
+
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SlideCarouselComponent, News, Instruction, Contact, CommonModule],
+  imports: [SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule, Login,RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -30,5 +33,5 @@ export class Home {
   changeTab(tab: string) {
     this.activeTab = tab;
   }
- 
+
 }

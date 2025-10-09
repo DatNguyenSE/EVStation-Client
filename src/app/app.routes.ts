@@ -9,9 +9,11 @@ import { Instruction } from '../layout/more-information/instruction/instruction'
 import { News } from '../layout/more-information/news/news';
 import { Profile } from '../layout/profile/profile';
 import { Login } from '../features/account/login/login';
+import { GgMap } from '../features/gg-map/gg-map';
 
 export const routes: Routes = [
      { path: '', component: Home },
+     
     {
         path: '',                               // start page
         runGuardsAndResolvers: 'always',
@@ -21,6 +23,8 @@ export const routes: Routes = [
             {path:'thanh-toan',component:Payment},
             {path:'thong-bao',component:Notification},
             {path:'tai-khoan',component:Profile},
+            {path:'map',component: GgMap},
+            
             
         ]
     },
