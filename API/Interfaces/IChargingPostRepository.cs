@@ -7,7 +7,7 @@ using API.Entities;
 
 namespace API.Interfaces
 {
-    public interface IPostRepository
+    public interface IChargingPostRepository
     {
         Task<List<ChargingPost>> GetAllAsync();
         Task<ChargingPost?> GetByIdAsync(int id);

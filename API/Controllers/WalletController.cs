@@ -14,7 +14,7 @@ using Microsoft.Identity.Client;
 
 namespace API.Controllers
 {
-    // [Authorize(Roles = "User")]
+    // [Authorize(Roles = "Driver")]
     [ApiController]
     [Route("api/wallet")]
     public class WalletController : ControllerBase
@@ -47,41 +47,6 @@ namespace API.Controllers
             {
                 Balance = wallet.Balance
             });
-        }
-
-        // nạp tiền vào ví
-        [HttpPost("topup")]
-        public async Task<IActionResult> TopUp([FromBody] TopUpRequestDto request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(username);
-            if (appUser == null) return Unauthorized();
-
-            var wallet = await _walletRepo.GetWalletByUserIdAsync(appUser.Id);
-            if (wallet == null)
-            {
-                wallet = await _walletRepo.CreateWalletAsync(appUser.Id);
-            }
-
-            wallet.Balance += request.Amount;
-
-            var AddedTransaction = await _walletTransactionRepo.AddTransactionAsync(new WalletTransaction
-            {
-                WalletId = wallet.Id,
-                Amount = request.Amount,
-                Description = "Nạp tiền vào ví",
-            });
-            if (!AddedTransaction) return BadRequest("Nạp tiền thất bại");
-
-            var result = await _walletRepo.UpdateWalletAsync(wallet);
-            if (!result) return BadRequest("Nạp tiền thất bại");
-
-            return Ok(new { message = "Nạp tiền thành công", newBalance = wallet.Balance });
         }
 
         // Lấy lịch sử giao dịch

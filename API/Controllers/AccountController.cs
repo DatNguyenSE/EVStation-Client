@@ -106,7 +106,7 @@ namespace API.Controllers
                     }
                     else
                     {
-                        return BadRequest("Username is already in use");
+                        return BadRequest("Tên đăng nhập đã được sử dụng");
                     }
                 }
 
@@ -121,7 +121,7 @@ namespace API.Controllers
                     }
                     else
                     {
-                        return BadRequest("Email is already in use");
+                        return BadRequest("Email đã được sử dụng");
                     }
                 }
 
@@ -132,20 +132,7 @@ namespace API.Controllers
                     Email = registerDto.Email,
                     FullName = registerDto.FullName,
                     Age = registerDto.Age
-                };
-
-                // Thêm danh sách xe
-                foreach (var v in registerDto.Vehicles)
-                {
-                    appUser.Vehicles.Add(new Vehicle
-                    {
-                        Model = v.Model,
-                        Type = v.Type,
-                        BatteryCapacityKWh = v.BatteryCapacityKWh,
-                        MaxChargingPowerKW = v.MaxChargingPowerKW,
-                        ConnectorType = v.ConnectorType
-                    });
-                }
+                }; 
 
                 // Tạo user trong Identity
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
@@ -156,7 +143,7 @@ namespace API.Controllers
                 }
 
                 // Gán role mặc định
-                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "Driver");
 
                 if (!roleResult.Succeeded)
                 {
@@ -186,7 +173,7 @@ namespace API.Controllers
                     
                     // Xóa user nếu không gửi được email 
                     await _userManager.DeleteAsync(appUser);
-                    return StatusCode(500, new { message = "Failed to send confirmation email. Please try again." });
+                    return StatusCode(500, new { message = "Không gửi được email xác nhận. Vui lòng thử lại." });
                 }
 
                 // Trả về dữ liệu user và token
@@ -209,19 +196,19 @@ namespace API.Controllers
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             {
-                return BadRequest(new { message = "Invalid confirmation link" });
+                return BadRequest(new { message = "Liên kết xác nhận không hợp lệ" });
             }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound(new { message = "User not found" });
+                return NotFound(new { message = "Không tìm thấy người dùng" });
             }
 
             // Kiểm tra xem email đã được xác nhận chưa
             if (user.EmailConfirmed)
             {
-                return Ok(new { message = "Email already confirmed. You can login now." });
+                return Ok(new { message = "Email đã được xác nhận. Bạn có thể đăng nhập ngay." });
             }
 
             // Decode token
@@ -236,7 +223,7 @@ namespace API.Controllers
                 
                 return Ok(new
                 {
-                    message = "Email confirmed successfully. You can now login.",
+                    message = "Email đã được xác nhận. Bạn có thể đăng nhập ngay.",
                     user = new
                     {
                         id = user.Id,
@@ -249,7 +236,7 @@ namespace API.Controllers
 
             return BadRequest(new
             {
-                message = "Error confirming email",
+                message = "Lỗi xác nhận email",
                 errors = result.Errors
             });
         }
@@ -259,19 +246,19 @@ namespace API.Controllers
         {
             if (string.IsNullOrEmpty(dto.Email))
             {
-                return BadRequest(new { message = "Email is required" });
+                return BadRequest(new { message = "Email là bắt buộc" });
             }
 
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
                 // Không tiết lộ thông tin user có tồn tại hay không (bảo mật)
-                return Ok(new { message = "If the email exists, a confirmation link has been sent." });
+                return Ok(new { message = "Nếu email tồn tại, liên kết xác nhận đã được gửi." });
             }
 
             if (user.EmailConfirmed)
             {
-                return BadRequest(new { message = "Email already confirmed" });
+                return BadRequest(new { message = "Email đã xác thực" });
             }
 
             // Tạo token mới
@@ -287,12 +274,12 @@ namespace API.Controllers
                 
                 _logger.LogInformation($"Confirmation email resent to {user.Email}");
                 
-                return Ok(new { message = "Confirmation email has been resent. Please check your inbox." });
+                return Ok(new { message = "Email xác nhận đã được gửi lại. Vui lòng kiểm tra hộp thư đến của bạn." });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to resend confirmation email to {user.Email}");
-                return StatusCode(500, new { message = "Failed to send confirmation email. Please try again later." });
+                return StatusCode(500, new { message = "Không gửi được email xác nhận. Vui lòng thử lại sau." });
             }
         }
 

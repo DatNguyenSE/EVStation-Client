@@ -26,7 +26,8 @@ namespace API.Entities
         Available,   // sẵn sàng
         Occupied,    // đang có xe
         Maintenance, // bảo trì
-        Offline      // mất kết nối
+        Offline,      // mất kết nối
+        Reserved
     }
 
     public enum PostType

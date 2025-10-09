@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "Driver")]
     [ApiController]
     [Route("api/payment")]
     public class PaymentController : ControllerBase
@@ -77,7 +77,7 @@ namespace API.Controllers
         /// Callback từ VNPAY
         /// </summary>
         [AllowAnonymous]
-        [HttpGet("payment-callback")]
+        [HttpGet("vnpay-return")]
         public async Task<IActionResult> PaymentCallback()
         {
             var response = _vnPayService.PaymentExecute(Request.Query);

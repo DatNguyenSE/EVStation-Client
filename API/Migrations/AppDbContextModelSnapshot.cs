@@ -94,6 +94,44 @@ namespace API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("API.Entities.ChargingPackage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DurationDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChargingPackages");
+                });
+
             modelBuilder.Entity("API.Entities.ChargingPost", b =>
                 {
                     b.Property<int>("Id")
@@ -132,7 +170,41 @@ namespace API.Migrations
 
                     b.HasIndex("StationId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("ChargingPosts");
+                });
+
+            modelBuilder.Entity("API.Entities.DriverPackage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PackageId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VehicleType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.ToTable("DriverPackages");
                 });
 
             modelBuilder.Entity("API.Entities.Station", b =>
@@ -155,6 +227,7 @@ namespace API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Latitude")
@@ -226,7 +299,7 @@ namespace API.Migrations
                     b.ToTable("Vehicles");
                 });
 
-            modelBuilder.Entity("API.Entities.Wallet", b =>
+            modelBuilder.Entity("API.Entities.Wallet.Wallet", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -249,7 +322,7 @@ namespace API.Migrations
                     b.ToTable("Wallets");
                 });
 
-            modelBuilder.Entity("API.Entities.WalletTransaction", b =>
+            modelBuilder.Entity("API.Entities.Wallet.WalletTransaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -322,14 +395,26 @@ namespace API.Migrations
                         new
                         {
                             Id = "2",
-                            Name = "User",
-                            NormalizedName = "USER"
+                            Name = "Driver",
+                            NormalizedName = "DRIVER"
                         },
                         new
                         {
                             Id = "3",
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = "4",
                             Name = "Staff",
                             NormalizedName = "STAFF"
+                        },
+                        new
+                        {
+                            Id = "5",
+                            Name = "Technician",
+                            NormalizedName = "TECHNICIAN"
                         });
                 });
 
@@ -448,6 +533,17 @@ namespace API.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("API.Entities.DriverPackage", b =>
+                {
+                    b.HasOne("API.Entities.ChargingPackage", "Package")
+                        .WithMany()
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Package");
+                });
+
             modelBuilder.Entity("API.Entities.Vehicle", b =>
                 {
                     b.HasOne("API.Entities.AppUser", "Owner")
@@ -459,20 +555,20 @@ namespace API.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("API.Entities.Wallet", b =>
+            modelBuilder.Entity("API.Entities.Wallet.Wallet", b =>
                 {
                     b.HasOne("API.Entities.AppUser", "appUser")
                         .WithOne()
-                        .HasForeignKey("API.Entities.Wallet", "UserId")
+                        .HasForeignKey("API.Entities.Wallet.Wallet", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("appUser");
                 });
 
-            modelBuilder.Entity("API.Entities.WalletTransaction", b =>
+            modelBuilder.Entity("API.Entities.Wallet.WalletTransaction", b =>
                 {
-                    b.HasOne("API.Entities.Wallet", "Wallet")
+                    b.HasOne("API.Entities.Wallet.Wallet", "Wallet")
                         .WithMany("Transactions")
                         .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -542,7 +638,7 @@ namespace API.Migrations
                     b.Navigation("Posts");
                 });
 
-            modelBuilder.Entity("API.Entities.Wallet", b =>
+            modelBuilder.Entity("API.Entities.Wallet.Wallet", b =>
                 {
                     b.Navigation("Transactions");
                 });

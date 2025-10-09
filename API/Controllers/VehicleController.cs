@@ -28,7 +28,7 @@ namespace API.Controllers
         }
 
         [HttpPost("add")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Driver")]
         public async Task<IActionResult> AddVehicle([FromBody] VehicleDto vehicleDto)
         {
             if (!ModelState.IsValid)
@@ -41,12 +41,6 @@ namespace API.Controllers
             if (appUser == null)
             {
                 return Unauthorized();
-            }
-
-            // kiem tra loai xe
-            if (await _vehicleRepo.UserHasVehicleTypeAsync(appUser.Id, vehicleDto.Type))
-            {
-                return BadRequest($"Bạn đã có xe loại {vehicleDto.Type}. Chỉ được thêm loại khác.");
             }
 
             // Kiểm tra trùng biển số
@@ -69,13 +63,14 @@ namespace API.Controllers
             var created = await _vehicleRepo.AddVehicleAsync(vehicle);
             return Ok(new
             {
-                message = "Vehicle added successfully",
+                message = "Đã thêm xe thành công",
                 vehicle = created
             });
         }
 
+        // lấy thông tin xe của User
         [HttpGet("my")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Driver")]
         public async Task<IActionResult> GetMyVehicles()
         {
             var username = User.GetUsername();
@@ -98,7 +93,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Driver")]
         public async Task<IActionResult> UpdateVehicle([FromRoute] int id, [FromBody] VehicleUpdateDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -111,15 +106,6 @@ namespace API.Controllers
             if (vehicle == null || vehicle.OwnerId != appUser.Id)
             {
                 return NotFound("Không tìm thấy xe hoặc bạn không có quyền.");
-            }
-
-            // Nếu đổi loại xe
-            if (vehicle.Type != dto.Type)
-            {
-                if (await _vehicleRepo.UserHasVehicleTypeAsync(appUser.Id, dto.Type))
-                {
-                    return BadRequest($"Bạn đã có xe loại {dto.Type}. Không thể đổi sang loại này.");
-                }
             }
 
             // Kiểm tra trùng biển số
@@ -147,7 +133,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("my/{id}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Driver")]
         public async Task<IActionResult> DeactivateVehicle([FromRoute] int id)
         {
             var username = User.GetUsername();

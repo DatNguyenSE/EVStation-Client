@@ -18,7 +18,9 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<WalletTransaction> WalletTransactions { get; set; }
     public DbSet<Station> Stations { get; set; }
-    public DbSet<ChargingPost> Posts { get; set; }  
+    public DbSet<ChargingPost> ChargingPosts { get; set; }  
+    public DbSet<ChargingPackage> ChargingPackages { get; set; }
+    public DbSet<DriverPackage> DriverPackages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -43,6 +45,10 @@ public class AppDbContext : IdentityDbContext<AppUser>
             .Property(p => p.PowerKW)
             .HasPrecision(5, 2);
 
+        builder.Entity<ChargingPackage>()
+            .Property(p => p.Price)
+            .HasPrecision(18, 2);
+
         // Seed Roles
         List<IdentityRole> roles = new List<IdentityRole>
         {
@@ -53,41 +59,25 @@ public class AppDbContext : IdentityDbContext<AppUser>
             },
             new IdentityRole {
                 Id = "2",
-                Name = "User",
-                NormalizedName = "USER"
+                Name = "Driver",
+                NormalizedName = "DRIVER"
             },
             new IdentityRole {
                 Id = "3",
+                Name = "Manager",
+                NormalizedName = "MANAGER"
+            },
+            new IdentityRole {
+                Id = "4",
                 Name = "Staff",
                 NormalizedName = "STAFF"
-            }
+            },
+            new IdentityRole {
+                Id = "5",
+                Name = "Technician",
+                NormalizedName = "TECHNICIAN"
+            },
         };
         builder.Entity<IdentityRole>().HasData(roles);
-
-        // Seed Admin User
-        // var hasher = new PasswordHasher<AppUser>();
-
-        // var adminUser = new AppUser
-        // {
-        //     Id = "100",
-        //     UserName = "admin",
-        //     NormalizedUserName = "ADMIN",
-        //     Email = "admin@gmail.com",
-        //     NormalizedEmail = "ADMIN@GMAIL.COM",
-        //     EmailConfirmed = true,
-        //     FullName = "System Administrator",
-        //     Age = 30   
-        // };
-
-        // adminUser.PasswordHash = hasher.HashPassword(adminUser, "Admin@123");
-
-        // builder.Entity<AppUser>().HasData(adminUser);
-
-        // Gan role Admin cho user nay
-        // builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-        // {
-        //     RoleId = "1",
-        //     UserId = "100"
-        // });
     }
 }

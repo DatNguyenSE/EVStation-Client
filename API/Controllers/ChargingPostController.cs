@@ -13,12 +13,12 @@ namespace API.Controllers
 {
     [Route("api/posts")]
     [ApiController]
-    public class PostController : ControllerBase
+    public class ChargingPostController : ControllerBase
     {
-        private readonly IPostRepository _postRepo;
+        private readonly IChargingPostRepository _postRepo;
         private readonly IStationRepository _stationRepo;
 
-        public PostController(IPostRepository postRepo, IStationRepository stationRepo)
+        public ChargingPostController(IChargingPostRepository postRepo, IStationRepository stationRepo)
         {
             _postRepo = postRepo;
             _stationRepo = stationRepo;

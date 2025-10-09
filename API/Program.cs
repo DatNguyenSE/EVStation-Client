@@ -15,8 +15,13 @@ using API.Entities.Email;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        // chuyển các giá trị kiểu enum thành chữ chứ không còn là 0, 1, 2,...
+        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+    });
 
 // swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -48,11 +53,6 @@ builder.Services.AddSwaggerGen(option =>
             new string[]{}
         }
     });
-});
-
-builder.Services.AddControllers().AddNewtonsoftJson(option =>
-{
-    option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -105,15 +105,18 @@ builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
 builder.Services.AddScoped<IStationRepository, StationRepository>();
-builder.Services.AddScoped<IPostRepository, PostRepository>();
-
+builder.Services.AddScoped<IChargingPostRepository, ChargingPostRepository>();
+builder.Services.AddScoped<IChargingPackageRepository, ChargingPackageRepository>();
+builder.Services.AddScoped<IDriverPackageRepository, DriverPackageRepository>();
 // Cấu hình Email Settings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 // Đăng ký Email Service
 builder.Services.AddScoped<IEmailService, EmailService>();
-
 // Connect VnPay API
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+
+// đăng ký service check status gói của người dùng mỗi 24h
+builder.Services.AddHostedService<PackageStatusChecker>();
 
 var app = builder.Build();
 

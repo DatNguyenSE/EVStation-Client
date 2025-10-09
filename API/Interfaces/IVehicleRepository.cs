@@ -8,7 +8,6 @@ namespace API.Interfaces
 {
     public interface IVehicleRepository
     {
-        Task<bool> UserHasVehicleTypeAsync(string userId, string type);
         Task<Vehicle> AddVehicleAsync(Vehicle vehicleModel);
         Task<IEnumerable<Vehicle>> GetVehiclesByUserAsync(string userId);
         Task<Vehicle?> GetVehicleByIdAsync(int id);

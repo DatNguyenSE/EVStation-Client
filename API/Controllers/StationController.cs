@@ -10,6 +10,7 @@ using API.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Microsoft.Identity.Client;
 
 namespace API.Controllers
 {
@@ -18,7 +19,7 @@ namespace API.Controllers
     public class StationController : ControllerBase
     {
         private readonly IStationRepository _stationRepo;
-        // private readonly AppDbContext _context;
+        
         public StationController(IStationRepository stationRepo)
         {
             _stationRepo = stationRepo;
@@ -105,5 +106,23 @@ namespace API.Controllers
             return NoContent();
         }
 
+        // API gợi ý trạm gần nhất
+        [HttpGet("nearby")]
+        public async Task<IActionResult> GetNearBy([FromQuery] double lat, [FromQuery] double lon, [FromQuery] double radiusKm = 5)
+        {
+            if (radiusKm <= 0) radiusKm = 5;
+            var stations = await _stationRepo.GetNearbyAsync(lat, lon, radiusKm);
+            var stationDtos = stations.Select(s => s.ToStationDto()).ToList();
+
+            return Ok(stationDtos);
+        }
+
+        // API tìm kiếm trạm
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string address)
+        {
+            var stations = await _stationRepo.SearchByAddressAsync(address);
+            return Ok(stations.Select(s => s.ToStationDto()));
+        }
     }
 }

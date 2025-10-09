@@ -8,9 +8,10 @@ namespace API.DTOs.Station
 {
     public class UpdateStationDto
     {
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
         public string? Description { get; set; }
-        public TimeSpan OpenTime { get; set; }
-        public TimeSpan CloseTime { get; set; }
+        public TimeSpan? OpenTime { get; set; }
+        public TimeSpan? CloseTime { get; set; }
+        public StationStatus? Status { get; set; }
     }
 }

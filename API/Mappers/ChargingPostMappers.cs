@@ -7,7 +7,7 @@ using API.Entities;
 
 namespace API.Mappers
 {
-    public static class PostMappers
+    public static class ChargingPostMappers
     {
         public static ChargingPostDto ToPostDto(this ChargingPost postModel)
         {

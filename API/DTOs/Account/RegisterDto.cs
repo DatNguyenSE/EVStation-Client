@@ -23,7 +23,7 @@ namespace API.DTOs.Account
         [Required]
         public string FullName { get; set; } = string.Empty;
         [Required]
-        [Range(16,100,ErrorMessage = "Age must greater than 16")]
+        [Range(18,100,ErrorMessage = "Tuổi phải lớn hơn 18")]
         public int Age { get; set; }
 
         // Danh sách xe

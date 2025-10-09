@@ -19,6 +19,9 @@ namespace API.Mappers
                 Address = stationModel.Address,
                 Latitude = stationModel.Latitude,
                 Longitude = stationModel.Longitude,
+                Description = stationModel.Description,
+                OpenTime = stationModel.OpenTime,
+                CloseTime = stationModel.CloseTime,
                 Status = stationModel.Status
             };
         }

@@ -30,7 +30,7 @@ namespace API.Repository
             int index = 1;
             foreach (var post in stationModel.Posts)
             {
-                post.Code = $"{stationModel.Code}-CHG{index:D3}"; 
+                post.Code = $"{stationModel.Code}-CHG{index:D3}";
                 index++;
             }
 
@@ -66,6 +66,32 @@ namespace API.Repository
             return await _context.Stations.FindAsync(id);
         }
 
+        public async Task<List<Station>> GetNearbyAsync(double latitude, double longitude, double radiusKm)
+        {
+            var stations = await _context.Stations.ToListAsync();
+
+            return stations
+                .Where(s => StationCodeHelper.GetDistanceKm(latitude, longitude, s.Latitude, s.Longitude) <= radiusKm)
+                .ToList();
+        }
+
+        public async Task<List<Station>> SearchByAddressAsync(string address)
+        {
+            // Kiểm tra input rỗng
+            if (string.IsNullOrEmpty(address))
+            {
+                return new List<Station>();
+            }
+
+            var search = address.Trim().ToLower();
+
+            // Tìm kiếm trong database
+            var stations = await _context.Stations
+                .Where(s => s.Address.ToLower().Contains(search)).ToListAsync();
+
+            return stations;
+        }
+
         public async Task<Station?> UpdateAsync(int id, UpdateStationDto stationDto)
         {
             var stationModel = await _context.Stations.FindAsync(id);
@@ -73,10 +99,16 @@ namespace API.Repository
             {
                 return null;
             }
-            stationModel.Name = stationDto.Name;
-            stationModel.Description = stationDto.Description;
-            stationModel.OpenTime = stationDto.OpenTime;
-            stationModel.CloseTime = stationDto.CloseTime;
+            if (stationDto.Name != null)
+                stationModel.Name = stationDto.Name;
+            if (stationDto.Description != null)
+                stationModel.Description = stationDto.Description;
+            if (stationDto.OpenTime.HasValue)
+                stationModel.OpenTime = stationDto.OpenTime.Value;
+            if (stationDto.CloseTime.HasValue)
+                stationModel.CloseTime = stationDto.CloseTime.Value;
+            if (stationDto.Status.HasValue)
+                stationModel.Status = stationDto.Status.Value;
             await _context.SaveChangesAsync();
             return stationModel;
         }

@@ -54,11 +54,5 @@ namespace API.Repository
             _context.Vehicles.Update(vehicle);
             return await _context.SaveChangesAsync() > 0;
         }
-
-        // kiểm tra user đã có loại xe đó chưa
-        public async Task<bool> UserHasVehicleTypeAsync(string userId, string type)
-        {
-            return await _context.Vehicles.AnyAsync(v => v.OwnerId == userId && v.Type == type && v.IsActive);
-        }
     } 
 }

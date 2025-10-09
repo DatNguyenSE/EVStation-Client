@@ -14,7 +14,7 @@ namespace API.Entities
         public string Address { get; set; } = string.Empty; // ví dụ 171 đường Độc Lập, Phú Giáo, Bình Dương
         public double Latitude { get; set; } // vĩ độ
         public double Longitude { get; set; } // kinh độ
-        public string? Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public TimeSpan OpenTime { get; set; }
         public TimeSpan CloseTime { get; set; }
         [Column(TypeName = "nvarchar(20)")]   // set type cho column chứ không nó để thành int
