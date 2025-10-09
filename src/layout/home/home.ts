@@ -12,7 +12,7 @@ import { Vehicle } from '../../features/vehicle/vehicle';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule],
+  imports: [SlideCarouselComponent, News, Instruction, Contact, CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })

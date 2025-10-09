@@ -7,64 +7,119 @@ import { Router } from '@angular/router';
 export class ToastService {
   private router = inject(Router);
 
-   constructor() {
+  constructor() {
     this.createToastContainer();
+    this.injectToastStyles();
   }
 
+  //  Container gốc
   private createToastContainer() {
     if (!document.getElementById('toast-container')) {
       const container = document.createElement('div');
       container.id = 'toast-container';
-      container.className = 'toast toast-bottom toast-end z-50'
-      document.body.appendChild(container)
+      container.className = `
+        fixed bottom-6 right-6 flex flex-col gap-3 z-[9999]
+        font-sans text-sm text-gray-800
+      `;
+      document.body.appendChild(container);
     }
   }
 
-  private createToastElement(message: string, alertClass: string, duration = 5000, 
-      avatar?: string, route?: string) {
-    const toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) return;
+  //  Inject CSS hiệu ứng toast
+  private injectToastStyles() {
+    if (document.getElementById('toast-style')) return;
+    const style = document.createElement('style');
+    style.id = 'toast-style';
+    style.innerHTML = `
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateX(50px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(50px); }
+      }
+      .toast-animate-in { animation: slideIn 0.3s ease forwards; }
+      .toast-animate-out { animation: fadeOut 0.4s ease forwards; }
+
+      .toast-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: white;
+        font-weight: 500;
+        letter-spacing: 0.2px;
+        transition: transform 0.2s ease;
+      }
+      .toast-item:hover { transform: scale(1.02); }
+
+      .toast-icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+      }
+
+      .toast-success { border-left: 5px solid #22c55e; }
+      .toast-error { border-left: 5px solid #ef4444; }
+      .toast-warning { border-left: 5px solid #facc15; }
+      .toast-info { border-left: 5px solid #3b82f6; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // 🔥 Tạo toast
+  private createToastElement(
+    message: string,
+    alertClass: string,
+    duration = 4000,
+    avatar?: string,
+    route?: string
+  ) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
 
     const toast = document.createElement('div');
-    toast.classList.add('alert', alertClass, 'shadow-lg', 'flex', 
-        'items-center', 'gap-3', 'cursor-pointer');
+    toast.className = `toast-item ${alertClass} toast-animate-in cursor-pointer`;
 
     if (route) {
-      toast.addEventListener('click', () => this.router.navigateByUrl(route))
+      toast.addEventListener('click', () => this.router.navigateByUrl(route));
     }
 
     toast.innerHTML = `
-      ${avatar ? `<img src=${avatar || '/user.png'} class='w-10 h-10 rounded'` : ''}
+      ${avatar ? `<img src="${avatar}" class="toast-icon rounded-full" alt="icon"/>` : ''}
       <span>${message}</span>
-      <button class="ml-4 btn btn-sm btn-ghost">x</button>
-    `
+      <button class="ml-auto text-gray-400 hover:text-gray-700 font-bold text-lg">&times;</button>
+    `;
 
-    toast.querySelector('button')?.addEventListener('click', () => {
-      toastContainer.removeChild(toast);
-    })
+    // Đóng khi bấm "x"
+    toast.querySelector('button')?.addEventListener('click', () => this.removeToast(toast));
 
-    toastContainer.append(toast);
+    container.appendChild(toast);
 
-    setTimeout(() => {
-      if (toastContainer.contains(toast)) {
-        toastContainer.removeChild(toast);
-      }
-    }, duration);
+    // Tự tắt
+    setTimeout(() => this.removeToast(toast), duration);
   }
 
-  success(message: string, duration?: number, avatar?: string, route?: string) {
-    this.createToastElement(message, 'alert-success', duration, avatar, route);
+  private removeToast(toast: HTMLElement) {
+    toast.classList.remove('toast-animate-in');
+    toast.classList.add('toast-animate-out');
+    setTimeout(() => toast.remove(), 400);
   }
 
-  error(message: string, duration?: number, avatar?: string, route?: string) {
-    this.createToastElement(message, 'alert-error', duration, avatar, route);
+  // 
+  success(msg: string, dur?: number, avatar?: string, route?: string) {
+    this.createToastElement(msg, 'toast-success', dur, avatar, route);
   }
-
-  warning(message: string, duration?: number, avatar?: string, route?: string) {
-    this.createToastElement(message, 'alert-warning', duration, avatar, route);
+  error(msg: string, dur?: number, avatar?: string, route?: string) {
+    this.createToastElement(msg, 'toast-error', dur, avatar, route);
   }
-
-  info(message: string, duration?: number, avatar?: string, route?: string) {
-    this.createToastElement(message, 'alert-info', duration, avatar, route);
+  warning(msg: string, dur?: number, avatar?: string, route?: string) {
+    this.createToastElement(msg, 'toast-warning', dur, avatar, route);
+  }
+  info(msg: string, dur?: number, avatar?: string, route?: string) {
+    this.createToastElement(msg, 'toast-info', dur, avatar, route);
   }
 }
