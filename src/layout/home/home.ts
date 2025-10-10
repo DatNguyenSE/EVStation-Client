@@ -9,13 +9,14 @@ import { CommonModule } from '@angular/common';
 import { Vehicle } from '../../features/vehicle/vehicle';
 import { Login } from "../../features/account/login/login";
 import { RouterLink } from '@angular/router';
+import { ConfirmEmail } from "../../features/confirm-email/confirm-email";
 
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule, Login,RouterLink],
+  imports: [SlideCarouselComponent, Vehicle, News, Instruction, Contact, CommonModule, Login, RouterLink, ConfirmEmail],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
