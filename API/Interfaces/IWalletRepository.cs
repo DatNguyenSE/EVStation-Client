@@ -10,6 +10,6 @@ namespace API.Interfaces
     {
         Task<Wallet?> GetWalletByUserIdAsync(string userId);
         Task<Wallet> CreateWalletAsync(string userId);
-        Task<bool> UpdateWalletAsync(Wallet wallet);
+        Task UpdateWalletAsync(Wallet wallet);
     }
 }

@@ -21,7 +21,7 @@ namespace API.Repository
             var packageModel = await _context.ChargingPackages.FindAsync(packageId);
             if (packageModel == null)
             {
-                throw new KeyNotFoundException("Package not found");
+                throw new KeyNotFoundException("Không tìm thấy gói");
             }
 
             var userPackageModel = new DriverPackage
@@ -35,7 +35,6 @@ namespace API.Repository
             };
 
             await _context.DriverPackages.AddAsync(userPackageModel);
-            await _context.SaveChangesAsync();
 
             return userPackageModel;
         }
@@ -49,7 +48,6 @@ namespace API.Repository
             }
 
             _context.DriverPackages.Remove(userPackageModel);
-            await _context.SaveChangesAsync();
             return userPackageModel;
         }
 

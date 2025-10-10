@@ -16,17 +16,17 @@ namespace API.Controllers
     [ApiController]
     public class ChargingPackageController : ControllerBase
     {
-        private readonly IChargingPackageRepository _packageRepo;
+        private readonly IUnitOfWork _uow;
 
-        public ChargingPackageController(IChargingPackageRepository packageRepo)
+        public ChargingPackageController(IUnitOfWork uow)
         {
-            _packageRepo = packageRepo;
+            _uow = uow;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var packages = await _packageRepo.GetAllAsync();
+            var packages = await _uow.ChargingPackages.GetAllAsync();
             var packageDtos = packages.Select(p => p.ToPackageDto()).ToList();
             return Ok(packageDtos);
         }
@@ -38,7 +38,7 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var packageModel = await _packageRepo.GetByIdAsync(id);
+            var packageModel = await _uow.ChargingPackages.GetByIdAsync(id);
             if (packageModel == null)
             {
                 return NotFound();
@@ -54,7 +54,11 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
             var packageModel = packageDto.ToPackageFromCreateDto();
-            await _packageRepo.CreateAsync(packageModel);
+            await _uow.ChargingPackages.CreateAsync(packageModel);
+
+            if (!await _uow.Complete())
+                return StatusCode(500, "Không thể lưu gói sạc.");
+
             return CreatedAtAction(nameof(GetById), new { id = packageModel.Id }, packageModel.ToPackageDto());
         }
 
@@ -66,11 +70,14 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var packageModel = await _packageRepo.UpdateAsync(id, packageDto);
+            var packageModel = await _uow.ChargingPackages.UpdateAsync(id, packageDto);
             if (packageModel == null)
             {
                 return NotFound();
             }
+            if (!await _uow.Complete())
+                return StatusCode(500, "Không thể cập nhật gói sạc.");
+
             return Ok(packageModel.ToPackageDto());
         }
 
@@ -82,11 +89,14 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
             
-            var packageModel = await _packageRepo.UpdateStatusAsync(id, packageDto);
+            var packageModel = await _uow.ChargingPackages.UpdateStatusAsync(id, packageDto);
             if (packageModel == null)
             {
                 return NotFound();
             }
+            if (!await _uow.Complete())
+                return StatusCode(500, "Không thể thay đổi trạng thái gói sạc.");
+
             return Ok(packageModel.ToPackageDto());
         }
 
@@ -97,11 +107,14 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var packageModel = await _packageRepo.DeleteAsync(id);
+            var packageModel = await _uow.ChargingPackages.DeleteAsync(id);
             if (packageModel == null)
             {
                 return NotFound();
             }
+            if (!await _uow.Complete())
+                return StatusCode(500, "Không thể xóa gói sạc.");
+
             return NoContent();
         }
     }

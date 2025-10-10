@@ -1,8 +1,13 @@
 using System.Threading.Tasks; //: Cung cấp các loại như Task để thực hiện xử lý bất đồng bộ (async).
 using API.Controllers;
 using API.Data;
+using API.DTOs.Account;
 using API.Entities;
+using API.Extensions;
+using API.Interfaces;
+using API.Mappers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc; //Cung cấp các tính năng để xây dựng Web API như ControllerBase, [HttpGet], ActionResult, v.v.
 using Microsoft.EntityFrameworkCore;
 
@@ -12,25 +17,46 @@ namespace API;
 
 [Route("api/users")]
 [ApiController]
-public class UsersController(AppDbContext context) : ControllerBase //cung cấp nhiều phương thức tiện ích như Ok(), NotFound(), BadRequest()…
+public class UsersController : ControllerBase //cung cấp nhiều phương thức tiện ích như Ok(), NotFound(), BadRequest()…
 {
-    [AllowAnonymous]
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+    private readonly UserManager<AppUser> _userManager;
+    private readonly IUnitOfWork _uow;
+     
+    public UsersController(UserManager<AppUser> userManager, IUnitOfWork uow)
     {
-        var users = await context.Users.ToListAsync();
-        return users;
+        _userManager = userManager;
+        _uow = uow;
     }
 
-
-    [Authorize]
-    [HttpGet("{id}")]  //localhost 5001 -> api/users/{id}
-    public async Task<ActionResult<AppUser>> GetUsers(String id)
+    [HttpGet("profile-driver")]
+    [Authorize(Roles ="Driver")]
+    public async Task<IActionResult> GetProfile_Driver()
     {
-        var user = await context.Users.FindAsync(id); // await -> Hãy đi tìm user trong database và khi tìm xong THÌ MỚI gán kết quả vào biến user.”
-        if (user == null) return NotFound();
+        var username = User.GetUsername();
+        var appUser = await _userManager.FindByNameAsync(username);
 
-        return user;
+        if (appUser == null) return Unauthorized();
+
+        // LẤY DANH SÁCH XE CỦA USER
+        var vehicles = await _uow.Vehicles.GetVehiclesByUserAsync(appUser.Id);
+
+        var roles = await _userManager.GetRolesAsync(appUser);
+        var singleRole = roles.FirstOrDefault();
+
+        // Chuyển đổi danh sách Entity Vehicle sang DTO
+        var VehicleResponseDto = vehicles.Select(v => v.ToVehicleResponseDto()).ToList();
+
+        return Ok(new UserProfileDto
+        {
+            Id = appUser.Id,
+            Username = username,
+            Email = appUser.Email,
+            Role = singleRole,
+            FullName = appUser.FullName,
+            Age = appUser.Age,
+            Vehicles = VehicleResponseDto
+        });
     }
+
 
 }

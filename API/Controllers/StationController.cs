@@ -18,18 +18,18 @@ namespace API.Controllers
     [ApiController]
     public class StationController : ControllerBase
     {
-        private readonly IStationRepository _stationRepo;
-        
-        public StationController(IStationRepository stationRepo)
+        private readonly IUnitOfWork _uow;
+
+        public StationController(IUnitOfWork uow)
         {
-            _stationRepo = stationRepo;
+            _uow = uow;
         }
 
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAll()
         {
-            var stations = await _stationRepo.GetAllAsync();
+            var stations = await _uow.Stations.GetAllAsync();
             var stationDtos = stations.Select(s => s.ToStationDto()).ToList();
             return Ok(stationDtos);
         }
@@ -41,7 +41,7 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var station = await _stationRepo.GetByIdAsync(id);
+            var station = await _uow.Stations.GetByIdAsync(id);
             if (station == null)
             {
                 return NotFound();
@@ -58,7 +58,9 @@ namespace API.Controllers
             }
 
             var stationModel = stationDto.ToStationFromCreateDto();
-            await _stationRepo.CreateAsync(stationModel);
+            await _uow.Stations.CreateAsync(stationModel);
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Tạo trạm thất bại");
             return CreatedAtAction(nameof(GetById), new { id = stationModel.Id }, stationModel.ToStationDto());
         }
 
@@ -71,22 +73,26 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var stationModel = await _stationRepo.UpdateAsync(id, stationDto);
+            var stationModel = await _uow.Stations.UpdateAsync(id, stationDto);
             if (stationModel == null)
             {
                 return NotFound();
             }
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Cập nhật trạm thất bại");
             return Ok(stationModel.ToStationDto());
         }
 
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus([FromRoute] int id, [FromBody] StationStatus status)
         {
-            var stationModel = await _stationRepo.UpdateStatusAsync(id, status);
+            var stationModel = await _uow.Stations.UpdateStatusAsync(id, status);
             if (stationModel == null)
             {
                 return NotFound();
             }
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Cập nhật trạm thất bại");
             return Ok(stationModel.ToStationDto());
         }
 
@@ -98,11 +104,13 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var stationModel = await _stationRepo.DeleteAsync(id);
+            var stationModel = await _uow.Stations.DeleteAsync(id);
             if (stationModel == null)
             {
                 return NotFound();
             }
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Xoá trạm thất bại");
             return NoContent();
         }
 
@@ -111,7 +119,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetNearBy([FromQuery] double lat, [FromQuery] double lon, [FromQuery] double radiusKm = 5)
         {
             if (radiusKm <= 0) radiusKm = 5;
-            var stations = await _stationRepo.GetNearbyAsync(lat, lon, radiusKm);
+            var stations = await _uow.Stations.GetNearbyAsync(lat, lon, radiusKm);
             var stationDtos = stations.Select(s => s.ToStationDto()).ToList();
 
             return Ok(stationDtos);
@@ -121,7 +129,7 @@ namespace API.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] string address)
         {
-            var stations = await _stationRepo.SearchByAddressAsync(address);
+            var stations = await _uow.Stations.SearchByAddressAsync(address);
             return Ok(stations.Select(s => s.ToStationDto()));
         }
     }

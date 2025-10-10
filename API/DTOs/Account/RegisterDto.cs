@@ -27,7 +27,6 @@ namespace API.DTOs.Account
         public int Age { get; set; }
 
         // Danh sách xe
-        [Required]
         public List<VehicleDto> Vehicles { get; set; } = new();
     }
 }

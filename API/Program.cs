@@ -11,6 +11,7 @@ using API.Repository;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using API.Entities.Email;
+using API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddControllers()
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         // chuyển các giá trị kiểu enum thành chữ chứ không còn là 0, 1, 2,...
         options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+        // Định dạng thời gian dễ đọc hơn
+        options.SerializerSettings.Converters.Add(new CustomDateTimeConverter());
     });
 
 // swagger
@@ -100,14 +103,23 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<ITokenService, TokenService>();
+// Đăng ký Unit of Work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// --- Đăng ký repository (tầng data)
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
-builder.Services.AddScoped<IWalletRepository, WalletRepository>();
-builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
-builder.Services.AddScoped<IStationRepository, StationRepository>();
-builder.Services.AddScoped<IChargingPostRepository, ChargingPostRepository>();
-builder.Services.AddScoped<IChargingPackageRepository, ChargingPackageRepository>();
-builder.Services.AddScoped<IDriverPackageRepository, DriverPackageRepository>();
+// builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+// builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+// builder.Services.AddScoped<IStationRepository, StationRepository>();
+// builder.Services.AddScoped<IChargingPostRepository, ChargingPostRepository>();
+// builder.Services.AddScoped<IChargingPackageRepository, ChargingPackageRepository>();
+// builder.Services.AddScoped<IDriverPackageRepository, DriverPackageRepository>();
+// builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+
+// --- Đăng ký service (tầng logic)
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
 // Cấu hình Email Settings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 // Đăng ký Email Service

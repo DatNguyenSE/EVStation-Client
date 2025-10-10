@@ -20,15 +20,13 @@ namespace API.Repository
         public async Task<Vehicle> AddVehicleAsync(Vehicle vehicleModel)
         {
             await _context.Vehicles.AddAsync(vehicleModel);
-            await _context.SaveChangesAsync();
             return vehicleModel;
         }
 
-        public async Task<bool> DeactivateVehicleAsync(Vehicle vehicle)
+        public async Task DeactivateVehicleAsync(Vehicle vehicle)
         {
             vehicle.IsActive = false;
             _context.Vehicles.Update(vehicle);
-            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<Vehicle?> GetVehicleByIdAsync(int id)
@@ -49,10 +47,9 @@ namespace API.Repository
                 .AnyAsync(v => v.Plate == plate && (excludeVehicleId == null || v.Id != excludeVehicleId));
         }
 
-        public async Task<bool> UpdateVehicleAsync(Vehicle vehicle)
+        public async Task UpdateVehicleAsync(Vehicle vehicle)
         {
             _context.Vehicles.Update(vehicle);
-            return await _context.SaveChangesAsync() > 0;
         }
     } 
 }

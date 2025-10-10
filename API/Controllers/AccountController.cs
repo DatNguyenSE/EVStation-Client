@@ -285,27 +285,5 @@ namespace API.Controllers
                 return StatusCode(500, new { message = "Không gửi được email xác nhận. Vui lòng thử lại sau." });
             }
         }
-
-        [HttpGet("profile")]
-        [Authorize]
-        public async Task<IActionResult> GetProfile()
-        {
-            var username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(username);
-
-            if (appUser == null) return Unauthorized();
-
-            var email = appUser.Email;
-            var age = appUser.Age;
-            var fullName = appUser.FullName;
-
-            return Ok(new UserProfileDto
-            {
-                Username = username,
-                Email = email,
-                FullName = fullName,
-                Age = age
-            });
-        }
     }
 }

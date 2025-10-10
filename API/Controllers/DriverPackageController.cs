@@ -16,18 +16,18 @@ namespace API.Controllers
     [ApiController]
     public class DriverPackageController : ControllerBase
     {
-        private readonly IDriverPackageRepository _userPackageRepo;
+        private readonly IUnitOfWork _uow;
 
-        public DriverPackageController(IDriverPackageRepository userPackageRepo)
+        public DriverPackageController(IUnitOfWork uow)
         {
-            _userPackageRepo = userPackageRepo;
+            _uow = uow;
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            var userPackageModels = await _userPackageRepo.GetAllAsync();
+            var userPackageModels = await _uow.DriverPackages.GetAllAsync();
             var userPackageDtos = userPackageModels.Select(up => up.ToDriverPackageDto()).ToList();
             return Ok(userPackageDtos);
         }
@@ -36,10 +36,10 @@ namespace API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(int id)
         {
-            var userPackageModel = await _userPackageRepo.GetByIdAsync(id);
+            var userPackageModel = await _uow.DriverPackages.GetByIdAsync(id);
             if (userPackageModel == null)
             {
-                return NotFound("Cannot found this item");
+                return NotFound("Không tìm thấy.");
             }
             return Ok(userPackageModel);
         }
@@ -53,7 +53,7 @@ namespace API.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var userPackageModels = await _userPackageRepo.GetByUserAsync(userId);
+            var userPackageModels = await _uow.DriverPackages.GetByUserAsync(userId);
             var userPackageDtos = userPackageModels.Select(up => up.ToUserPackageViewDto()).ToList();
             return Ok(userPackageDtos);
         }
@@ -63,7 +63,7 @@ namespace API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByUser(string userId)
         {
-            var userPackageModels = await _userPackageRepo.GetByUserAsync(userId);
+            var userPackageModels = await _uow.DriverPackages.GetByUserAsync(userId);
             var userPackageDtos = userPackageModels.Select(up => up.ToUserPackageViewDto()).ToList();
             return Ok(userPackageDtos);
         }
@@ -76,15 +76,19 @@ namespace API.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("Cannot found your account!!");
 
-            var userPackageModel = await _userPackageRepo.CreateAsync(userId, userPackageDto.PackageId);
+            var userPackageModel = await _uow.DriverPackages.CreateAsync(userId, userPackageDto.PackageId);
             if (userPackageModel == null)
             {
                 return NotFound("Package not found!!");
             }
+            var result = await _uow.Complete();
+            if (!result)
+                return BadRequest("Failed to create package");
             return CreatedAtAction(nameof(GetById), new { id = userPackageModel.Id }, userPackageModel);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (!ModelState.IsValid)
@@ -92,11 +96,15 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userPackageModel = await _userPackageRepo.DeleteAsync(id);
+            var userPackageModel = await _uow.DriverPackages.DeleteAsync(id);
             if (userPackageModel == null)
             {
                 return NotFound("Cannot found this item");
             }
+            
+            var result = await _uow.Complete();
+            if (!result)
+                return BadRequest("Failed to delete");
 
             return NoContent();
         }

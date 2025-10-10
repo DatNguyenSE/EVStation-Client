@@ -25,7 +25,7 @@ namespace API.Repository
                 Balance = 0
             };
             await _context.Wallets.AddAsync(wallet);
-            await _context.SaveChangesAsync();
+
             return wallet;
         }
 
@@ -34,10 +34,9 @@ namespace API.Repository
             return await _context.Wallets.Include(w => w.appUser).FirstOrDefaultAsync(w => w.UserId == userId);
         }
 
-        public async Task<bool> UpdateWalletAsync(Wallet wallet)
+        public async Task UpdateWalletAsync(Wallet wallet)
         {
             _context.Wallets.Update(wallet);
-            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

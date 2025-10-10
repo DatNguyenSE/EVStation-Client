@@ -22,7 +22,6 @@ namespace API.Repository
         public async Task<ChargingPackage> CreateAsync(ChargingPackage packageModel)
         {
             await _context.ChargingPackages.AddAsync(packageModel);
-            await _context.SaveChangesAsync();
             return packageModel;
         }
 
@@ -34,7 +33,6 @@ namespace API.Repository
                 return null;
             }
             _context.ChargingPackages.Remove(packageModel);
-            await _context.SaveChangesAsync();
             return packageModel;
         }
 
@@ -67,7 +65,6 @@ namespace API.Repository
                 packageModel.DurationDays = packageDto.DurationDays.Value;
             if (packageDto.IsActive.HasValue)
                 packageModel.IsActive = packageDto.IsActive.Value;
-            await _context.SaveChangesAsync();
             return packageModel;
         }
 
@@ -80,7 +77,6 @@ namespace API.Repository
                 return null;
             }
             packageModel.IsActive = packageStatusDto.IsActive;
-            await _context.SaveChangesAsync();
             return packageModel;
         }
     }

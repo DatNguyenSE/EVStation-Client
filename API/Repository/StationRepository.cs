@@ -34,8 +34,6 @@ namespace API.Repository
                 index++;
             }
 
-            await _context.SaveChangesAsync();
-
             return stationModel;
         }
 
@@ -47,7 +45,7 @@ namespace API.Repository
                 return null;
             }
             _context.Stations.Remove(stationModel);
-            await _context.SaveChangesAsync();
+
             return stationModel;
         }
 
@@ -109,7 +107,6 @@ namespace API.Repository
                 stationModel.CloseTime = stationDto.CloseTime.Value;
             if (stationDto.Status.HasValue)
                 stationModel.Status = stationDto.Status.Value;
-            await _context.SaveChangesAsync();
             return stationModel;
         }
 
@@ -143,7 +140,6 @@ namespace API.Repository
                 }
             }
 
-            await _context.SaveChangesAsync();
             return station;
         }
     }

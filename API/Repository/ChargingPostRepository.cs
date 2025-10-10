@@ -23,7 +23,7 @@ namespace API.Repository
                 .Include(s => s.Posts)
                 .FirstOrDefaultAsync(s => s.Id == stationId);
 
-            if (station == null) throw new Exception("Station not found");
+            if (station == null) throw new Exception("Không tìm thấy trạm");
 
             // lấy số thứ tự cho trụ của trạm đó
             int nextIndex = station.Posts.Any() ? station.Posts.Max(p => int.Parse(p.Code.Split("CHG")[1])) + 1 : 1;
@@ -32,7 +32,14 @@ namespace API.Repository
             postModel.StationId = stationId;
 
             await _context.ChargingPosts.AddAsync(postModel);
-            await _context.SaveChangesAsync();
+            return postModel;
+        }
+
+        // PHƯƠNG THỨC GHI: KHÔNG GỌI SaveChangesAsync()
+        public ChargingPost? Update(ChargingPost postModel)
+        {
+            // Chỉ đánh dấu entity là Modified trong Context
+            _context.ChargingPosts.Update(postModel);
             return postModel;
         }
 
@@ -44,7 +51,6 @@ namespace API.Repository
                 return null;
             }
             _context.ChargingPosts.Remove(postModel);
-            await _context.SaveChangesAsync();
             return postModel;
         }
 
@@ -78,7 +84,9 @@ namespace API.Repository
                 postModel.ConnectorType = postDto.ConnectorType.Value;
             if (postDto.Status.HasValue)
                 postModel.Status = postDto.Status.Value;
-            await _context.SaveChangesAsync();
+
+            // Chỉ đánh dấu là Modified
+            _context.ChargingPosts.Update(postModel); 
             return postModel;
         }
 
@@ -91,7 +99,8 @@ namespace API.Repository
             }
 
             post.Status = status;
-            await _context.SaveChangesAsync();
+            // Chỉ đánh dấu là Modified
+            _context.ChargingPosts.Update(post); 
             return post;
         }
     }

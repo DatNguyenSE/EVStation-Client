@@ -16,10 +16,9 @@ namespace API.Repository
         {
             _context = context;
         }
-        public async Task<bool> AddTransactionAsync(WalletTransaction transaction)
+        public async Task AddTransactionAsync(WalletTransaction transaction)
         {
             await _context.WalletTransactions.AddAsync(transaction);
-            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<WalletTransaction?> GetByVnpTxnRefAsync(string vnpTxnRef)
@@ -38,7 +37,6 @@ namespace API.Repository
         public async Task UpdateTransactionAsync(WalletTransaction transaction)
         {
             _context.WalletTransactions.Update(transaction);
-            await _context.SaveChangesAsync();
         }
     }
 }

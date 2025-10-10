@@ -11,8 +11,8 @@ namespace API.Interfaces
         Task<Vehicle> AddVehicleAsync(Vehicle vehicleModel);
         Task<IEnumerable<Vehicle>> GetVehiclesByUserAsync(string userId);
         Task<Vehicle?> GetVehicleByIdAsync(int id);
-        Task<bool> UpdateVehicleAsync(Vehicle vehicle);
+        Task UpdateVehicleAsync(Vehicle vehicle);
         Task<bool> PlateExistsAsync(string plate, int? excludeVehicleId = null);
-        Task<bool> DeactivateVehicleAsync(Vehicle vehicle);
+        Task DeactivateVehicleAsync(Vehicle vehicle);
     }
 }

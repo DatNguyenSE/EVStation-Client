@@ -9,7 +9,7 @@ namespace API.Interfaces
 {
     public interface IWalletTransactionRepository
     {
-        Task<bool> AddTransactionAsync(WalletTransaction transaction);
+        Task AddTransactionAsync(WalletTransaction transaction);
         Task<WalletTransaction?> GetByVnpTxnRefAsync(string vnpTxnRef);
         Task UpdateTransactionAsync(WalletTransaction transaction);
         Task<IEnumerable<WalletTransaction>> GetTransactionsByWalletIdAsync(int walletId);

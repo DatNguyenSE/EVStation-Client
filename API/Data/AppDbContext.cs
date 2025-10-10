@@ -21,6 +21,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<ChargingPost> ChargingPosts { get; set; }  
     public DbSet<ChargingPackage> ChargingPackages { get; set; }
     public DbSet<DriverPackage> DriverPackages { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

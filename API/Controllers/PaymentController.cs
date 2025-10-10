@@ -19,16 +19,16 @@ namespace API.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IVnPayService _vnPayService;
-        private readonly IWalletRepository _walletRepo;
-        private readonly IWalletTransactionRepository _transactionRepo;
+        // private readonly IWalletRepository _walletRepo;
+        // private readonly IWalletTransactionRepository _transactionRepo;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
 
 
-        public PaymentController(IVnPayService vnPayService, IWalletRepository walletRepo, IWalletTransactionRepository walletTransactionRepo, UserManager<AppUser> userManager)
+        public PaymentController(IVnPayService vnPayService, IUnitOfWork uow, UserManager<AppUser> userManager)
         {
             _vnPayService = vnPayService;
-            _transactionRepo = walletTransactionRepo;
-            _walletRepo = walletRepo;
+            _uow = uow;
             _userManager = userManager;
         }
 
@@ -44,10 +44,10 @@ namespace API.Controllers
             if (appUser == null) return Unauthorized();
 
             // Lấy hoặc tạo ví
-            var wallet = await _walletRepo.GetWalletByUserIdAsync(appUser.Id);
+            var wallet = await _uow.Wallets.GetWalletByUserIdAsync(appUser.Id);
             if (wallet == null)
             {
-                wallet = await _walletRepo.CreateWalletAsync(appUser.Id);
+                wallet = await _uow.Wallets.CreateWalletAsync(appUser.Id);
             }
 
             // Lưu transaction pending
@@ -62,7 +62,12 @@ namespace API.Controllers
                 VnpTxnRef = txnRef,
                 CreatedAt = DateTime.UtcNow
             };
-            await _transactionRepo.AddTransactionAsync(txn);
+            await _uow.WalletTransactions.AddTransactionAsync(txn);
+
+            if (!await _uow.Complete())
+            {
+                throw new Exception("Lỗi hệ thống: Không thể lưu giao dịch Pending.");
+            }
 
             // Thêm thông tin orderType/Name cho VNPAY
             model.Name = username;
@@ -81,27 +86,41 @@ namespace API.Controllers
         public async Task<IActionResult> PaymentCallback()
         {
             var response = _vnPayService.PaymentExecute(Request.Query);
-            var txn = await _transactionRepo.GetByVnpTxnRefAsync(response.OrderId);
+            var txn = await _uow.WalletTransactions.GetByVnpTxnRefAsync(response.OrderId);
             if (txn == null)
                 return NotFound("Không tìm thấy giao dịch");
 
             if (response.Success)
             {
-                if (txn.Status != "Success")
-                {
-                    txn.Status = "Success";
-                    await _transactionRepo.UpdateTransactionAsync(txn);
+                // if (txn.Status != "Success")
+                // {
+                //     txn.Status = "Success";
+                //     await _uow.WalletTransactions.UpdateTransactionAsync(txn);
 
-                    var wallet = txn.Wallet;
-                    wallet.Balance += txn.Amount;
-                    await _walletRepo.UpdateWalletAsync(wallet);
-                }
+                //     var wallet = txn.Wallet;
+                //     wallet.Balance += txn.Amount;
+                //     await _uow.Wallets.UpdateWalletAsync(wallet);
+                // }
+                // return Ok(new { message = "Nạp tiền thành công", data = response });
+                txn.Status = "Success";
+
+                var wallet = txn.Wallet;
+                wallet.Balance += txn.Amount;
+
+                await _uow.WalletTransactions.UpdateTransactionAsync(txn);
+                await _uow.Wallets.UpdateWalletAsync(wallet);
+
+                var success = await _uow.Complete();
+                if (!success)
+                    return StatusCode(500, "Có lỗi xảy ra khi lưu thay đổi.");
+
                 return Ok(new { message = "Nạp tiền thành công", data = response });
             }
             else
             {
                 txn.Status = "Failed";
-                await _transactionRepo.UpdateTransactionAsync(txn);
+                await _uow.WalletTransactions.UpdateTransactionAsync(txn);
+                await _uow.Complete();
                 return BadRequest(new { message = "Thanh toán thất bại", data = response });
             }
         }

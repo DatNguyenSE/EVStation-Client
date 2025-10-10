@@ -19,11 +19,12 @@ namespace API.Controllers
     [ApiController]
     public class VehicleController : ControllerBase
     {
-        private readonly IVehicleRepository _vehicleRepo;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
-        public VehicleController(IVehicleRepository vehicleRepo, UserManager<AppUser> userManager)
+
+        public VehicleController(IUnitOfWork uow, UserManager<AppUser> userManager)
         {
-            _vehicleRepo = vehicleRepo;
+            _uow = uow;
             _userManager = userManager;
         }
 
@@ -44,7 +45,7 @@ namespace API.Controllers
             }
 
             // Kiểm tra trùng biển số
-            if (await _vehicleRepo.PlateExistsAsync(vehicleDto.Plate))
+            if (await _uow.Vehicles.PlateExistsAsync(vehicleDto.Plate))
             {
                 return BadRequest("Biển số xe đã tồn tại.");
             }
@@ -60,7 +61,11 @@ namespace API.Controllers
                 OwnerId = appUser.Id,
             };
 
-            var created = await _vehicleRepo.AddVehicleAsync(vehicle);
+            var created = await _uow.Vehicles.AddVehicleAsync(vehicle);
+
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Thêm xe thất bại");
+
             return Ok(new
             {
                 message = "Đã thêm xe thành công",
@@ -81,7 +86,7 @@ namespace API.Controllers
                 return Unauthorized();
             }
 
-            var vehicles = await _vehicleRepo.GetVehiclesByUserAsync(appUser.Id);
+            var vehicles = await _uow.Vehicles.GetVehiclesByUserAsync(appUser.Id);
 
             if (!vehicles.Any())
                 return Ok(new List<VehicleResponseDto>()); // hoặc trả thông báo rỗng
@@ -102,14 +107,14 @@ namespace API.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return Unauthorized();
 
-            var vehicle = await _vehicleRepo.GetVehicleByIdAsync(id);
+            var vehicle = await _uow.Vehicles.GetVehicleByIdAsync(id);
             if (vehicle == null || vehicle.OwnerId != appUser.Id)
             {
                 return NotFound("Không tìm thấy xe hoặc bạn không có quyền.");
             }
 
             // Kiểm tra trùng biển số
-            if (await _vehicleRepo.PlateExistsAsync(dto.Plate, id))
+            if (await _uow.Vehicles.PlateExistsAsync(dto.Plate, id))
             {
                 return BadRequest("Biển số xe đã tồn tại.");
             }
@@ -122,8 +127,9 @@ namespace API.Controllers
             vehicle.ConnectorType = dto.ConnectorType;
             vehicle.Plate = dto.Plate;
 
-            var success = await _vehicleRepo.UpdateVehicleAsync(vehicle);
-            if (!success) return BadRequest("Cập nhật xe thất bại.");
+            await _uow.Vehicles.UpdateVehicleAsync(vehicle);
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Cập nhật xe thất bại.");
 
             return Ok(new
             {
@@ -140,7 +146,7 @@ namespace API.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return Unauthorized();
 
-            var vehicle = await _vehicleRepo.GetVehicleByIdAsync(id);
+            var vehicle = await _uow.Vehicles.GetVehicleByIdAsync(id);
             if (vehicle == null)
             {
                 return NotFound("Không tìm thấy xe");
@@ -156,8 +162,9 @@ namespace API.Controllers
                 return BadRequest("Xe này đã bị vô hiệu hóa trước đó.");
             }
 
-            var success = await _vehicleRepo.DeactivateVehicleAsync(vehicle);
-            if (!success) return BadRequest("Vô hiệu hóa xe thất bại.");
+            await _uow.Vehicles.DeactivateVehicleAsync(vehicle);
+            var result = await _uow.Complete();
+            if (!result) return BadRequest("Vô hiệu hóa xe thất bại.");
             return Ok(new { message = "Xe đã được vô hiệu hóa (inactive)." });
         }
     }
