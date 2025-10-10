@@ -50,8 +50,12 @@ namespace API.Services
             }
         }
 
-        public async Task SendEmailConfirmationAsync(string toEmail, string confirmationLink)
+        public async Task SendEmailConfirmationAsync(string toEmail, string userId,string token)
         {
+            var frontendUrl = "http://localhost:4200";
+            var encodeToken = Uri.EscapeDataString(token);
+            var confirmationLink = $"{frontendUrl}/confirm-email?userId={userId}&token={encodeToken}"; 
+            
             var subject = "Xác nhận địa chỉ Email của bạn";
             var body = $@"
                 <html>

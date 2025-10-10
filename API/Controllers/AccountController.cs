@@ -149,21 +149,23 @@ namespace API.Controllers
                 {
                     return BadRequest(roleResult.Errors);
                 }
-
+                // url FE
+                var frontendUrl = "http://localhost:4200";
                 // Tạo token xác nhận email
                 var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
                 // Encode token để truyền qua URL
                 var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(emailToken));
                 // Lấy base URL từ configuration hoặc từ request
-                var baseUrl = _configuration["AppSettings:BaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+                // var baseUrl = _configuration["AppSettings:BaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
 
                 // Tạo link xác nhận email
-                var confirmationLink = $"{baseUrl}/api/account/confirm-email?userId={appUser.Id}&token={encodedToken}";
+                var confirmationLink = $"{frontendUrl}/api/account/confirm-email?userId={appUser.Id}&token={encodedToken}";
+              
 
                 // Gửi email xác nhận
                 try
                 {
-                    await _emailService.SendEmailConfirmationAsync(appUser.Email, confirmationLink);
+                    await _emailService.SendEmailConfirmationAsync(appUser.Email, appUser.Id , encodedToken);
                     
                     _logger.LogInformation($"Email confirmation sent to {appUser.Email}");
                 }
@@ -264,13 +266,14 @@ namespace API.Controllers
             // Tạo token mới
             var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(emailToken));
-
+            var frontendUrl = "http://localhost:4200";
             var baseUrl = _configuration["AppSettings:BaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
-            var confirmationLink = $"{baseUrl}/api/account/confirm-email?userId={user.Id}&token={encodedToken}";
+            var confirmationLink = $"{frontendUrl}/api/account/confirm-email?userId={user.Id}&token={encodedToken}";
+        
 
             try
             {
-                await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
+                await _emailService.SendEmailConfirmationAsync(user.Email, user.Id,encodedToken);
                 
                 _logger.LogInformation($"Confirmation email resent to {user.Email}");
                 

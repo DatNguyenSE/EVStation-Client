@@ -10,6 +10,7 @@ import { News } from '../layout/more-information/news/news';
 import { Profile } from '../layout/profile/profile';
 import { Login } from '../features/account/login/login';
 import { GgMap } from '../features/gg-map/gg-map';
+import { ConfirmEmail } from '../features/confirm-email/confirm-email';
 
 export const routes: Routes = [
      { path: '', component: Home },
@@ -32,6 +33,7 @@ export const routes: Routes = [
         {path: 'lien-he',component:Contact},
         {path: 'huong-dan',component:Instruction},
         {path: 'tin-tuc',component:News},
+        {path:'confirm-email',component:ConfirmEmail}
 
     // { path :'errors', component: TestErrors},
     // { path :'server-error', component: ServerErrorComponent},
