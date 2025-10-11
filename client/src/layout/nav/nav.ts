@@ -2,7 +2,7 @@ import { Component, inject, HostListener, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { UserService } from '../../core/service/user-service';
+import { DriverService } from '../../core/service/driver-service';
 
 
 
@@ -16,7 +16,7 @@ export class Nav {
   accountService = inject(AccountService);
   protected creds: any = {}
 
-    userService = inject(UserService); 
+    driverService = inject(DriverService); 
     routers = inject(Router);
   
   logout() {

@@ -7,7 +7,7 @@ import { map } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class DriverService {
   private http = inject(HttpClient);
   protected router = inject(Router);
   baseUrl = 'https://localhost:5001/api/';

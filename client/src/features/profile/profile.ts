@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { UserService } from '../../core/service/user-service';
+import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { AccountService } from '../../core/service/account-service';
 
@@ -10,16 +10,16 @@ import { AccountService } from '../../core/service/account-service';
   styleUrl: './profile.css'
 })
 export class Profile implements OnInit {
-  userService = inject(UserService);
+  driverService = inject(DriverService);
 
   ngOnInit(): void {
     this.profile();
   }
 
   profile() {
-    this.userService.GetProfile_Driver().subscribe({
+    this.driverService.GetProfile_Driver().subscribe({
       next: dirver => {
-        this.userService.currentDriver.set(dirver);
+        this.driverService.currentDriver.set(dirver);
       }  
     })
   }

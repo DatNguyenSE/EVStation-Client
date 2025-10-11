@@ -1,7 +1,5 @@
-import { Component, Inject, inject, OnInit, signal } from '@angular/core';
-import { UserService } from '../../core/service/user-service';
-import { AccountService } from '../../core/service/account-service';
-import { Driver, User } from '../../_models/user';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from "../vehicle/vehicle";
 
@@ -12,16 +10,16 @@ import { Vehicle } from "../vehicle/vehicle";
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
-  userService = inject(UserService);
+  driverService = inject(DriverService);
   
   ngOnInit(): void {
     this.GetProfile_Driver();
   }
 
   GetProfile_Driver(){
-    this.userService.GetProfile_Driver().subscribe({
+    this.driverService.GetProfile_Driver().subscribe({
       next: driver => {
-        this.userService.currentDriver.set(driver);
+        this.driverService.currentDriver.set(driver);
       }   
     })
   }
