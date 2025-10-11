@@ -1,42 +1,105 @@
 <!-- Current vehicle -->
-<h2 class="flex items-center text-xl font-semibold mb-4 text-black">
-    <span class="text-blue-700"> Phương tiện hiện tại
-    </span>
+<h2 class="flex items-center text-xl font-semibold mb-6 text-gray-800">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2 text-blue-600">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+    </svg>
+    <span class="text-blue-700">Phương tiện hiện tại</span>
 </h2>
-<div *ngIf="currentVehicle.status === 'active'" class="space-y-4">
-    <div class="flex items-center justify-between ">
-        <div>
-            <div class="flex gap-1">
-                <h3 class="text-lg font-semibold text-black">{{ currentVehicle.vehicle }}</h3>
-                <img src="assets/vehicle-icon/car.gif" alt="car" class="w-6 h-6" />
+
+@if (driverService.Vehicles().length === 0) {
+    <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto text-gray-400 mb-3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+        </svg>
+        <p class="text-gray-500 text-lg">Hiện chưa có phương tiện</p>
+    </div>
+}
+
+@for (vehicle of driverService.Vehicles(); track vehicle.vehicleId) {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden mb-4">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 border-b border-blue-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="assets/vehicle-icon/car.gif" alt="car" class="w-10 h-10" />
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">{{ vehicle.model }}</h3>
+                        <p class="text-sm text-gray-600">{{ vehicle.type }}</p>
+                    </div>
+                </div>
+                <span class="bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                    Đang hoạt động
+                </span>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+            <!-- License Plate -->
+            <div class="flex items-center gap-2 mb-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg px-4 py-3 w-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-gray-700">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                <span class="font-bold text-gray-800 text-lg tracking-wider">{{ vehicle.plate }}</span>
             </div>
 
+            <!-- Vehicle Stats Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <!-- Battery Capacity -->
+                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 10.5h.375c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125H21M3.75 18h15.75m-12.75-9h9m-9 0a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25H18a2.25 2.25 0 002.25-2.25V11.25A2.25 2.25 0 0018 9h-2.25" />
+                        </svg>
+                        <p class="text-sm font-medium text-gray-600">Dung lượng pin</p>
+                    </div>
+                    <p class="text-2xl font-bold text-blue-700">{{ vehicle.batteryCapacityKWh }} <span class="text-sm font-normal text-gray-600">kWh</span></p>
+                </div>
+
+                <!-- Charging Power -->
+                <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-green-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                        </svg>
+                        <p class="text-sm font-medium text-gray-600">Công suất sạc</p>
+                    </div>
+                    <p class="text-2xl font-bold text-green-700">{{ vehicle.maxChargingPowerKW }} <span class="text-sm font-normal text-gray-600">kW</span></p>
+                </div>
+
+                <!-- Connector Type -->
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-purple-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5 14.25 2.25m0 0L15 9.75m-.75-7.5L21 9l-6.75.75M21 15l-9-5.25m0 0L15.75 21M12 9.75l-8.25 6.75" />
+                        </svg>
+                        <p class="text-sm font-medium text-gray-600">Loại đầu sạc</p>
+                    </div>
+                    <p class="text-lg font-bold text-purple-700">{{ vehicle.connectorType }}</p>
+                </div>
+
+                <!-- Vehicle ID -->
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                        </svg>
+                        <p class="text-sm font-medium text-gray-600">Mã phương tiện</p>
+                    </div>
+                    <p class="text-lg font-bold text-gray-700">{{ vehicle.vehicleId }}</p>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex space-x-3">
+                <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    Xem chi tiết
+                </button>
+            </div>
         </div>
-        <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">Đang hoạt động</span>
     </div>
-
-    <div class="grid grid-cols-2 gap-4 pt-2">
-        <div class="flex gap-2">
-            <p class="text-m font-semibold text-black">Số kilomter: </p>
-            <p class="text-m text-gray-500">{{ currentVehicle.kmHasRun }} </p>
-        </div>
-        <div class="pl-30">
-            <p class="text-sm text-gray-500">Pin</p>
-            <p class="font-semibold text-green-600">{{ currentVehicle.battery }}%</p>
-        </div>
-    </div>
-    <span class=" flex gap-2  text-gray-600">
-
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            class="size-5.5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-        </svg>
-
-        {{ currentVehicle.owner }}
-    </span>
-
-    <div class="flex space-x-4">
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer">Chi tiết</button>
-    </div>
-</div>
+}

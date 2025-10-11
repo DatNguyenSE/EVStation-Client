@@ -1,22 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DriverService } from '../../core/service/driver-service';
 
 @Component({
   selector: 'app-vehicle',
   standalone: true,  
-  imports: [CommonModule,],
+  imports: [CommonModule],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.css'
 })
+export class Vehicle implements OnInit {
+  driverService = inject(DriverService);
 
-export class Vehicle {
-  currentVehicle = {
-    id: "RNT001",
-    vehicle: "Vinfast VF-5",
-    owner: "Dat Nguyen",
-    kmHasRun: "16.820.7 km",
-    battery: 85,
-    status: "active"
-  };
+  ngOnInit(): void {
+    this.GetVehicles(); 
+  }
 
+  GetVehicles() {
+    this.driverService.GetVehicles().subscribe({
+      next: vehicles => {
+        this.driverService.Vehicles.set(vehicles);
+        console.log('Vehicles:', vehicles); 
+      },
+      error: err => {
+        console.error(' Lỗi khi lấy vehicles:', err);
+      }
+    });
+  }
 }

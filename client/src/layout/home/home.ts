@@ -5,7 +5,7 @@ import { News } from '../more-information/news/news';
 import { Instruction } from '../more-information/instruction/instruction';
 import { Contact } from '../more-information/contact/contact';
 import { CommonModule } from '@angular/common';
-import { Dashboard } from "../../features/dashboard/dashboard";
+import { Dashboard } from "../dashboard/dashboard";
 
 
 
