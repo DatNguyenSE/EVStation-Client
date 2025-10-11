@@ -24,18 +24,6 @@ export class Nav {
     this.routers.navigateByUrl('/' );
   }
 
-  profile() {
-    const id = this.accountService.currentAccount()?.id;
-    if (!id) return; // không có id thì không gọi API
-
-    this.userService.profile(id).subscribe({
-      next: user => {
-        this.userService.currentUser.set(user);
-         this.routers.navigateByUrl('/tai-khoan');
-      }  
-    })
-  }
-
    // thêm biến quản lý menu mobile
   isMenuOpen = false;
   isMobile = window.innerWidth < 640; // sm:640px trong Tailwind

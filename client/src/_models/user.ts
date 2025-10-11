@@ -15,6 +15,27 @@ export type User = {
     roles: string[];
 }
 
+export type Vehicle = {
+  vehicleId: number;
+  model: string;
+  type: string;
+  batteryCapacityKWh: number;
+  maxChargingPowerKW: number;
+  connectorType: string;
+  plate: string;
+};
+
+export type Driver = {
+    id: string;
+    username: string;
+    email: string;
+    fullName: string;
+    age: number;
+    vehicles: Vehicle[];
+};
+
+    
+
 export type LoginCreds = {
     username: string;
     password: string;

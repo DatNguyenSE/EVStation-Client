@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet-routing-machine": "^3.2.12"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.20",
+    "@types/leaflet-routing-machine": "^3.2.9"
+  }
+}

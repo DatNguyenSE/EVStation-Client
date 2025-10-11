@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Account, User } from '../../_models/user';
+import { Driver, User } from '../../_models/user';
 import { map } from 'rxjs';
-import { AccountService } from './account-service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +11,22 @@ export class UserService {
   private http = inject(HttpClient);
   protected router = inject(Router);
   baseUrl = 'https://localhost:5001/api/';
-  currentUser = signal<User | null>(null);
+  currentDriver = signal<Driver | null>(null);
 
+  //  Hàm lấy token từ localStorage  \\\ Option?[headers params responseType observe]
+  private getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      headers: new HttpHeaders({
+        Authorization: token ? `Bearer ${token}` : ''
+      })
+    };
+  }
 
-  profile(id : string) {
-    return this.http.get<User>(this.baseUrl + 'users/' +id);
+  GetProfile_Driver() {
+    return this.http.get<Driver>(
+      `${this.baseUrl}users/profile-driver`,
+      this.getAuthHeaders()
+    );
   }
 }

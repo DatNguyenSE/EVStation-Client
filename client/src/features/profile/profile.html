@@ -1,4 +1,4 @@
-@if (userService.currentUser(); as user) {
+@if (userService.currentDriver(); as user) {
    
 <div class="  min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 py-16 px-4 pt-30 ">
  <div class="absolute inset-0 bg-[url('/assets/bank-note.svg')] bg-cover  opacity-20"></div>
@@ -11,7 +11,7 @@
         <img src="/assets/user.png" alt="User Avatar" class="object-cover w-full h-full">
       </div>
 
-      <h2 class="text-3xl font-bold text-blue-700">{{ user.fullName || user.userName }}</h2>
+      <h2 class="text-3xl font-bold text-blue-700">{{ user.fullName || user.fullName }}</h2>
       <p class="text-gray-500 text-sm">Thành viên trạm sạc xe điện</p>
     </div>
 
@@ -42,7 +42,7 @@
           </svg>
           Tên đăng nhập
         </span>
-        <span class="text-gray-800 font-semibold">{{ user.userName }}</span>
+        <span class="text-gray-800 font-semibold">{{ user.username }}</span>
       </div>
 
       <div class="flex items-center justify-between">

@@ -8,7 +8,7 @@ import { Account } from '../../_models/user';
 @Component({
   selector: 'app-confirm-email',
   standalone: true,
-  imports: [CommonModule, RouterModule], // 👈 BẮT BUỘC phải có RouterModule
+  imports: [CommonModule, RouterModule], 
   templateUrl: './confirm-email.html',
   styleUrls: ['./confirm-email.css'],
 })

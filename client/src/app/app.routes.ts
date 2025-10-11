@@ -7,7 +7,7 @@ import { ServiceList } from '../features/service-list/service-list';
 import { Contact } from '../layout/more-information/contact/contact';
 import { Instruction } from '../layout/more-information/instruction/instruction';
 import { News } from '../layout/more-information/news/news';
-import { Profile } from '../layout/profile/profile';
+import { Profile } from '../features/profile/profile';
 import { Login } from '../features/account/login/login';
 import { GgMap } from '../features/gg-map/gg-map';
 import { ConfirmEmail } from '../features/confirm-email/confirm-email';
