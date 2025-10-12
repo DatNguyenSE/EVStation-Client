@@ -3,12 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DriverService } from '../../core/service/driver-service';
+import { CommonModule } from '@angular/common';
 
 
 
 @Component({
   selector: 'app-nav',
-  imports: [FormsModule, RouterLink, RouterLinkActive],
+  imports: [FormsModule, RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
