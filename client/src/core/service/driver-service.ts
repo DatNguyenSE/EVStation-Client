@@ -13,27 +13,13 @@ export class DriverService {
   currentDriver = signal<Driver | null>(null);
   Vehicles = signal<Vehicle[] >([]);
 
-  //  Hàm lấy token từ localStorage  \\\ Option?[headers params responseType observe]
-  private getAuthHeaders() {
-    const token = localStorage.getItem('token');
-    return {
-      headers: new HttpHeaders({
-        Authorization: token ? `Bearer ${token}` : ''
-      })
-    };
-  }
-
   GetProfile_Driver() {
     return this.http.get<Driver>(
-      `${this.baseUrl}users/profile-driver`,
-      this.getAuthHeaders()
-    );
+      `${this.baseUrl}users/profile-driver`);
   }
 
   GetVehicles() {
     return this.http.get<Vehicle[]>(
-      `${this.baseUrl}vehicle/my`,
-      this.getAuthHeaders()
-    );
+      `${this.baseUrl}vehicle/my`);
   }
 }
