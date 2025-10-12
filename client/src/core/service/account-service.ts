@@ -44,13 +44,4 @@ export class AccountService {
     this.currentAccount.set(null);
     this.router.navigate(['/']);
   }
-
-  loadCurrentUser() {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    this.currentAccount.set(JSON.parse(storedUser));
-  }
-}
-
-
 }

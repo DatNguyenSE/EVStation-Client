@@ -1,0 +1,4 @@
+nav a {
+  user-select: none; /* không cho bôi chọn chữ */
+  caret-color: transparent; /* ẩn dấu nháy */
+}

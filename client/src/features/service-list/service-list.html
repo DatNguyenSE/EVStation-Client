@@ -9,52 +9,83 @@
       </h1>
       </header>
 
-    <div class="flex bg-white shadow-md sticky top-[76px] z-10 border-b border-gray-200">
-      <button
-        class="flex-1 px-4 py-3 text-center transition-all duration-300 relative group"
-        [ngClass]="{
-          'text-blue-800 font-bold': activeTab==='history',
-          'text-gray-600 hover:bg-gray-100': activeTab!=='history'
-        }"
-        (click)="activeTab='history'">
-        Lịch sử sạc
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-transparent transition-colors duration-300"
-              [ngClass]="{'!bg-blue-600': activeTab==='history'}"></span>
-      </button>
-      <button
-        class="flex-1 px-4 py-3 text-center transition-all duration-300 relative group"
-        [ngClass]="{
-          'text-blue-800 font-bold': activeTab==='package',
-          'text-gray-600 hover:bg-gray-100': activeTab!=='package'
-        }"
-        (click)="activeTab='package'">
-        Gói dịch vụ
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-transparent transition-colors duration-300"
-              [ngClass]="{'!bg-blue-600': activeTab==='package'}"></span>
-      </button>
-      <button
-        class="flex-1 px-4 py-3 text-center transition-all duration-300 relative group"
-        [ngClass]="{
-          'text-blue-800 font-bold': activeTab==='qr',
-          'text-gray-600 hover:bg-gray-100': activeTab!=='qr'
-        }"
-        (click)="activeTab='qr'">
-        Quét QR
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-transparent transition-colors duration-300"
-              [ngClass]="{'!bg-blue-600': activeTab==='qr'}"></span>
-      </button>
-      <button
-        class="flex-1 px-4 py-3 text-center transition-all duration-300 relative group"
-        [ngClass]="{
-          'text-blue-800 font-bold': activeTab==='find',
-          'text-gray-600 hover:bg-gray-100': activeTab!=='find'
-        }"
-        (click)="activeTab='find'">
-        Tìm Trạm Sạc
-        <span class="absolute bottom-0 left-0 w-full h-1 bg-transparent transition-colors duration-300"
-              [ngClass]="{'!bg-blue-600': activeTab==='find'}"></span>
-      </button>
+    <!-- Thanh chọn dịch vụ (được làm lại kiểu thẻ) -->
+    <div class="py-6 px-6">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl mx-auto">
+        <!-- Thẻ: Lịch sử sạc -->
+        <button
+          class="p-4 rounded-xl shadow-md border transition-all duration-300 flex flex-col items-center justify-center
+                 hover:shadow-lg hover:-translate-y-1
+                 select-none"
+          [ngClass]="{
+            'bg-blue-600 text-white border-blue-600': activeTab === 'history',
+            'bg-white text-gray-700 border-gray-200': activeTab !== 'history'
+          }"
+          (click)="activeTab = 'history'">
+          <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-9-9 9 9 0 019 9z"></path>
+          </svg>
+          <span class="font-semibold text-sm">Lịch sử sạc</span>
+        </button>
 
+        <!-- Thẻ: Gói dịch vụ -->
+        <button
+          class="p-4 rounded-xl shadow-md border transition-all duration-300 flex flex-col items-center justify-center
+                 hover:shadow-lg hover:-translate-y-1
+                 select-none"
+          [ngClass]="{
+            'bg-blue-600 text-white border-blue-600': activeTab === 'package',
+            'bg-white text-gray-700 border-gray-200': activeTab !== 'package'
+          }"
+          (click)="activeTab = 'package'">
+          <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+          <span class="font-semibold text-sm">Gói dịch vụ</span>
+        </button>
+
+        <!-- Thẻ: Quét QR -->
+        <button
+          class="p-4 rounded-xl shadow-md border transition-all duration-300 flex flex-col items-center justify-center
+                 hover:shadow-lg hover:-translate-y-1
+                 select-none"
+          [ngClass]="{
+            'bg-blue-600 text-white border-blue-600': activeTab === 'qr',
+            'bg-white text-gray-700 border-gray-200': activeTab !== 'qr'
+          }"
+          (click)="activeTab = 'qr'">
+          <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+          </svg>
+          <span class="font-semibold text-sm">Quét QR</span>
+        </button>
+
+        <!-- Thẻ: Tìm Trạm Sạc -->
+        <button
+          class="p-4 rounded-xl shadow-md border transition-all duration-300 flex flex-col items-center justify-center
+                 hover:shadow-lg hover:-translate-y-1
+                 select-none"
+          [ngClass]="{
+            'bg-blue-600 text-white border-blue-600': activeTab === 'find',
+            'bg-white text-gray-700 border-gray-200': activeTab !== 'find'
+          }"
+          (click)="activeTab = 'find'">
+          <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span class="font-semibold text-sm">Tìm Trạm Sạc</span>
+        </button>
+      </div>
     </div>
 
     <div class="p-4 md:p-8 max-w-5xl mx-auto">
@@ -83,58 +114,116 @@
         </div>
       </div>
 
-      <div *ngIf="activeTab==='package'" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white rounded-xl p-8 shadow-2xl border-t-8 border-blue-500 transform hover:scale-[1.02] transition-transform duration-300">
-          <span class="inline-block bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
-            Premium
-          </span>
-          <h2 class="text-3xl font-extrabold text-gray-900 mb-2">Gói <span class="text-gray-600">Xe Hơi</span></h2>
-          <p class="text-5xl font-extrabold text-gray-900 mb-8">
-            3.000k <span class="text-xl font-medium text-gray-500">/ tháng</span>
-          </p>
-          <ul class="text-base text-gray-700 mb-8 space-y-3">
-            <li class="flex items-start">
-              <span class="text-blue-600 mr-2 mt-1 font-extrabold">✓</span>
-              <p><strong>Sạc Không giới hạn</strong> (Tháng)</p>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-600 mr-2 mt-1 font-extrabold">✓</span>
-              <p>Ưu tiên tốc độ sạc (Fast Lane)</p>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-600 mr-2 mt-1 font-extrabold">✓</span>
-              <p>Hỗ trợ 24/7 chuyên biệt</p>
-            </li>
-          </ul>
-          <button class="w-full bg-blue-500 text-white text-lg font-semibold px-4 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-300">
-            Mua Gói Cao cấp
-          </button>
+      <div *ngIf="activeTab==='package'">
+        <h2 class="text-xl font-semibold text-white mb-5 border-b pb-2">Chọn gói dịch vụ phù hợp</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Card Gói Xe Hơi -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-500 group"
+               [ngClass]="{'border-blue-500 ring-4 ring-blue-200': selectedPackage==='car'}"
+               (click)="selectedPackage='car'">
+            
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 relative">
+              <div class="absolute top-3 right-3">
+                <div class="w-8 h-8 rounded-full border-3 border-white flex items-center justify-center transition-all duration-300"
+                     [ngClass]="{'bg-white': selectedPackage==='car', 'bg-transparent': selectedPackage!=='car'}">
+                  <svg *ngIf="selectedPackage==='car'" class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <span class="inline-block bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full mb-2 uppercase tracking-wider">
+                Premium
+              </span>
+              <h3 class="text-2xl font-extrabold text-white">Gói Xe Hơi</h3>
+            </div>
+
+            <div class="p-6">
+              <div class="mb-6">
+                <p class="text-4xl font-extrabold text-gray-900">
+                  3.000k <span class="text-lg font-medium text-gray-500">/ tháng</span>
+                </p>
+              </div>
+
+              <ul class="space-y-3 mb-6">
+                <li class="flex items-start">
+                  <span class="text-blue-600 mr-3 mt-1 text-xl">✓</span>
+                  <p class="text-gray-700"><strong>Sạc Không giới hạn</strong> (Tháng)</p>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-blue-600 mr-3 mt-1 text-xl">✓</span>
+                  <p class="text-gray-700">Ưu tiên tốc độ sạc (Fast Lane)</p>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-blue-600 mr-3 mt-1 text-xl">✓</span>
+                  <p class="text-gray-700">Hỗ trợ 24/7 chuyên biệt</p>
+                </li>
+              </ul>
+
+              <button class="w-full bg-blue-500 text-white text-base font-semibold px-4 py-3 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 group-hover:shadow-lg"
+                      [ngClass]="{'bg-blue-600': selectedPackage==='car'}">
+                {{ selectedPackage==='car' ? 'Đã chọn' : 'Chọn gói này' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Card Gói Xe Máy -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-500 group"
+               [ngClass]="{'border-blue-500 ring-4 ring-blue-200': selectedPackage==='motorbike'}"
+               (click)="selectedPackage='motorbike'">
+            
+            <div class="bg-gradient-to-r from-blue-400 to-blue-500 p-4 relative">
+              <div class="absolute top-3 right-3">
+                <div class="w-8 h-8 rounded-full border-3 border-white flex items-center justify-center transition-all duration-300"
+                     [ngClass]="{'bg-white': selectedPackage==='motorbike', 'bg-transparent': selectedPackage!=='motorbike'}">
+                  <svg *ngIf="selectedPackage==='motorbike'" class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <span class="inline-block bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full mb-2 uppercase tracking-wider">
+                Tiêu chuẩn
+              </span>
+              <h3 class="text-2xl font-extrabold text-white">Gói Xe Máy</h3>
+            </div>
+
+            <div class="p-6">
+              <div class="mb-6">
+                <p class="text-4xl font-extrabold text-gray-900">
+                  500k <span class="text-lg font-medium text-gray-500">/ tháng</span>
+                </p>
+              </div>
+
+              <ul class="space-y-3 mb-6">
+                <li class="flex items-start">
+                  <span class="text-blue-600 mr-3 mt-1 text-xl">✓</span>
+                  <p class="text-gray-700"><strong>Sạc Không giới hạn</strong> (Tháng)</p>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-blue-600 mr-3 mt-1 text-xl">✓</span>
+                  <p class="text-gray-700">Truy cập tất cả trạm sạc</p>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-blue-600 mr-3 mt-1 text-xl">✓</span>
+                  <p class="text-gray-700">Chỉ dành cho xe máy điện</p>
+                </li>
+              </ul>
+
+              <button class="w-full bg-blue-500 text-white text-base font-semibold px-4 py-3 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 group-hover:shadow-lg"
+                      [ngClass]="{'bg-blue-600': selectedPackage==='motorbike'}">
+                {{ selectedPackage==='motorbike' ? 'Đã chọn' : 'Chọn gói này' }}
+              </button>
+            </div>
+          </div>
+
         </div>
 
-        <div class="bg-white rounded-xl p-8 shadow-2xl border-t-8 border-blue-500 transform hover:scale-[1.02] transition-transform duration-300">
-          <span class="inline-block bg-orange-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
-            Tiêu chuẩn
-          </span>
-          <h2 class="text-3xl font-extrabold text-gray-900 mb-2">Gói <span class="text-gray-500">Xe Máy</span></h2>
-          <p class="text-5xl font-extrabold text-gray-900 mb-8">
-            500k <span class="text-xl font-medium text-gray-500">/ tháng</span>
-          </p>
-          <ul class="text-base text-gray-700 mb-8 space-y-3">
-            <li class="flex items-start">
-              <span class="text-blue-600 mr-2 mt-1 font-extrabold">✓</span>
-              <p><strong>Sạc Không giới hạn</strong> (Tháng)</p>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-600 mr-2 mt-1 font-extrabold">✓</span>
-              <p>Truy cập tất cả trạm sạc</p>
-            </li>
-            <li class="flex items-start">
-              <span class="text-blue-600 mr-2 mt-1 font-extrabold">✓</span>
-              <p>Chỉ dành cho xe máy điện</p>
-            </li>
-          </ul>
-          <button class="w-full bg-blue-500 text-white text-lg font-semibold px-4 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-colors duration-300">
-            Mua Gói Tiêu chuẩn
+        <!-- Action Button -->
+        <div class="mt-8 text-center" *ngIf="selectedPackage">
+          <button class="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-blue-600">
+            Tiếp tục thanh toán
           </button>
         </div>
       </div>

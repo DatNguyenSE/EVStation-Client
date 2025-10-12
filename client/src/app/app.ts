@@ -14,9 +14,4 @@ import { AccountService } from '../core/service/account-service';
 
 export class App {
   protected router = inject(Router);
-  private accountService = inject(AccountService);
-
-  constructor() {
-    this.accountService.loadCurrentUser();
-  }
 }

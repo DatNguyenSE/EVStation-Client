@@ -20,5 +20,6 @@ export class ServiceList {
     { date: '25/09/2025', time: '09:10', station: 'Trụ B05', kwh: 8.2, price: 30000 },
     { date: '20/09/2025', time: '19:05', station: 'Trụ C12', kwh: 15.7, price: 56000 }
   ]
+selectedPackage: any;
 
 }
