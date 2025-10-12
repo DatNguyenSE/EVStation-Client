@@ -18,9 +18,15 @@ export class Profile implements OnInit {
 
   profile() {
     this.driverService.GetProfile_Driver().subscribe({
-      next: dirver => {
-        this.driverService.currentDriver.set(dirver);
+      next: driver => {
+        this.driverService.currentDriver.set(driver);
       }  
+    });
+
+    this.driverService.GetVehicles().subscribe({
+      next : vehicle =>{
+        this.driverService.Vehicles.set(vehicle);
+      }
     })
   }
 }

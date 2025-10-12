@@ -11,6 +11,7 @@ import { Profile } from '../features/profile/profile';
 import { Login } from '../features/account/login/login';
 import { GgMap } from '../features/gg-map/gg-map';
 import { ConfirmEmail } from '../features/confirm-email/confirm-email';
+import { RegisterVehicle } from '../features/register-vehicle/register-vehicle';
 
 export const routes: Routes = [
      { path: '', component: Home },
@@ -25,6 +26,7 @@ export const routes: Routes = [
             {path:'thong-bao',component:Notification},
             {path:'tai-khoan',component:Profile},
             {path:'map',component: GgMap},
+            {path:'dangki-xe',component:RegisterVehicle}
             
             
         ]

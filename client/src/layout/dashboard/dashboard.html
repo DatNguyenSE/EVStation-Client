@@ -1,7 +1,7 @@
 @if (driverService.currentDriver(); as driver) {
-  <div class="min-h-screen bg-gray-100 flex flex-col">
+  <div class="min-h-screen bg-gray-100 flex flex-col ">
     <!-- Header -->
-    <header class="bg-white shadow p-4 flex items-center justify-between">
+    <header class="bg-white shadow p-4  flex items-center justify-between">
       <h1 class="text-2xl font-bold text-blue-600">EV Charging Dashboard</h1>
       <div class="flex items-center gap-3">
         <img src="assets/logo.png" alt="Avatar" class="w-10 h-10 rounded-full" />
@@ -18,7 +18,7 @@
         <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
           <i class="fa-solid fa-charging-station text-blue-600 "></i> Trạm sạc gần bạn
         </h2>
-        <div class="h-115 bg-gray-200 rounded-lg overflow-hidden relative">
+        <div class="h-[460px] bg-gray-200 rounded-lg overflow-hidden relative">
           <!-- Bản đồ Leaflet -->
           <div id="map" class="w-full h-full">
             <app-gg-map></app-gg-map>

@@ -68,6 +68,36 @@
         </span>
         <span class="text-gray-800 font-semibold">{{ user.age }}</span>
       </div>
+
+       <div>
+      <h3 class="text-2xl font-bold text-blue-700 mb-4 text-center">🚗 Danh sách xe</h3>
+
+      @if (driverService.Vehicles().length > 0) {
+        <ul class="space-y-3">
+          @for (vehicle of driverService.Vehicles(); track vehicle) {
+          <li class="p-4 rounded-xl  shadow-sm hover:bg-blue-100 transition">
+      <div class="grid grid-cols-3 gap-4 text-sm text-gray-700">
+        <div>
+          <p class="font-semibold text-blue-700">Loại xe</p>
+          <p class="text-gray-800">{{ vehicle.type }}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-blue-700">Mẫu xe</p>
+          <p class="text-gray-800">{{ vehicle.model }}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-blue-700">Biển số</p>
+          <p class="text-gray-800">{{ vehicle.plate }}</p>
+        </div>
+      </div>
+    </li>
+          }
+        </ul>
+      } @else {
+        <p class="text-gray-500 text-center italic">Hiện tại bạn chưa có xe nào được đăng ký.</p>
+      }
+    </div>
+
     </div>
 
     <!-- Divider -->

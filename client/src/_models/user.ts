@@ -24,6 +24,10 @@ export type Vehicle = {
   connectorType: string;
   plate: string;
 };
+export interface VehicleResponse {
+  message: string;
+  data: Vehicle;
+}
 
 export type Driver = {
     id: string;

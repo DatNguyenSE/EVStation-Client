@@ -41,7 +41,7 @@ export class ConfirmEmail implements OnInit {
           this.isSuccess = true;
           this.loading = false;
           this.cdr.detectChanges();
-          setTimeout(() => this.router.navigate(['/dang-nhap']), 10000);
+          setTimeout(() => this.router.navigate(['/dang-nhap']), 3000);
         },
         error: (err: HttpErrorResponse) => {
           this.message = 'Xác nhận email thất bại.';

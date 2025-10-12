@@ -2,9 +2,10 @@
 @import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 
 :host {
-  display: block;
-  width: 100%;
+  position: relative;
+  z-index: 0;
 }
+
 
 #map {
   width: 100% !important;
@@ -13,3 +14,38 @@
   border-radius: 12px;
   overflow: hidden;
 }
+.leaflet-control-geosearch {
+  margin-top: 12px !important;
+  margin-left: 12px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+}
+
+.leaflet-control-geosearch form {
+  background: white !important;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.leaflet-control-geosearch input {
+  width: 220px;
+  padding: 6px 10px;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.leaflet-control-geosearch input::placeholder {
+  color: #888;
+}
+
+.leaflet-control-geosearch button {
+  display: none;
+}
+
+
+
+

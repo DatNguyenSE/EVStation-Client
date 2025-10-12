@@ -2,7 +2,9 @@ import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { StationService } from '../../core/service/station-service';
 import { DecimalPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 import * as L from 'leaflet';
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-routing-machine';
+import { FormsModule } from '@angular/forms';
 
 // 🧩 Icon riêng cho trạm sạc
 const stationIcon = L.icon({
@@ -24,7 +26,7 @@ const userIcon = L.icon({
 @Component({
   selector: 'app-gg-map',
   standalone: true,
-  imports: [NgIf, NgFor, JsonPipe],
+  imports: [NgIf, NgFor, JsonPipe,FormsModule],
   templateUrl: './gg-map.html',
   styleUrls: ['./gg-map.css'],
 })
@@ -40,19 +42,20 @@ export class GgMap implements AfterViewInit, OnDestroy {
   constructor(private stationSvc: StationService) {}
 
   ngAfterViewInit(): void {
-    // ✅ Bảo đảm DOM sẵn sàng
-    const mapEl = document.getElementById('map');
-    if (!mapEl) return;
+    // // ✅ Bảo đảm DOM sẵn sàng
+    // const mapEl = document.getElementById('map');
+    // if (!mapEl) return;
 
-    // ✅ Quan sát khi phần tử map thật sự hiển thị => mới khởi tạo (ổn định hơn setTimeout)
-    const observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (entry.isIntersecting) {
-        this.initMap();
-        observer.disconnect();
-      }
-    });
-    observer.observe(mapEl);
+    // // ✅ Quan sát khi phần tử map thật sự hiển thị => mới khởi tạo (ổn định hơn setTimeout)
+    // const observer = new IntersectionObserver((entries) => {
+    //   const entry = entries[0];
+    //   if (entry.isIntersecting) {
+    //     this.initMap();
+    //     observer.disconnect();
+    //   }
+    // });
+    // observer.observe(mapEl);
+    this.initMap();
   }
 
   private initMap(): void {
@@ -60,6 +63,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
       center: [10.776, 106.7],
       zoom: 13,
       zoomControl: true,
+      scrollWheelZoom: false,
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -68,6 +72,10 @@ export class GgMap implements AfterViewInit, OnDestroy {
 
     // ép map vẽ lại khi hiển thị lần đầu
     setTimeout(() => this.map.invalidateSize(), 300);
+     this.map.on('focus', () => this.map.scrollWheelZoom.enable());
+    this.map.on('blur', () => this.map.scrollWheelZoom.disable());
+    
+    
 
     // ✅ Lấy danh sách trạm sạc
     this.stationSvc.getStations().subscribe({
@@ -77,6 +85,14 @@ export class GgMap implements AfterViewInit, OnDestroy {
       },
       error: (err) => console.error('Lỗi tải trạm:', err),
     });
+
+ 
+    this.stationSvc.getStations().subscribe({
+      next:(data :any) =>{
+        this.stations = data || [];
+        this.addStationMarkers();
+      }
+    })
   }
 
 private addStationMarkers(): void {
@@ -223,6 +239,51 @@ reserveStation(station: any) {
   },
     }).addTo(this.map);
   }
+
+  searchTerm: string = '';
+searchResults: any[] = [];
+searchTimeout?: any;
+
+onSearchChange(): void {
+  clearTimeout(this.searchTimeout);
+  this.searchTimeout = setTimeout(() => {
+    const term = this.searchTerm.trim();
+    if (term.length >= 2) {
+      this.stationSvc.searchStations(term).subscribe({
+        next : (data: any[]) => {
+          this.searchResults = data;
+          this.showSearchResults();
+        },
+        error: (err) => console.error('Search lỗi:', err)
+      });
+    }
+  }, 400); // debounce 0.4s
+}
+focusStation(s: any) {
+  // Zoom tới trạm
+  this.map.setView([s.latitude, s.longitude], 15);
+
+  // Mở popup của trạm (nếu có marker)
+  const marker = L.marker([s.latitude, s.longitude]);
+  marker.bindPopup(this.createStationPopup(s)).openPopup();
+  this.searchResults = [];
+  this.searchTerm = '';
+}
+
+
+
+
+private showSearchResults(): void {
+  // xóa marker cũ nếu có
+  this.searchResults.forEach(s => {
+    const marker = L.marker([s.latitude, s.longitude], { icon: stationIcon })
+      .addTo(this.map)
+      .bindPopup(this.createStationPopup(s), { maxWidth: 250 })
+      .openPopup();
+    this.map.setView([s.latitude, s.longitude], 14);
+  });
+}
+
 
   ngOnDestroy(): void {
     if (this.map) this.map.remove();
