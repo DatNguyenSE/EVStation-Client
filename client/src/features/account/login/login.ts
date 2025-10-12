@@ -30,16 +30,12 @@ export class Login {
         this.toast.success('Đăng nhập thành công!');
         this.router.navigate(['/']);
       },
-      error: error => {
-        if(error.status === 0) {
+      error: err => {
+        console.error('Error:', err.error);
+        if(err.status === 0) {
           this.toast.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.');
           return;
         }
-        if(error.status === 400) {
-          this.toast.error('Hãy nhập "Tên đăng nhập" và "Mật khẩu".');
-          return;
-        }
-        this.toast.error(error.error)
       }
     })
 

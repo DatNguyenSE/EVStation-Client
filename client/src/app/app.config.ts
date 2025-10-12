@@ -6,6 +6,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { jwtInterceptor } from '../core/interceptors/jwt-interceptor';
 import { InitService } from '../core/service/init-service';
 import { last, lastValueFrom } from 'rxjs';
+import { errorInterceptor } from '../core/interceptors/error-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,8 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient( // trc khi request thì authorization
-      withInterceptors([jwtInterceptor])
-    ),
+      withInterceptors([jwtInterceptor, errorInterceptor])),
     provideAppInitializer(async () => {
       const initService = inject(InitService);
       return new Promise<void>((resolve) => {
