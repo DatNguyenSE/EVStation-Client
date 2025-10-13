@@ -1,0 +1,9 @@
+.bg-pattern {
+  background-image: url('/assets/bg-shapes.svg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+}
+.background-home{
+  background-color: rgb(246, 246, 246);
+}

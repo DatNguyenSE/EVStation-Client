@@ -1,0 +1,95 @@
+<!-- NỀN TOÀN TRANG -->
+<main class="relative z-0 mt-[-35px] min-h-[calc(100vh-80px)] flex justify-center items-center px-6 py-12">
+  <!-- KHUNG FORM -->
+  <div
+    class=" relative z-10  w-full max-w-lg bg-white/95  rounded-3xl p-8 pb-10 transform transition "
+  >
+    <!-- TIÊU ĐỀ -->
+    <h2
+      class="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+    >
+       Đăng ký xe điện
+    </h2>
+
+    <!-- FORM -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div>
+        <label class="block font-semibold mb-2 text-gray-700">Mẫu xe (Model)</label>
+        <input
+          type="text"
+          formControlName="model"
+          placeholder="Nhập mẫu xe..."
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+        />
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2 text-gray-700">Loại xe (Type)</label>
+        <input
+          type="text"
+          formControlName="type"
+          placeholder="VD: Car, Motorbike"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block font-semibold mb-2 text-gray-700">Dung lượng pin (kWh)</label>
+          <input
+            type="number"
+            formControlName="batteryCapacityKWh"
+            class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-2 text-gray-700">Công suất sạc tối đa (kW)</label>
+          <input
+            type="number"
+            formControlName="maxChargingPowerKW"
+            class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2 text-gray-700">Loại cổng sạc</label>
+        <select
+          formControlName="connectorType"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+        >
+          <option value="">-- Chọn loại cổng --</option>
+          <option *ngFor="let c of connectorTypes" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2 text-gray-700">Biển số xe</label>
+        <input
+          type="text"
+          formControlName="plate"
+          placeholder="VD: 51H-12345"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
+        />
+      </div>
+
+      <!-- NÚT ĐĂNG KÝ -->
+      <button
+        type="submit"
+        [disabled]="registerForm.invalid"
+        class="w-full py-3 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition disabled:opacity-50"
+          
+        >
+        Đăng ký
+      </button>
+    </form>
+
+    <!-- THÔNG BÁO -->
+    <div *ngIf="message" class="mt-6 text-center animate-fadeIn">
+      <p [ngClass]="isError ? 'text-red-600' : 'text-green-600'" class="font-semibold text-lg">
+        {{ message }}
+      </p>
+    </div>
+  </div>
+</main>

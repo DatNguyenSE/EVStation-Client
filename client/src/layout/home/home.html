@@ -1,0 +1,194 @@
+@if(userService.currentAccount()){
+    <app-dashboard></app-dashboard>
+}@else{
+    <div>
+    <!-- Layout khi đã login -->
+    <div class="background-home">
+        <!-- Slider -->
+        <app-slide-carousel></app-slide-carousel>
+
+        <!-- Package  -->
+        <div
+            class="min-h-screen bg-white flex flex-col md:flex-row items-center justify-between px-8 md:px-16 lg:px-24 gap-10 background-home">
+            <!-- Cột trái: nội dung -->
+            <div class="w-full md:w-1/2 space-y-6 md:space-y-8">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-snug">
+                    Mua gói để nhận nhiều ưu đãi
+                </h2>
+
+                <ul class="space-y-4 mt-6">
+                    <li class="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                            stroke="currentColor" class="size-6 bg-blue-500 text-white rounded-full p-1 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span class="text-gray-700 text-lg">Mua gói để được nhận nhiều quyền lợi</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                            stroke="currentColor" class="size-6 bg-blue-500 text-white rounded-full p-1 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span class="text-gray-700 text-lg">Chỉ Với 500k cho xe máy điện và 3000k cho xe hơi điện sạc thỏa ga trong 30 ngày</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                            stroke="currentColor" class="size-6 bg-blue-500 text-white rounded-full p-1 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span class="text-gray-700 text-lg">Thiết bị sạc được kiểm định chất lượng đạt chuẩn quốc
+                            tế</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                            stroke="currentColor" class="size-6 bg-blue-500 text-white rounded-full p-1 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span class="text-gray-700 text-lg">Đội ngũ chăm sóc khách hàng và kỹ thuật viên luôn sẵn sàng
+                            hỗ trợ</span>
+                    </li>
+                </ul>
+
+                <div class="flex items-center gap-4 mt-10">
+                    <a href="/lien-he" target="_blank"
+                        class="bg-green-500 text-white text-lg font-medium px-10 py-3.5 rounded-full hover:bg-green-600 hover:scale-105 shadow-md transition-all duration-300">
+                        Mua Gói Ngay
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cột phải: hình ảnh của package -->
+            <div class="w-full md:w-1/2 flex justify-center relative">
+                <img src="assets/package-car.png"
+                    class="rounded-3xl shadow-2xl w-[90%] md:w-[500px] lg:w-[650px] object-cover hover:scale-105 transition-transform duration-500 hidden sm:block" />
+                <!-- Hiệu ứng nền -->
+                <div
+                    class="absolute inset-0 blur-3xl bg-blue-100/60 -z-10 rounded-full w-[80%] h-[80%] top-[10%] left-[10%]">
+                </div>
+            </div>
+        </div>
+
+
+        <section id="about" class="flex flex-col md:flex-row items-center justify-between px-8 md:px-10 py-16 bg-white">
+            <!-- Bản đồ Việt Nam -->
+            <div class="w-full md:w-1/2 justify-center md:justify-start mb-10 md:mb-0 ml-23 hidden sm:block">
+                <img src="/assets/vietnam-tramsac.png" alt="Bản đồ trạm sạc"
+                    class="w-[90%] md:w-[60%] max-w-2xl object-contain drop-shadow-lg transition-transform duration-500 hover:scale-[1.03]" />
+            </div>
+
+            <!-- Nội dung -->
+            <div class="w-full md:w-1/2 text-center md:text-left">
+                <p class="text-green-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                    </svg>
+
+
+                    Về Chúng Tôi
+                </p>
+                <h2 class="text-4xl font-bold mb-6 leading-tight text-gray-900">
+                    Giải pháp sạc điện toàn diện<br />cho người dùng Việt
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div>
+                        <div class="flex justify-center md:justify-start">
+                            <div class="bg-blue-500 text-white p-3 rounded-full mb-3">
+                                <i class="fa-solid fa-charging-station text-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                    </svg>
+                                </i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">Sạc mọi dòng xe</h3>
+                        <p class="text-gray-600">
+                            Sạc dễ dàng với mọi dòng xe điện – từ xe máy đến ô tô, không cần lo ngại về chuẩn kết nối.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div>
+                        <div class="flex justify-center md:justify-start">
+                            <div class="bg-blue-500 text-white p-3 rounded-full mb-3">
+                                <i class="fa-solid fa-charging-station text-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                    </svg>
+                                </i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">Thuận tiện</h3>
+                        <p class="text-gray-600">
+                            Hỗ trợ đặt chỗ, đa dạng thanh toán – tiết kiệm thời gian, chủ động di chuyển.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div>
+                        <div class="flex justify-center md:justify-start ">
+                            <div class="bg-blue-500 text-white p-3 rounded-full mb-3 ">
+                                <i class="fa-solid fa-charging-station text-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                    </svg>
+                                </i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">Giảm thải CO₂</h3>
+                        <p class="text-gray-600">
+                            Sử dụng năng lượng sạch, góp phần giảm đến 80% lượng khí thải CO₂ – vì một tương lai xanh.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="mb-5 px-6 bg-white">
+            <!-- More information -->
+
+            <div class="flex border-b border-gray-300 mb-4 space-x-6">
+
+                <button (click)="changeTab('news')"
+                    [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='news','text-gray-500':activeTab!=='news'}"
+                    class="px-4 py-2 cursor-pointer">Tin tức</button>
+                <button (click)="changeTab('contact')"
+                    [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='contact','text-gray-500':activeTab!=='contact'}"
+                    class="px-4 py-2 cursor-pointer">Liên hệ</button>
+                <button (click)="changeTab('instruction')"
+                    [ngClass]="{'border-b-2 border-orange-500 text-orange-600': activeTab==='instruction','text-gray-500':activeTab!=='instruction'}"
+                    class="px-4 py-2 cursor-pointer">Hướng dẫn sử dụng</button>
+            </div>
+
+            <!-- contact -->
+            <div *ngIf="activeTab==='contact'">
+                <app-contact></app-contact>
+            </div>
+
+            <!-- news -->
+            <div *ngIf="activeTab==='news'">
+                <app-news></app-news>
+            </div>
+
+            <!-- Instruction -->
+            <div *ngIf="activeTab==='instruction'">
+                <app-instruction class="grid grid-cols-1 md:grid-cols-2 gap-6"></app-instruction>
+            </div>
+
+        </div>
+    </div>
+</div> 
+}

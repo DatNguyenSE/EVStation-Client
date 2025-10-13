@@ -1,0 +1,39 @@
+<div class="relative w-full overflow-hidden">
+  <!-- Wrapper -->
+  <div class="flex transition-transform duration-700 ease-in-out"
+       [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+    <div *ngFor="let slide of slides"
+         class="relative w-full flex-shrink-0 h-[600px]">
+      <img [src]="slide.image"
+           alt="Slide image"
+           class="absolute inset-0 w-full h-full object-cover" />
+
+      <!-- Overlay mờ -->
+      <div class="absolute inset-0 bg-black/40"></div>
+
+      <!-- Nội dung text -->
+      <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ slide.title }}</h1>
+        <p class="text-lg md:text-xl max-w-3xl">{{ slide.subtitle }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút điều hướng -->
+  <button (click)="prev()"
+          class="absolute top-1/2 left-6 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white px-3 py-2 rounded-full">‹</button>
+  <button (click)="next()"
+          class="absolute top-1/2 right-6 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white px-3 py-2 rounded-full">›</button>
+
+  <!-- Dots -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+    <button *ngFor="let _ of slides; let i = index"
+            (click)="goTo(i)"
+            class="h-3 rounded-full transition-all"
+            [class.bg-white]="i === currentIndex"
+            [class.w-8]="i === currentIndex"
+            [class.bg-white/40]="i !== currentIndex"
+            [class.w-3]="i !== currentIndex">
+    </button>
+  </div>
+</div>
