@@ -1,7 +1,7 @@
 import { Component, inject, model,ChangeDetectorRef } from '@angular/core';
 import { VehicleService } from '../../core/service/vehicle-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Vehicle } from '../../_models/user';
+import { Vehicles } from '../../_models/user';
 import { CommonModule } from '@angular/common';
 
 
@@ -37,7 +37,7 @@ export class RegisterVehicle {
           return
         }
 
-        const vehicle : Vehicle  = this.registerForm.value;
+        const vehicle : Vehicles  = this.registerForm.value;
 
         this.vehicleservice.register(vehicle).subscribe({
           next:(res) =>{

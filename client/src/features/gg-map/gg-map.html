@@ -1,125 +1,75 @@
 <div class="flex flex-col items-center gap-6 p-6 bg-gray-50 rounded-xl shadow-inner relative">
 
-  <!-- 🧭 Tiêu đề -->
+  <!--  Tiêu đề -->
   <h2 class="text-2xl font-bold text-gray-800 text-center">
-    🔌 Tìm Trạm Sạc Gần Nhất
+    Tìm Trạm Sạc Gần Nhất
   </h2>
 
-  <!-- 📍 Nút thao tác -->
-  <div class="flex gap-3 flex-wrap justify-center">
-    <button
-      (click)="locateMe()"
-      class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-    >
-       📍 Vị trí của tôi
-    </button>
 
-    <button
-      (click)="routeToNearest()"
-      class="bg-emerald-600 text-white px-4 py-2 rounded-lg shadow hover:bg-emerald-700 transition disabled:opacity-50"
-      [disabled]="!nearest"
-    >
-      🧭 Chỉ đường đến trạm gần nhất
-    </button>
-  </div>
 
-  <!-- 🗺️ Map + Search -->
-  <div class="relative w-full h-[80vh] rounded-xl overflow-hidden shadow-lg border border-gray-200">
-    
+  <!-- 🗺️ Map + Tìm kiếm + Thông tin trong cùng 1 khung -->
+  <div class="relative w-full h-full rounded-xl overflow-hidden shadow-lg border border-gray-200">
+
     <!-- Ô tìm kiếm nổi -->
-    <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center space-y-2 w-80">
+    <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center space-y-2 w-80">
       <div class="bg-white shadow-md rounded-lg flex items-center px-3 py-2 w-72 border border-gray-200">
-        <input
-          type="text"
-          placeholder="🔍 Tìm trạm sạc..."
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange()"
-          class="flex-1 text-gray-700 placeholder-gray-400 bg-transparent border-none outline-none text-sm"
-        />
-        <button
-          *ngIf="searchTerm"
-          (click)="searchTerm=''; searchResults=[]"
-          class="text-gray-400 hover:text-gray-600"
-        >✖</button>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="size-4">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        <input type="text" placeholder=" Tìm trạm sạc..." [(ngModel)]="searchTerm" (input)="onSearchChange()"
+          class="flex-1 text-gray-700 placeholder-gray-400 bg-transparent border-none outline-none text-sm" />
+        <button *ngIf="searchTerm" (click)="searchTerm=''; searchResults=[]"
+          class="text-gray-400 hover:text-gray-600">✖</button>
       </div>
 
-      <!-- Danh sách gợi ý -->
-      <ul
-        *ngIf="searchResults.length > 0"
-        class="bg-white shadow-lg rounded-lg w-72 max-h-64 overflow-y-auto border border-gray-200 mt-1"
-      >
-        <li
-          *ngFor="let s of searchResults"
-          (click)="focusStation(s)"
-          class="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm border-b last:border-b-0 text-black"
-        >
+      <!-- Gợi ý -->
+      <ul *ngIf="searchResults.length > 0"
+        class="bg-white shadow-lg rounded-lg w-72 max-h-64 overflow-y-auto border border-gray-200 mt-1">
+        <li *ngFor="let s of searchResults" (click)="focusStation(s)"
+          class="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm border-b last:border-b-0 text-black">
           <b>{{ s.name }}</b><br />
           <span class="text-gray-500 text-xs">{{ s.address }}</span>
         </li>
       </ul>
 
       <!-- Không có kết quả -->
-      <div
-        *ngIf="searchResults.length === 0 && searchTerm.trim().length >= 2"
-        class="bg-white shadow-md rounded-lg px-3 py-2 text-sm text-gray-500 w-72 border border-gray-200 mt-1"
-      >
+      <div *ngIf="searchResults.length === 0 && searchTerm.trim().length >= 2"
+        class="bg-white shadow-md rounded-lg px-3 py-2 text-sm text-gray-500 w-72 border border-gray-200 mt-1">
         Không tìm thấy trạm sạc nào.
       </div>
     </div>
 
-    <!-- Map -->
-    <div id="map" class="w-full h-full"></div>
-  </div>
+    <!-- Bản đồ -->
+    <div id="map" class="w-full h-full z-[10]"></div>
 
-  <!-- 📍 Thông tin trạm gần nhất -->
-  <div
-    *ngIf="nearest"
-    class="bg-white p-5 rounded-xl shadow-md border border-gray-100 text-center w-full max-w-md mt-6 transition-transform hover:scale-[1.01]"
-  >
-    <h3 class="text-lg font-semibold text-gray-800 mb-1">Trạm gần nhất:</h3>
-    <p class="text-blue-700 font-bold text-lg">{{ nearest?.name }}</p>
-    <p class="text-gray-600">{{ nearest?.address }}</p>
-    <p class="text-gray-500">
-      ⏰ {{ nearest?.openTime }} - {{ nearest?.closeTime }}
-    </p>
-    <p class="text-gray-700 mt-1">
-      ⚡ {{ nearest?.posts?.length || 0 }} cổng sạc |
-      🚗 {{ nearestDistance?.toFixed(2) }} km
-    </p>
-  </div>
-
-  <!-- 🔋 Danh sách tất cả trạm -->
-  <div
-    class="w-full max-w-5xl mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-  >
-    <div
-      *ngFor="let s of stations"
-      class="bg-white border border-gray-100 rounded-xl p-5 shadow hover:shadow-lg hover:-translate-y-1 transition"
-    >
-      <h4 class="font-bold text-blue-800 text-lg mb-1">{{ s.name }}</h4>
-      <p class="text-gray-600 text-sm mb-1">📍 {{ s.address }}</p>
-      <p class="text-gray-500 text-sm mb-1">
-        ⏰ {{ s.openTime }} - {{ s.closeTime }}
+    <!-- Thông tin trạm gần nhất (nổi trên map) -->
+    <div *ngIf="nearest"
+      class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center w-80 z-[999]">
+      <h3 class="text-lg font-semibold text-gray-800 mb-1">Trạm gần nhất:</h3>
+      <p class="text-blue-700 font-bold text-lg">{{ nearest?.name }}</p>
+      <p class="text-gray-600">{{ nearest?.address }}</p>
+      <p class="text-gray-500">
+        {{ nearest?.openTime }} - {{ nearest?.closeTime }}
       </p>
-      <p class="text-gray-700 text-sm">
-        ⚡ {{ s.posts?.length || 0 }} cổng sạc
+      <p class="text-gray-700 mt-1">
+        {{ nearest?.posts?.length || 0 }} cổng sạc |
+        {{ nearestDistance?.toFixed(2) }} km
       </p>
-
-      <button
-        (click)="nearest = s; routeToNearest()"
-        class="mt-4 bg-blue-500 text-white w-full py-2 rounded-lg hover:bg-blue-600 transition"
-      >
-        🧭 Chỉ đường tới đây
-      </button>
     </div>
   </div>
+  <!-- 📍 Nút thao tác -->
+  <div class="flex gap-3 flex-wrap justify-center z-[20]">
+    <button (click)="locateMe()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+      Vị trí của tôi
+    </button>
 
-  <!-- 📡 Phản hồi từ backend -->
-  <div
-    *ngIf="lastResponse"
-    class="mt-6 bg-gray-50 border rounded-lg p-4 text-sm text-gray-600 w-full max-w-md shadow-inner"
-  >
-    <strong class="block mb-1">📡 Phản hồi từ server:</strong>
-    <pre class="whitespace-pre-wrap">{{ lastResponse | json }}</pre>
+    <button (click)="routeToNearest()"
+      class="bg-emerald-600 text-white px-4 py-2 rounded-lg shadow hover:bg-emerald-700 transition disabled:opacity-50"
+      [disabled]="!nearest">
+       Chỉ đường đến trạm gần nhất
+    </button>
   </div>
 </div>

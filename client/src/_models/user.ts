@@ -15,7 +15,7 @@ export type User = {
     roles: string[];
 }
 
-export type Vehicle = {
+export type Vehicles = {
   vehicleId: number;
   model: string;
   type: string;
@@ -26,7 +26,7 @@ export type Vehicle = {
 };
 export interface VehicleResponse {
   message: string;
-  data: Vehicle;
+  data: Vehicles;
 }
 
 export type Driver = {
@@ -35,7 +35,7 @@ export type Driver = {
     email: string;
     fullName: string;
     age: number;
-    vehicles: Vehicle[];
+    vehicles: Vehicles[];
 };
 
     

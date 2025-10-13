@@ -26,7 +26,7 @@ const userIcon = L.icon({
 @Component({
   selector: 'app-gg-map',
   standalone: true,
-  imports: [NgIf, NgFor, JsonPipe,FormsModule],
+  imports: [NgIf, NgFor,FormsModule],
   templateUrl: './gg-map.html',
   styleUrls: ['./gg-map.css'],
 })

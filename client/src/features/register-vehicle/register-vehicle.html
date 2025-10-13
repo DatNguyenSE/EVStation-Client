@@ -1,17 +1,14 @@
 <!-- NỀN TOÀN TRANG -->
-<main class="relative z-0 mt-[80px] min-h-[calc(100vh-80px)] flex justify-center items-center px-6 py-12">
-  <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-800 z-0"></div>
-  <div class="absolute inset-0 bg-[url('/assets/bank-note.svg')] bg-center bg-cover opacity-10 z-0"></div>
-
+<main class="relative z-0 mt-[-35px] min-h-[calc(100vh-80px)] flex justify-center items-center px-6 py-12">
   <!-- KHUNG FORM -->
   <div
-    class="relative z-10 w-full max-w-lg bg-white/95 backdrop-blur-md shadow-2xl rounded-3xl p-8 pb-10 transform transition hover:-translate-y-1 hover:shadow-3xl"
+    class=" relative z-10  w-full max-w-lg bg-white/95  rounded-3xl p-8 pb-10 transform transition "
   >
     <!-- TIÊU ĐỀ -->
     <h2
       class="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
     >
-      🚗 Đăng ký xe điện
+       Đăng ký xe điện
     </h2>
 
     <!-- FORM -->
@@ -82,7 +79,7 @@
         type="submit"
         [disabled]="registerForm.invalid"
         class="w-full py-3 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition disabled:opacity-50"
-          (click)="onSubmit"
+          
         >
         Đăng ký
       </button>

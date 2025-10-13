@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Driver, Vehicle } from '../../_models/user';
+import { Driver, Vehicles } from '../../_models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class DriverService {
   protected router = inject(Router);
   baseUrl = 'https://localhost:5001/api/';
   currentDriver = signal<Driver | null>(null);
-  Vehicles = signal<Vehicle[] >([]);
+  Vehicles = signal<Vehicles[] >([]);
 
   GetProfile_Driver() {
     return this.http.get<Driver>(
@@ -19,7 +19,7 @@ export class DriverService {
   }
 
   GetVehicles() {
-    return this.http.get<Vehicle[]>(
+    return this.http.get<Vehicles[]>(
       `${this.baseUrl}vehicle/my`);
   }
 }
