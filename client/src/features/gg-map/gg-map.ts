@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, inject, OnDestroy} from '@angular/core';
 import { StationService } from '../../core/service/station-service';
 import { DecimalPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 import * as L from 'leaflet';
@@ -38,6 +38,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
   nearest: any;
   nearestDistance?: number;
   lastResponse: any;
+  private cdf = inject(ChangeDetectorRef);
 
   constructor(private stationSvc: StationService) {}
 
@@ -74,8 +75,8 @@ export class GgMap implements AfterViewInit, OnDestroy {
     setTimeout(() => this.map.invalidateSize(), 300);
      this.map.on('focus', () => this.map.scrollWheelZoom.enable());
     this.map.on('blur', () => this.map.scrollWheelZoom.disable());
-    
-    
+
+
 
     // ✅ Lấy danh sách trạm sạc
     this.stationSvc.getStations().subscribe({
@@ -86,7 +87,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
       error: (err) => console.error('Lỗi tải trạm:', err),
     });
 
- 
+
     this.stationSvc.getStations().subscribe({
       next:(data :any) =>{
         this.stations = data || [];
@@ -130,15 +131,15 @@ private addStationMarkers(): void {
       📍 ${s.address}<br/>
       ⏰ ${s.openTime} - ${s.closeTime}<br/>
       ⚡ ${s.posts?.length || 0} cổng sạc<br/>
-      <button id="reserve-${id}" 
+      <button id="reserve-${id}"
               style="
-                margin-top:8px; 
-                width:100%; 
-                background:#2563EB; 
-                color:white; 
-                border:none; 
-                padding:6px 0; 
-                border-radius:6px; 
+                margin-top:8px;
+                width:100%;
+                background:#2563EB;
+                color:white;
+                border:none;
+                padding:6px 0;
+                border-radius:6px;
                 cursor:pointer;
               ">
         🔋 Đặt chỗ sạc
@@ -253,6 +254,7 @@ onSearchChange(): void {
         next : (data: any[]) => {
           this.searchResults = data;
           this.showSearchResults();
+          this.cdf.detectChanges();
         },
         error: (err) => console.error('Search lỗi:', err)
       });
