@@ -55,9 +55,18 @@ export type RegisterCreds = {
     password: string;
 }
 export type Package = {
-    packagename:string;
+    name:string;
     description:string;
     vehicleType : string;
     price : number;
-    durationsDay : 30;
+    durationsDay : number;
+}
+
+export interface VehicleModelDetail {
+  model: string;
+  type: string;
+  batteryCapacityKWh: number;
+  maxChargingPowerKW: number;
+  connectorType: string;
+  hasDualBattery: boolean;
 }
