@@ -1,18 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { GgMap } from "../gg-map/gg-map";
-import { RegisterVehicle } from "../register-vehicle/register-vehicle";
-import { Packages } from "../packages/packages";
 
 @Component({
   selector: 'app-service-list',
   standalone:true,
-  imports: [CommonModule, GgMap, RegisterVehicle, Packages],
+  imports: [CommonModule, GgMap],
   templateUrl: './service-list.html',
   styleUrl: './service-list.css'
 })
 export class ServiceList {
- activeTab: string = '';
+ activeTab: string = 'history';
 
   history = [
     { date: '01/10/2025', time: '14:32', station: 'Trụ A01', kwh: 12.5, price: 45000 },

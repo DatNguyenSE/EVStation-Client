@@ -38,7 +38,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
   nearest: any;
   nearestDistance?: number;
   lastResponse: any;
-  
+
    private cdRef = inject(ChangeDetectorRef);
 
 
