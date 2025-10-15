@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { GgMap } from "../gg-map/gg-map";
 import { RegisterVehicle } from "../register-vehicle/register-vehicle";
+import { Packages } from "../packages/packages";
 
 @Component({
   selector: 'app-service-list',
   standalone:true,
-  imports: [CommonModule, GgMap, RegisterVehicle],
+  imports: [CommonModule, GgMap, RegisterVehicle, Packages],
   templateUrl: './service-list.html',
   styleUrl: './service-list.css'
 })

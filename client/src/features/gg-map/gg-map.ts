@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
 import { StationService } from '../../core/service/station-service';
 import { DecimalPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 import * as L from 'leaflet';
@@ -38,6 +38,8 @@ export class GgMap implements AfterViewInit, OnDestroy {
   nearest: any;
   nearestDistance?: number;
   lastResponse: any;
+   private cdRef = inject(ChangeDetectorRef);
+
 
   constructor(private stationSvc: StationService) {}
 
@@ -172,9 +174,7 @@ reserveStation(station: any) {
 
       this.map.setView([lat, lng], 14);
 
-      this.stationSvc.sendLocation({ lat, lng }).subscribe((res) => {
-        this.lastResponse = res;
-      });
+    
 
       this.findNearest(lat, lng);
     });
@@ -253,6 +253,7 @@ onSearchChange(): void {
         next : (data: any[]) => {
           this.searchResults = data;
           this.showSearchResults();
+          this.cdRef.detectChanges();
         },
         error: (err) => console.error('Search lỗi:', err)
       });

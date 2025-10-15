@@ -20,10 +20,6 @@ export class StationService {
     return this.http.get<Station[]>(`${this.baseUrl}/station`);
   }
 
-  sendLocation(location: { lat: number; lng: number }) {
-    return this.http.post(`${this.baseUrl}/location`, location);
-  }
-
   searchStations(address: string) {
     return this.http.get<Station[]>(`${this.baseUrl}/station/search?address=${encodeURIComponent(address)}`);
   }

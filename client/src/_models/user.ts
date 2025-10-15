@@ -1,3 +1,5 @@
+import { DecimalPipe } from "@angular/common";
+
 export type Account = {
     id: string;
     username: string;
@@ -51,4 +53,11 @@ export type RegisterCreds = {
     fullname: string;
     age: number;
     password: string;
+}
+export type Package = {
+    packagename:string;
+    description:string;
+    vehicleType : string;
+    price : number;
+    durationsDay : 30;
 }
