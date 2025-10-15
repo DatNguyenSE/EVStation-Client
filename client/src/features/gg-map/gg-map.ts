@@ -26,7 +26,7 @@ const userIcon = L.icon({
 @Component({
   selector: 'app-gg-map',
   standalone: true,
-  imports: [NgIf, NgFor, JsonPipe,FormsModule],
+  imports: [NgIf, NgFor,FormsModule],
   templateUrl: './gg-map.html',
   styleUrls: ['./gg-map.css'],
 })
@@ -38,7 +38,9 @@ export class GgMap implements AfterViewInit, OnDestroy {
   nearest: any;
   nearestDistance?: number;
   lastResponse: any;
-  private cdf = inject(ChangeDetectorRef);
+  
+   private cdRef = inject(ChangeDetectorRef);
+
 
   constructor(private stationSvc: StationService) {}
 
@@ -173,9 +175,7 @@ reserveStation(station: any) {
 
       this.map.setView([lat, lng], 14);
 
-      this.stationSvc.sendLocation({ lat, lng }).subscribe((res) => {
-        this.lastResponse = res;
-      });
+
 
       this.findNearest(lat, lng);
     });
@@ -254,7 +254,7 @@ onSearchChange(): void {
         next : (data: any[]) => {
           this.searchResults = data;
           this.showSearchResults();
-          this.cdf.detectChanges();
+          this.cdRef.detectChanges();
         },
         error: (err) => console.error('Search lỗi:', err)
       });
