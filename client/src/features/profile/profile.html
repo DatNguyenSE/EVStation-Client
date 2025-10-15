@@ -1,7 +1,6 @@
 @if (driverService.currentDriver(); as user) {
 
-<div
-  class="  min-h-screen flex items-center justify-center  py-16 px-4 pt-30 ">
+<div class="  min-h-screen flex items-center justify-center  py-16 px-4 pt-30 ">
   <!-- ẢNH NỀN MỜ -->
   <div class="absolute inset-0 bg-cover bg-center"
     style="background-image: url('/assets/background/nen-tram-sac-xe-dien.png'); filter: brightness(0.55) blur(2px);">
@@ -71,7 +70,9 @@
           </svg>
           Tuổi
         </span>
-        <span class="text-gray-800 font-semibold">{{ user.age }}</span>
+        <span class="text-gray-800 font-semibold">
+          {{ user.dateOfBirth | date:'dd/MM/yyyy' }}
+        </span>
       </div>
 
       <div>
