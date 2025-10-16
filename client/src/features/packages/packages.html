@@ -1,18 +1,21 @@
-<div class="flex justify-center gap-8 w-full max-w-[1200px] mx-auto">
+<div class="flex flex-wrap justify-center gap-8 w-full max-w-[1400px] mx-auto px-4">
   <div
     *ngFor="let p of package"
-    class="w-1/2 max-w-[500px] bg-white rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-500 group"
-    [ngClass]="{'border-blue-500 ring-4 ring-blue-200': selectedPackage === p.vehicleType}"
-    (click)="selectPackage(p.vehicleType)"
+    class="w-full sm:w-[48%] md:w-[45%] lg:w-[40%] xl:w-[35%] bg-white rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-500 group"
+    [ngClass]="{'border-blue-500 ring-4 ring-blue-200': selectedPackageId === p.id}"
+    (click)="selectPackage(p.id)"
   >
     <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 relative">
       <div class="absolute top-3 right-3">
         <div
           class="w-8 h-8 rounded-full border-3 border-white flex items-center justify-center transition-all duration-300"
-          [ngClass]="{'bg-white': selectedPackage === p.vehicleType, 'bg-transparent': selectedPackage !== p.vehicleType}"
+          [ngClass]="{
+            'bg-white': selectedPackageId === p.id,
+            'bg-transparent': selectedPackageId !== p.id
+          }"
         >
           <svg
-            *ngIf="selectedPackage === p.vehicleType"
+            *ngIf="selectedPackageId === p.id"
             class="w-5 h-5 text-blue-600"
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -25,10 +28,6 @@
           </svg>
         </div>
       </div>
-
-      <span class="inline-block bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full mb-2 uppercase tracking-wider">
-        {{ p.vehicleType === 'Car' ? 'Premium' : 'Tiêu chuẩn' }}
-      </span>
 
       <h3 class="text-2xl font-extrabold text-white">{{ p.name }}</h3>
     </div>
@@ -50,15 +49,15 @@
 
       <button
         class="w-full bg-blue-500 text-white text-base font-semibold px-4 py-3 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 group-hover:shadow-lg"
-        [ngClass]="{'bg-blue-600': selectedPackage === p.vehicleType}"
+        [ngClass]="{'bg-blue-600': selectedPackageId === p.id}"
       >
-        {{ selectedPackage === p.vehicleType ? 'Đã chọn' : 'Chọn gói này' }}
+        {{ selectedPackageId === p.id ? 'Đã chọn' : 'Chọn gói này' }}
       </button>
     </div>
   </div>
 </div>
 
-<div class="mt-8 text-center" *ngIf="selectedPackage">
+<div class="mt-8 text-center" *ngIf="selectedPackageId">
   <button
     class="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-blue-600"
   >
