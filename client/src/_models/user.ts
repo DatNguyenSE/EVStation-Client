@@ -55,9 +55,10 @@ export type RegisterCreds = {
     password: string;
 }
 export type Package = {
+    id:number;
     name:string;
     description:string;
-    vehicleType : string;
+    vehicleType : number;
     price : number;
     durationsDay : number;
 }

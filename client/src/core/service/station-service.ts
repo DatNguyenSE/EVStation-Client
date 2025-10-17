@@ -6,10 +6,10 @@ import { Observable } from 'rxjs';
 export interface Station {
   id: string;
   name: string;
-  lat: number;
-  lng: number;
+  latitude: number;
+  longitude: number;
+  distance: number;
 }
-
 
 @Injectable({
   providedIn: 'root'
@@ -38,4 +38,22 @@ export class StationService {
       observe: 'response' 
     });
   }
+getNearby(location: { lat: number; lon: number }) {
+  return this.http.get<Station>(`${this.baseUrl}/station/nearest?lat=${location.lat}&lon=${location.lon}`);
+}
+getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  return this.http.get<{distance :number}>(`${this.baseUrl}/station/distance`, {
+    params: {
+      lat1: lat1.toString(),
+      lon1: lon1.toString(),
+      lat2: lat2.toString(),
+      lon2: lon2.toString(),
+    },
+    
+  });
+}
+
+
+
+
 }

@@ -10,11 +10,13 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './packages.html',
   styleUrl: './packages.css'
 })
+
 export class Packages {
     package : Package[]=[];
-    selectedPackage: string | null = null;
+    selectedPackageId: number | null = null;
     private packageservice = inject(PackagesService);
     private cdRef = inject(ChangeDetectorRef);
+    
     ngOnInit(){
           this.getPackages(); 
     }
@@ -26,7 +28,11 @@ export class Packages {
         }
       })
     }
-     selectPackage(vehicleType: string) {
-    this.selectedPackage = vehicleType;
+     selectPackage(packageId : number) {
+     if(this.selectedPackageId === packageId){
+       this.selectedPackageId = null;
+     }else{
+         this.selectedPackageId= packageId;
+     }
   }
 }
