@@ -134,25 +134,7 @@
 
       <div *ngIf="activeTab==='qr'"
         class="flex flex-col items-center py-10 px-6 bg-white rounded-xl shadow-2xl max-w-md mx-auto border border-gray-100">
-        <h2 class="text-2xl font-bold text-gray-800 mb-8">Bắt đầu sạc</h2>
-
-        <div
-          class="w-64 h-64 md:w-72 md:h-72 border-4 border-solid border-blue-600 bg-blue-50/50 flex flex-col items-center justify-center rounded-lg mb-8 shadow-xl relative overflow-hidden">
-          <div class="absolute inset-0 z-0 opacity-15 flex items-center justify-center">
-            <div class="w-1/2 h-full bg-blue-600 animate-pulse-slow"></div>
-          </div>
-          <svg class="w-24 h-24 text-blue-700 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-          <p class="text-blue-800 font-semibold mt-4 z-10 text-base">Quét mã QR trên trụ sạc</p>
-        </div>
-
-        <p class="text-gray-600 mb-4">Hoặc</p>
-        <button
-          class="text-blue-600 font-semibold text-lg hover:text-blue-700 transition-colors duration-200 border-b border-blue-600 pb-0.5">
-          Nhập ID Trụ Sạc
-        </button>
+        <app-qr-code />
       </div>
 
 
