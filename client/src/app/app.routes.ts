@@ -12,6 +12,7 @@ import { Login } from '../features/account/login/login';
 import { GgMap } from '../features/gg-map/gg-map';
 import { ConfirmEmail } from '../features/confirm-email/confirm-email';
 import { RegisterVehicle } from '../features/register-vehicle/register-vehicle';
+import { ChargingDashboard } from '../features/charging-dashboard/charging-dashboard';
 
 export const routes: Routes = [
      { path: '', component: Home },
@@ -26,8 +27,8 @@ export const routes: Routes = [
             {path:'thong-bao',component:Notification},
             {path:'tai-khoan',component:Profile},
             {path:'map',component: GgMap},
-            {path:'dangki-xe',component:RegisterVehicle}
-            
+            {path:'dangki-xe',component:RegisterVehicle},
+            {path:'thongtinsac/:id',component:ChargingDashboard}
             
         ]
     },

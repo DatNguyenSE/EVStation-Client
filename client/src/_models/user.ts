@@ -1,3 +1,5 @@
+import { DecimalPipe } from "@angular/common";
+
 export type Account = {
     id: string;
     username: string;
@@ -10,7 +12,7 @@ export type User = {
     id: string
     userName: string;
     email: string;
-    age: number;
+    dateOfBirth: string;
     fullName: string;
     roles: string[];
 }
@@ -34,7 +36,7 @@ export type Driver = {
     username: string;
     email: string;
     fullName: string;
-    age: number;
+    dateOfBirth: number;
     vehicles: Vehicles[];
 };
 
@@ -49,6 +51,23 @@ export type RegisterCreds = {
     email: string;
     username: string;
     fullname: string;
-    age: number;
+    dateOfBirth: string;
     password: string;
+}
+export type Package = {
+    id:number;
+    name:string;
+    description:string;
+    vehicleType : number;
+    price : number;
+    durationsDay : number;
+}
+
+export interface VehicleModelDetail {
+  model: string;
+  type: string;
+  batteryCapacityKWh: number;
+  maxChargingPowerKW: number;
+  connectorType: string;
+  hasDualBattery: boolean;
 }

@@ -80,12 +80,13 @@
             </p>
           </div>
 
-          <!-- Tuổi -->
+          <!-- Ngày sinh -->
           <div>
-            <input type="number" name="age" required min="1" [(ngModel)]="creds.age" placeholder="Tuổi"
-              class="input input-bordered w-full rounded-lg font-medium" #age="ngModel" />
-            <p *ngIf="age.invalid && age.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập tuổi hợp lệ.
+            <input type="date" name="dateOfBirth" required [(ngModel)]="creds.dateOfBirth" placeholder="Ngày sinh"
+              class="input input-bordered w-full rounded-lg font-medium" #dateOfBirth="ngModel" />
+
+            <p *ngIf="dateOfBirth.invalid && dateOfBirth.touched" class="text-red-500 text-sm mt-1">
+              Vui lòng chọn ngày sinh hợp lệ.
             </p>
           </div>
 

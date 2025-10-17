@@ -1,0 +1,58 @@
+<div class="flex flex-col items-center gap-6 p-6">
+  <h2 class="text-xl font-bold text-gray-800 text-center"> Quét hoặc Nhập Mã in trên Trụ Sạc</h2>
+
+  <!-- Kết quả -->
+  <div *ngIf="resultText" class="p-4 rounded-lg bg-green-100 text-green-800 w-full text-center">
+     Quét trụ sạc thành công: Mã trụ sạc: <strong>{{ resultText }}</strong>
+  </div>
+
+  <!-- Thông báo lỗi -->
+  <div *ngIf="errorMessage" class="p-3 bg-red-100 text-red-700 rounded-lg w-full text-center">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Video preview -->
+  <div class="w-full flex justify-center">
+    <video id="video-preview" class="w-80 h-56 bg-black rounded-xl" autoplay></video>
+  </div>
+
+  <div class="flex flex-wrap justify-center gap-4">
+    <button
+      class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      (click)="startScan()"
+      [disabled]="isScanning"
+    >
+      Mở camera
+    </button>
+
+    <button
+      class="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition"
+      (click)="stopScan()"
+      [disabled]="!isScanning"
+    >
+      Dừng quét
+    </button>
+  </div>
+
+  <!-- Upload ảnh QR -->
+  <div class="flex flex-col items-center gap-2">
+    <label for="fileInput" class="cursor-pointer text-blue-600 hover:underline">Tải ảnh QR từ thiết bị</label>
+    <input id="fileInput" type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+  </div>
+
+  <!-- Nhập ID trụ -->
+  <div class="flex gap-2 items-center">
+    <input
+      type="text"
+      placeholder="Nhập ID trụ sạc thủ công..."
+      [(ngModel)]="stationId"
+      class="border rounded-lg px-4 py-2 focus:ring focus:ring-blue-200"
+    />
+    <button
+      (click)="submitStationId()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+    >
+      Nhập
+    </button>
+  </div>
+</div>

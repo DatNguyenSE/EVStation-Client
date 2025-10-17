@@ -1,0 +1,106 @@
+@if (!errorMessage()) {
+@if (this.currentStation()?.status === 'Active') {
+
+<div class="w-full max-w-6xl mx-auto mt-33 mb-30 p-8 ">
+  <div class="flex flex-col md:flex-row gap-8">
+
+    <!--  THÔNG TIN TRẠM -->
+    <div class="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-blue-100">
+      <div class="flex items-center mb-4">
+        <span class="text-2xl mr-2">
+          <img src="/assets/logo.png" class="size-10" />
+        </span>
+        <h2 class="text-2xl font-bold text-blue-700">Thông tin Trạm Sạc</h2>
+      </div>
+      <div class="space-y-2 text-gray-800">
+        <p><strong>Tên:</strong> {{ this.currentStation()?.name }}</p>
+        <p><strong>Địa chỉ:</strong> {{ this.currentStation()?.address }}</p>
+      </div>
+
+      <div class="mt-5 border-t border-gray-200 pt-4">
+        <div class="flex items-center mb-2">
+          <h3 class="text-lg font-semibold text-blue-600">Trụ sạc</h3>
+        </div>
+
+        <ul class="text-gray-700 space-y-1">
+          <li><strong>Mã trụ: </strong> <span class="text-gray-700">{{ this.currentPost()?.id }}</span></li>
+          <li><strong>Loại: </strong><span class="text-gray-700"> {{ this.currentPost()?.type }}</span></li>
+          <li><strong>Công suất: </strong> <span class="text-gray-700">{{ this.currentPost()?.powerKW }}</span> </li>
+          <li><strong>Đầu nối:</strong> <span class="text-gray-700">{{ this.currentPost()?.connectorType }}</span></li>
+          <li><strong>Trạng thái: </strong>
+            <span class="px-2 py-0.5 rounded text-sm font-medium" [ngClass]="{
+                'bg-green-100 text-green-700': this.currentPost()?.status === 'Available',
+                'bg-yellow-100 text-yellow-700': this.currentPost()?.status === 'Charging',
+                'bg-red-100 text-red-700': this.currentPost()?.status === 'Offline'
+              }">
+              <span> {{ this.currentPost()?.status }}</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    @if(this.currentPost()?.status==='Available'){
+    <!--  TRẠNG THÁI SẠC -->
+    <div
+      class="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-green-100 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center mb-4">
+          <h2 class="text-2xl font-bold text-green-700">Đang sạc...</h2>
+        </div>
+
+        <!-- Vòng tròn pin -->
+        <div class="relative w-48 h-48 mx-auto my-6">
+          <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" stroke="#e5e7eb" stroke-width="10" fill="none" />
+            <circle cx="50" cy="50" r="45" stroke="#22c55e" stroke-width="10" fill="none" stroke-linecap="round"
+              [attr.stroke-dasharray]="282.6" [attr.stroke-dashoffset]="282.6 - (batteryPercent * 2.826)"
+              class="transition-all duration-700 ease-in-out" />
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center text-3xl font-bold text-green-600">
+            {{ batteryPercent | number: '1.0-0' }}%
+          </div>
+        </div>
+
+        <p class="text-center text-gray-600 text-sm -mt-2">Dung lượng pin</p>
+
+        <!-- Thông tin sạc -->
+        <div class="mt-6 space-y-2 text-gray-800">
+          <p><strong>Điện đã nạp:</strong> {{ chargedKwh | number:'1.2-2' }} kWh</p>
+          <p><strong>Thời gian sạc:</strong> {{ timeElapsed | number:'1.0-0' }} giây</p>
+          <p><strong>Giá tiền:</strong> {{ totalPrice | number }} đ</p>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <button
+          class="bg-red-500 text-white py-2.5 px-6 rounded-lg font-semibold shadow-md hover:bg-red-600 active:scale-95 transition">
+          Dừng sạc
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
+} @else {
+<div class="flex flex-col mt-30 mb-30 items-center justify-center min-h-[70vh]">
+  Trạm hiện không hoạt động.
+</div>
+}
+} @else {
+<!--  Giao diện lỗi -->
+<div class="flex flex-col mt-30 mb-30 items-center justify-center min-h-[70vh]">
+  <svg class="size-6" viewBox="0 0 24 24" fill="currentColor">
+    <path d="file:///D:/T%E1%BA%A3i%20xu%E1%BB%91ng/alert-error-svgrepo-com.svg" />
+  </svg>
+  <h2 class="text-2xl font-bold text-red-600 mb-3">Lỗi khi xác thực trạm sạc</h2>
+  <p class="text-gray-700 text-center mb-6 w-[400px]">
+    {{ errorMessage() }}
+  </p>
+  <button (click)="router.navigate(['/'])"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold">
+    ← Quay về trang chủ
+  </button>
+</div>
+}
