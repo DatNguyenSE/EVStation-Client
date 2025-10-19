@@ -17,19 +17,19 @@ import { Router } from '@angular/router';
 export class QrCodeComponent implements OnInit, OnDestroy {
   codeReader = new BrowserMultiFormatReader();
   videoElement!: HTMLVideoElement;
-  resultText: string | null = null;
+  resultUrl: string | null = null;
   selectedFile: File | null = null;
-  stationId: string = '';
+  idPost: string = '';
   isScanning = false;
   errorMessage: string | null = null;
   controls: IScannerControls | null = null;
   router = inject(Router)
-  ngOnInit() {}
+  ngOnInit() { }
 
   async startScan() {
     try {
       this.isScanning = true;
-      this.resultText = null;
+      this.resultUrl = null;
       this.errorMessage = null;
 
       const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
@@ -46,10 +46,16 @@ export class QrCodeComponent implements OnInit, OnDestroy {
       // Lưu controls để dừng sau
       this.controls = await this.codeReader.decodeFromVideoDevice(firstDeviceId, this.videoElement, (result, err) => {
         if (result) {
-          this.resultText = result.getText();
-          console.log("Thong tin: "+this.resultText)
+          this.resultUrl = result.getText();
+
+          console.log("Thong tin: " + this.resultUrl)
           this.stopScan();
-          this.router.navigate(['/thongtinsac',this.resultText]);
+
+          const cleanPath  = this.resultUrl.replace("http://localhost:4200/thongtinsac/", "");;
+        console.log(cleanPath ); // "1"
+
+        this.router.navigate(['/thongtinsac',cleanPath]);
+          
         }
       });
 
@@ -79,8 +85,14 @@ export class QrCodeComponent implements OnInit, OnDestroy {
     img.onload = async () => {
       try {
         const result: Result = await this.codeReader.decodeFromImageElement(img);
-        this.resultText = result.getText();
-         this.router.navigate(['/thongtinsac',this.resultText]);
+        this.resultUrl = result.getText();
+
+        const cleanPath  = this.resultUrl.replace("http://localhost:4200/thongtinsac/", "");
+        console.log(cleanPath ); // "1"
+
+        this.router.navigate(['/thongtinsac',cleanPath]);
+
+
       } catch (err) {
         this.errorMessage = 'Không thể đọc mã QR từ ảnh.';
       }
@@ -88,13 +100,13 @@ export class QrCodeComponent implements OnInit, OnDestroy {
   }
 
   submitStationId() {
-    if (!this.stationId.trim()) return;
-     this.router.navigate(['/thongtinsac',this.stationId]);
+    if (!this.idPost.trim()) return;
+    this.router.navigate(['/thongtinsac', this.idPost]);
   }
 
   ngOnDestroy() {
     this.stopScan();
   }
 
-  
+
 }

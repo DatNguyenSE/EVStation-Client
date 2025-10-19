@@ -12,16 +12,16 @@ import { switchMap, tap } from 'rxjs';
   styleUrl: './charging-dashboard.css'
 })
 export class ChargingDashboard implements OnInit, OnDestroy {
-  postID!: string;
+  idPost!: string;
   route = inject(ActivatedRoute)
   stationService = inject(StationService);
   currentPost = signal<Post | null>(null);
   currentStation = signal<DtoStation | null> (null);
   router = inject(Router)
-errorMessage = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
 
 validateScan() {
-  this.stationService.validateScan(this.postID).subscribe({
+  this.stationService.validateScan(this.idPost).subscribe({
     next: response => {
       if (response.status === 200) {
         console.log(' Validate thành công', response.body);
@@ -33,7 +33,7 @@ validateScan() {
         console.error('Validate lỗi:', err.error?.message);
         this.errorMessage.set(err.error?.message || 'Có lỗi xảy ra');
       } else {
-        console.error('⚠️ Lỗi khác:', err);
+        console.error(' Lỗi khác:', err);
         this.errorMessage.set('Không thể kết nối đến server');
       }
     }
@@ -49,7 +49,7 @@ validateScan() {
 
   ngOnInit() {
     this.startChargingSimulation();
-    this.postID = this.route.snapshot.paramMap.get('id')!;
+    this.idPost = this.route.snapshot.paramMap.get('idPost')!;
     this.getPostById();
     this.validateScan();
   }
@@ -68,14 +68,27 @@ validateScan() {
   }
 
   getPostById() {
-    this.stationService.getPostById(this.postID).pipe(
-      tap(post => this.currentPost.set(post)),
-      switchMap(post => this.stationService.getStationByid(post.stationId)),
-      tap(DtoStation => this.currentStation.set(DtoStation))
-    ).subscribe({
-      next: () => console.log('Đã load post + station'),
-      error: err => console.error(err)
-    })
+    console.log('🟢 Gửi validate với postId:', this.idPost); // 👉 in ra xem có đúng là "11" không
+  this.stationService.getPostById(this.idPost).pipe(
+    tap(post => {
+      console.log(' Nhận được post:', post);
+      this.currentPost.set(post);
+    }),
 
-  }
+    switchMap(post => {
+      console.log('Gọi stationId:', post.stationId);
+      return this.stationService.getStationByid(post.stationId);
+    }),
+    tap(station => {
+      console.log(' Nhận được station:', station);
+      this.currentStation.set(station);
+    })
+  ).subscribe({
+    next: () => console.log('Đã load post + station'),
+    error: err => {
+      console.error(' Lỗi khi load post/station:', err);
+      console.error(' idPost:', this.idPost);
+    }
+  });
+}
 }

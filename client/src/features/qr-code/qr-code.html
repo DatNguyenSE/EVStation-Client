@@ -2,8 +2,8 @@
   <h2 class="text-xl font-bold text-gray-800 text-center"> Quét hoặc Nhập Mã in trên Trụ Sạc</h2>
 
   <!-- Kết quả -->
-  <div *ngIf="resultText" class="p-4 rounded-lg bg-green-100 text-green-800 w-full text-center">
-     Quét trụ sạc thành công: Mã trụ sạc: <strong>{{ resultText }}</strong>
+  <div *ngIf="resultUrl" class="p-4 rounded-lg bg-green-100 text-green-800 w-full text-center">
+     Quét trụ sạc thành công: Mã trụ sạc: <strong>{{ resultUrl }}</strong>
   </div>
 
   <!-- Thông báo lỗi -->
@@ -45,7 +45,7 @@
     <input
       type="text"
       placeholder="Nhập ID trụ sạc thủ công..."
-      [(ngModel)]="stationId"
+      [(ngModel)]="idPost"
       class="border rounded-lg px-4 py-2 focus:ring focus:ring-blue-200"
     />
     <button

@@ -26,11 +26,9 @@
 
           <!-- Username -->
           <div>
-            <input type="text" name="username"  [(ngModel)]="creds.username" placeholder="Tên đăng nhập"
-              autocomplete="off" required #username="ngModel" class="input input-bordered w-full rounded-lg font-medium" />
-            <p *ngIf="username.invalid && username.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập tên đăng nhập.
-            </p>
+            <input type="text" name="username" [(ngModel)]="creds.username" placeholder="Tên đăng nhập"
+              autocomplete="off" required #username="ngModel"
+              class="input input-bordered w-full rounded-lg font-medium" />
           </div>
 
           <!-- Password -->
@@ -40,8 +38,11 @@
               class="input input-bordered w-full rounded-lg font-medium pr-10" />
 
             <!-- Toggle eye -->
-            <button type="button" (click)="togglePassword()"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+
+
+            <button (click)="togglePassword()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+              title="Ẩn/Hiện số dư">
               <!-- Mắt đóng -->
               <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" class="w-5 h-5">
@@ -52,7 +53,6 @@
              -1.274 4.057-5.065 7-9.542 7
              -4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-
               <!-- Mắt mở -->
               <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" class="w-5 h-5">
@@ -64,10 +64,6 @@
               </svg>
             </button>
 
-            <!-- Thông báo lỗi -->
-            <p *ngIf="password.invalid && password.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập mật khẩu.
-            </p>
           </div>
 
           <!-- Quên mật khẩu -->

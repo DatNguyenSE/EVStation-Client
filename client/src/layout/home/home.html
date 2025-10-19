@@ -1,7 +1,8 @@
-@if(userService.currentAccount()){
+@if(userService.currentAccount()?.emailConfirmed){
     <app-dashboard></app-dashboard>
 }@else{
     <div>
+        
     <!-- Layout khi đã login -->
     <div class="background-home">
         <!-- Slider -->

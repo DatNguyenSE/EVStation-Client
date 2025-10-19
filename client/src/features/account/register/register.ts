@@ -34,10 +34,6 @@ export class Register {
         console.log(res);
         this.cancelRegister.emit(false);
         this.router.navigate(['/dang-nhap']);
-      },
-      error: (err: any) => {
-        console.error('Error:', err.error);
-        this.validationErrors.set(err);
       }
     });
   }
