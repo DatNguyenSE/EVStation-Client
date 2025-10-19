@@ -1,10 +1,11 @@
 import {AfterViewInit, ChangeDetectorRef, Component, inject, OnDestroy} from '@angular/core';
 import { StationService } from '../../core/service/station-service';
-import { DecimalPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
-import * as L from 'leaflet';
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import {  NgFor, NgIf } from '@angular/common';
+import * as L from 'leaflet'
 import 'leaflet-routing-machine';
 import { FormsModule } from '@angular/forms';
+import { Route, Router } from '@angular/router';
+import { Post } from '../../_models/station';
 
 // Icon riêng cho trạm sạc
 const stationIcon = L.icon({
@@ -37,6 +38,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
   private routing?: any;
   private stationLayer = L.layerGroup();
   stations: any[] = [];
+ 
   nearest: any;
   nearestDistance?: number;
   lastResponse: any;
@@ -47,7 +49,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
    private cdRef = inject(ChangeDetectorRef);
 
 
-  constructor(private stationSvc: StationService) {}
+  constructor(private stationSvc: StationService, private router :Router) {}
   private clearRoute(): void {
   if (this.routing) {
     try {
@@ -207,12 +209,18 @@ private addStationMarkers(): void {
 
 
 reserveStation(station: any) {
-  console.log('Đặt chỗ cho trạm:', station);
-  alert(`Đã gửi yêu cầu đặt chỗ tại ${station.name}`);
-  
-  //  Sau này bạn có thể gọi API thực:
-  // this.stationSvc.reserveStation(station.id).subscribe(...)
+  if (!station || !station.id) {
+    alert('Không tìm thấy thông tin sạc trạm sạc');
+    return;
+  }
+    this.router.navigate(['/datcho'], {
+    queryParams: {
+      stationId: station.id,
+      stationName: station.name
+    }
+  });
 }
+
 
 
   locateMe(): void {

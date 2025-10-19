@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EmailServices } from '../../core/service/email-services';
-import { Account } from '../../_models/user';
 
 @Component({
   selector: 'app-confirm-email',
@@ -37,11 +36,10 @@ export class ConfirmEmail implements OnInit {
       this.emailService.confirmEmail(userId, token).subscribe({
         next: (res: { message: string }) => {
           this.message = res.message;
-
           this.isSuccess = true;
           this.loading = false;
           this.cdr.detectChanges();
-          setTimeout(() => this.router.navigate(['/dang-nhap']), 3000);
+          setTimeout(() => this.router.navigate(['/dang-nhap']), 100000);
         },
         error: (err: HttpErrorResponse) => {
           this.message = 'Xác nhận email thất bại.';
@@ -51,10 +49,10 @@ export class ConfirmEmail implements OnInit {
         },
       });
     } 
-    // else {
-    //   this.message = 'Liên kết không hợp lệ hoặc đã hết hạn.';
-    //   this.loading = false;
-    //   this.isSuccess = false;
-    // }
+    else {
+      this.message = 'Liên kết không hợp lệ hoặc đã hết hạn.';
+      this.loading = false;
+      this.isSuccess = false;
+    }
   }
 }

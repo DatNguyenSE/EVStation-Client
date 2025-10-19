@@ -16,6 +16,7 @@ import { ChargingDashboard } from '../features/charging-dashboard/charging-dashb
 import { Vehicle } from '../features/vehicle/vehicle';
 import { ProfileDetails } from '../features/driver/profile-details/profile-details';
 import { driverResolver } from '../features/driver/driver-resolver';
+import { Reservation } from '../features/reservation/reservation';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -42,7 +43,8 @@ export const routes: Routes = [
             },
             { path: 'map', component: GgMap },
             { path: 'dangki-xe', component: RegisterVehicle },
-            { path: 'thongtinsac/:idPost', component: ChargingDashboard }
+            { path: 'thongtinsac/:idPost', component: ChargingDashboard },
+            {path:'datcho',component:Reservation}
 
         ]
     },
