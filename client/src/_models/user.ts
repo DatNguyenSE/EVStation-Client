@@ -39,6 +39,9 @@ export type Driver = {
     dateOfBirth: number;
     vehicles: Vehicles[];
 };
+export type DriverBalance = {
+  balance : number;
+}
 
     
 

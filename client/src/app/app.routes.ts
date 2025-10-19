@@ -28,7 +28,7 @@ export const routes: Routes = [
             {path:'tai-khoan',component:Profile},
             {path:'map',component: GgMap},
             {path:'dangki-xe',component:RegisterVehicle},
-            {path:'thongtinsac/:id',component:ChargingDashboard}
+            {path:'thongtinsac/:idPost',component:ChargingDashboard}
             
         ]
     },

@@ -165,8 +165,6 @@ private addStationMarkers(): void {
 
 }
 
-
-
   private createStationPopup(s: any): string {
    const id = s.id || L.Util.stamp(s); // tạo ID duy nhất
 
@@ -211,7 +209,7 @@ private addStationMarkers(): void {
 reserveStation(station: any) {
   console.log('Đặt chỗ cho trạm:', station);
   alert(`Đã gửi yêu cầu đặt chỗ tại ${station.name}`);
-
+  
   //  Sau này bạn có thể gọi API thực:
   // this.stationSvc.reserveStation(station.id).subscribe(...)
 }
