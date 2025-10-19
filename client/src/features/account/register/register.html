@@ -27,27 +27,21 @@
           <div>
             <input type="text" name="username" required [(ngModel)]="creds.username" placeholder="Tên hiển thị"
               class="input input-bordered w-full rounded-lg font-medium" #username="ngModel" />
-            <p *ngIf="username.invalid && username.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập tên hiển thị.
-            </p>
+
           </div>
 
           <!-- Email -->
           <div>
             <input type="email" name="email" required [(ngModel)]="creds.email" placeholder="Email"
               class="input input-bordered w-full rounded-lg font-medium" #email="ngModel" />
-            <p *ngIf="email.invalid && email.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập email hợp lệ.
-            </p>
+
           </div>
 
           <!-- Họ và tên -->
           <div>
             <input type="text" name="fullname" required [(ngModel)]="creds.fullname" placeholder="Họ và tên"
               class="input input-bordered w-full rounded-lg font-medium" #fullname="ngModel" />
-            <p *ngIf="fullname.invalid && fullname.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập họ và tên.
-            </p>
+
           </div>
 
           <!-- Mật khẩu -->
@@ -75,9 +69,7 @@
              9.542 7a9.956 9.956 0 01-4.252 5.568M3 3l18 18" />
               </svg>
             </button>
-            <p *ngIf="password.invalid && password.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng nhập mật khẩu.
-            </p>
+
           </div>
 
           <!-- Ngày sinh -->
@@ -85,9 +77,7 @@
             <input type="date" name="dateOfBirth" required [(ngModel)]="creds.dateOfBirth" placeholder="Ngày sinh"
               class="input input-bordered w-full rounded-lg font-medium" #dateOfBirth="ngModel" />
 
-            <p *ngIf="dateOfBirth.invalid && dateOfBirth.touched" class="text-red-500 text-sm mt-1">
-              Vui lòng chọn ngày sinh hợp lệ.
-            </p>
+
           </div>
 
           <!-- Điều khoản -->

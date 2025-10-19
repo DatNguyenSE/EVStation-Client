@@ -1,9 +1,11 @@
-import { Component, inject, HostListener, signal } from '@angular/core';
+import { Component, inject, HostListener, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
+import { Payment } from '../../features/payment/payment';
+import { DriverBalance } from '../../_models/user';
 
 
 
@@ -13,21 +15,32 @@ import { CommonModule } from '@angular/common';
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
-export class Nav {
+export class Nav implements OnInit{
   accountService = inject(AccountService);
   protected creds: any = {}
-
     driverService = inject(DriverService); 
     routers = inject(Router);
-  
+    showBalance = signal<boolean>(true);
+  ngOnInit(): void {
+    this.driverService.loadWallet();
+  }
+
+  getCurrentBalance() {
+    return this.driverService.walletBalance();
+  }
+
   logout() {
     this.accountService.logout();
     this.routers.navigateByUrl('/' );
   }
 
+   toggleBalance() {
+    this.showBalance.update((v) => !v);
+  }
+
    // thêm biến quản lý menu mobile
   isMenuOpen = false;
-  isMobile = window.innerWidth < 640; // sm:640px trong Tailwind
+  isMobile = window.innerWidth < 640; // sm:640px 
 
   // lắng nghe resize để cập nhật lại isMobile
   @HostListener('window:resize', ['$event'])
@@ -37,5 +50,28 @@ export class Nav {
     if (!this.isMobile) {
       this.isMenuOpen = false;
     }
+  }
+
+   showNotification = false;
+
+  notifications = [
+    { message: "Bạn được mời tham gia cuộc họp 'Phiên họp check trùng 2' vào 14/10/2025 10:15 - 12:15.", time: '08:53 15/10/2025' },
+    { message: "Bạn được mời tham gia cuộc họp 'Phiên họp test trùng 1' vào 14/10/2025 10:14 - 12:14.", time: '04:16 14/10/2025' },
+  ];
+
+  toggleNotification() {
+    this.showNotification = !this.showNotification;
+  }
+
+  closeNotification() {
+    this.showNotification = false;
+  }
+
+  removeNotification(item: any) {
+    this.notifications = this.notifications.filter(n => n !== item);
+  }
+
+  clearAll() {
+    this.notifications = [];
   }
 }
