@@ -4,8 +4,7 @@ import { AccountService } from '../../core/service/account-service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
-import { Payment } from '../../features/payment/payment';
-import { DriverBalance } from '../../_models/user';
+
 
 
 
@@ -20,7 +19,7 @@ export class Nav implements OnInit{
   protected creds: any = {}
     driverService = inject(DriverService); 
     routers = inject(Router);
-    showBalance = signal<boolean>(true);
+    showBalance = signal<boolean>(false);
   ngOnInit(): void {
     this.driverService.loadWallet();
   }

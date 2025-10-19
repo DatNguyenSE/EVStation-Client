@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Driver, DriverBalance, Vehicles } from '../../_models/user';
+import { Driver, Vehicles } from '../../_models/user';
 
 @Injectable({
   providedIn: 'root'
