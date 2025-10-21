@@ -43,8 +43,6 @@ export class ReservationService {
      const availableSlots = availableSlotsRaw.map((slotObj: any) => slotObj.startTime);
      
 
-console.log('🕒 Slot trả về từ backend:', availableSlots);
-
       const startTs = new Date(req.timeSlotStart).getTime();
       const isSlotAvailable = availableSlots.some(s => {
         const slotTs = new Date(s).getTime();
@@ -76,7 +74,7 @@ checkAvailableSlots(postId: number) {
     return this.http.get<any[]>(`${this.baseUrl}/station/${stationId}/compatible-posts/${vehicleId}`);
   }
   
-  cancelReservation(){
-    
+  cancelReservation(id:number){
+    return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation/${id}/cancel`,{});
   }
 }
