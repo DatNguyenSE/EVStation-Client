@@ -4,7 +4,7 @@ import { DtoStation, Post } from '../../_models/station';
 import { Observable } from 'rxjs';
 
 export interface Station {
-  id: string;
+  id: number;
   name: string;
   latitude: number;
   longitude: number;

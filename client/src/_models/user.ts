@@ -1,5 +1,3 @@
-import { DecimalPipe } from "@angular/common";
-
 export type Account = {
     id: string;
     username: string;
@@ -38,12 +36,7 @@ export type Driver = {
     fullName: string;
     dateOfBirth: number;
     vehicles: Vehicles[];
-};
-export type DriverBalance = {
-  balance : number;
-}
-
-    
+}; 
 
 export type LoginCreds = {
     username: string;

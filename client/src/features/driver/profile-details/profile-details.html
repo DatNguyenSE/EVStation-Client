@@ -1,0 +1,45 @@
+@if (driver(); as driver) {
+<div class="flex flex-col gap-4">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 text-white">
+    <h2 class="text-2xl font-bold">
+      {{ driver.fullName || 'Tài xế chưa có tên' }}
+    </h2>
+    <p class="text-sm opacity-90">Mã người dùng: {{ driver.id }}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div class="flex flex-col">
+      <span class="text-gray-500 text-sm mb-1">Tên đăng nhập</span>
+      <span class="text-gray-800 font-medium">{{ driver.username }}</span>
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-gray-500 text-sm mb-1">Email</span>
+      <span class="text-gray-800 font-medium">{{ driver.email }}</span>
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-gray-500 text-sm mb-1">Họ và tên</span>
+      <span class="text-gray-800 font-medium">{{ driver.fullName }}</span>
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-gray-500 text-sm mb-1">Ngày sinh</span>
+      <span class="text-gray-800 font-medium">
+        {{ driver.dateOfBirth | date:'dd/MM/yyyy' }}
+      </span>
+    </div>
+  </div>
+<div class="text-center text-gray-500 text-sm italic pb-6 pt-20">
+  “Cảm ơn bạn đã đồng hành cùng hệ thống sạc điện sạch – vì một tương lai xanh hơn.”
+</div>
+
+</div>
+} @else {
+<div class="text-center text-gray-500 italic">
+  Không tìm thấy thông tin người dùng.
+</div>
+}
