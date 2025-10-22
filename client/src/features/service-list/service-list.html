@@ -1,4 +1,4 @@
-<div class="w-full min-h-screen font-sans antialiased relative">
+<div class="w-full min-h-screen font-sans antialiased relative ">
   <!-- ẢNH NỀN MỜ -->
   <div class="absolute inset-0 bg-cover bg-center"
     style="background-image: url('/assets/background/nen-tram-sac-xe-dien.png'); filter: brightness(0.55) blur(2px);">
@@ -12,14 +12,14 @@
     </header>
 
     <!-- Thanh chọn dịch vụ (được làm lại kiểu thẻ) -->
-    <div class="py-6 px-6">
+    <div class="py-6 px-6 ">
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-5xl mx-auto">
         <!-- Thẻ: Dang kí xe -->
         <button class="p-4 rounded-xl shadow-md border transition-all duration-300 flex flex-col items-center justify-center
                  hover:shadow-lg hover:-translate-y-1
                  select-none" [ngClass]="{
             'bg-blue-600 text-white border-blue-600': activeTab === 'register-vehicle',
-            'bg-white text-gray-700 border-gray-200': activeTab !== 'register-vehicle'
+            'bg-base-100 text-base-content  border-base-300': activeTab !== 'register-vehicle'
           }" (click)="activeTab = 'register-vehicle'">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
             class="size-8">
@@ -35,7 +35,7 @@
                  hover:shadow-lg hover:-translate-y-1
                  select-none" [ngClass]="{
             'bg-blue-600 text-white border-blue-600': activeTab === 'history',
-            'bg-white text-gray-700 border-gray-200': activeTab !== 'history'
+            'bg-base-100 text-base-content  border-base-300': activeTab !== 'history'
           }" (click)="activeTab = 'history'">
           <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +49,7 @@
                  hover:shadow-lg hover:-translate-y-1
                  select-none" [ngClass]="{
             'bg-blue-600 text-white border-blue-600': activeTab === 'package',
-            'bg-white text-gray-700 border-gray-200': activeTab !== 'package'
+            'bg-base-100 text-base-content  border-base-300': activeTab !== 'package'
           }" (click)="activeTab = 'package'">
           <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +64,7 @@
                  hover:shadow-lg hover:-translate-y-1
                  select-none" [ngClass]="{
             'bg-blue-600 text-white border-blue-600': activeTab === 'qr',
-            'bg-white text-gray-700 border-gray-200': activeTab !== 'qr'
+            'bg-base-100 text-base-content  border-base-300': activeTab !== 'qr'
           }" (click)="activeTab = 'qr'">
           <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg">
@@ -80,7 +80,7 @@
                  hover:shadow-lg hover:-translate-y-1
                  select-none" [ngClass]="{
             'bg-blue-600 text-white border-blue-600': activeTab === 'find',
-            'bg-white text-gray-700 border-gray-200': activeTab !== 'find'
+            'bg-base-100 text-base-content border-base-300': activeTab !== 'find'
           }" (click)="activeTab = 'find'">
           <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg">

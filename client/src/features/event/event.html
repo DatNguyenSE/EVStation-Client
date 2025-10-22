@@ -1,73 +1,72 @@
-<div class="w-full min-h-screen font-sans antialiased px-4 sm:px-8 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 pt-24">
+<div class="w-full min-h-screen font-sans antialiased px-4 sm:px-8 bg-base-200 text-base-content pt-24">
   <h2 class="text-2xl font-semibold mb-6">
-    Bạn có <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ reservations()?.length || 0 }}</span> lịch đặt chỗ
+    Bạn có
+    <span class="text-green-600 font-bold">{{ reservations()?.length || 0 }}</span>
+    lịch đặt chỗ
   </h2>
 
+  <!-- Empty state -->
   <div *ngIf="!reservations()?.length" class="flex flex-col items-center justify-center py-20 text-center">
-    <p class="text-gray-500 text-lg">Hiện không có lịch đặt nào.</p>
+    <p class="text-base-content/60 text-lg">Hiện không có lịch đặt nào.</p>
     <img src="assets/empty-state.svg" alt="No reservations" class="w-48 opacity-70 mt-6">
   </div>
 
-  <ul class="px-5 space-y-5" *ngIf="reservations()?.length">
+  <!-- Reservation list -->
+  <ul class="space-y-5" *ngIf="reservations()?.length">
     <li
       *ngFor="let r of reservations()"
-      class="group relative bg-white dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+      class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
     >
-      <!-- Header -->
-      <div class="flex justify-between items-start flex-wrap gap-2">
-        <div>
-          <h3 class="text-lg font-semibold">Mã đặt chỗ #{{ r.id }}</h3>
-          <p class="text-sm text-gray-500 mt-1">
-            Xe: <span class="font-medium text-gray-700 dark:text-gray-300">{{ r.vehicleId }}</span> ·
-            Trụ sạc: <span class="font-medium text-gray-700 dark:text-gray-300">{{ r.chargingPostId }}</span>
-          </p>
+      <div class="card-body relative">
+        <!-- Header -->
+        <div class="flex justify-between items-start flex-wrap gap-2">
+          <div>
+            <h3 class="text-lg font-semibold">Mã đặt chỗ #{{ r.id }}</h3>
+            <p class="text-sm opacity-70 mt-1">
+              Xe: <span class="font-medium">{{ r.vehicleId }}</span> ·
+              Trụ sạc: <span class="font-medium">{{ r.chargingPostId }}</span>
+            </p>
+          </div>
+
+          <span
+            class="badge badge-lg"
+            [ngClass]="{
+              'badge-success': r.status === 'Confirmed',
+              'badge-warning': r.status === 'Pending',
+              'badge-error': r.status === 'Cancelled'
+            }"
+          >
+            {{ r.status }}
+          </span>
         </div>
 
-        <span
-          class="px-3 py-1 rounded-full text-sm font-medium"
+        <!-- Time info -->
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-xs opacity-60 uppercase tracking-wide">Thời gian bắt đầu</p>
+            <p class="font-medium mt-1">{{ r.timeSlotStart | date:'short' }}</p>
+          </div>
+          <div>
+            <p class="text-xs opacity-60 uppercase tracking-wide">Thời gian kết thúc</p>
+            <p class="font-medium mt-1">{{ r.timeSlotEnd | date:'short' }}</p>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 flex flex-wrap gap-3 justify-end">
+          <button class="btn btn-outline btn-sm">Xem chi tiết</button>
+          <button class="btn bg-red-700 btn-sm  text-white">Hủy</button>
+        </div>
+
+        <!-- Accent border -->
+        <div
+          class="absolute left-0 top-0 h-full w-1 rounded-l-2xl"
           [ngClass]="{
-            'bg-emerald-100 text-emerald-700 dark:bg-emerald-700/40 dark:text-emerald-200': r.status === 'Confirmed',
-            'bg-yellow-100 text-yellow-700 dark:bg-yellow-700/40 dark:text-yellow-200': r.status === 'Pending',
-            'bg-red-100 text-red-700 dark:bg-red-700/40 dark:text-red-200': r.status === 'Cancelled'
+            'bg-success': r.status === 'Confirmed',
+            'bg-warning': r.status === 'Pending',
+            'bg-error': r.status === 'Cancelled'
           }"
-        >
-          {{ r.status }}
-        </span>
-      </div>
-
-      <!-- Time info -->
-      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-        <div>
-          <p class="text-xs text-gray-400 uppercase tracking-wide">Thời gian bắt đầu</p>
-          <p class="font-medium mt-1">{{ r.timeSlotStart | date:'short' }}</p>
-        </div>
-        <div>
-          <p class="text-xs text-gray-400 uppercase tracking-wide">Thời gian kết thúc</p>
-          <p class="font-medium mt-1">{{ r.timeSlotEnd | date:'short' }}</p>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="mt-6 flex flex-wrap gap-3 justify-end">
-        <button
-          class="px-4 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
-        >
-          Xem chi tiết
-        </button>
-        <button
-          class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium shadow-sm transition-colors"
-        >
-          Hủy
-        </button>
-      </div>
-
-      <!-- Subtle border accent -->
-      <div class="absolute left-0 top-0 h-full w-1 rounded-l-2xl"
-           [ngClass]="{
-             'bg-emerald-500': r.status === 'Confirmed',
-             'bg-yellow-500': r.status === 'Pending',
-             'bg-red-500': r.status === 'Cancelled'
-           }">
+        ></div>
       </div>
     </li>
   </ul>

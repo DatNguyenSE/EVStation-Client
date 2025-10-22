@@ -26,16 +26,16 @@
       <a routerLink="/thanh-toan" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
         class=" hover:text-cyan-600 cursor-pointer">Thanh
         toán</a>
-|
+      |
       <a routerLink="/su-kien" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
         class=" hover:text-cyan-600 cursor-pointer pl-2">
-          <div class="relative inline-block">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-          viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-        </svg>
-         <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+        <div class="relative inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+          </svg>
+          <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
             {{this.reservations()?.length || 0}}
           </span>
         </div>
@@ -53,6 +53,24 @@
         </div>
       </a>
 
+      <div class="dropdown dropdown-end mr-5">
+        <button tabindex="1"
+          class="flex flex-col justify-center items-center cursor-pointer uppercase text-xs text-base-content hover:text-primary transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+          </svg>
+        </button>
+
+        <ul tabindex="1" class="dropdown-content menu bg-base-100 text-base-content rounded-box w-52 p-2 shadow">
+          @for (theme of themes; track $index) {
+          <li (click)="handleSelectedTheme(theme)">
+            <a class="capitalize hover:bg-base-200">{{ theme }}</a>
+          </li>
+          }
+        </ul>
+      </div>
       <a routerLink="/profile" (click)="isMenuOpen = false" class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài
         khoản</a>
       @if(accountService.currentAccount()) {
@@ -70,12 +88,12 @@
 
     <div class="hidden sm:flex align-middle ml-auto gap-3">
 
-      <div class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
+      <div class="bg-base-100 shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
         <span class="text-sm text-gray-600 font-semibold">Số dư:</span>
-        <span class="text-base font-bold text-gray-800">
+        <span class="text-base font-bold text-base-content">
           {{ showBalance() ? (getCurrentBalance() | number) + ' đ' : '•••••• đ' }}
         </span>
-        <button (click)="toggleBalance()" class="text-gray-500 hover:text-gray-700 transition" title="Ẩn/Hiện số dư">
+        <button (click)="toggleBalance()" class="text-base-content hover:text-gray-700 transition" title="Ẩn/Hiện số dư">
           <svg *ngIf="showBalance()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -98,7 +116,7 @@
       </div>
 
       <div class="dropdown dropdown-end ">
-        <div tabindex="0" role="button" class="flex items-center text-white text-xl gap-3 cursor-pointer">
+        <div tabindex="0" role="button" class="flex items-center text-xl gap-3 cursor-pointer">
           <div class="flex flex-col items-start">
             <span class="text-sm">Xin chào,
               <span class="text-xl font-bold ">
@@ -114,8 +132,8 @@
           </svg>
 
         </div>
-        <ul tabindex="0" class=" text-gray-800 dark:text-gray-100
-         bg-white dark:bg-gray-800 dropdown-content menu rounded-box z-1 w-52 p-2 shadow-sm">
+        <ul tabindex="0" class=" text-base-content
+         bg-base-100 dark:bg-gray-800 dropdown-content menu rounded-box z-1 w-52 p-2 shadow-sm">
           <li><a routerLink="/tai-khoan">Profile</a></li>
           <li><a class="" (click)="logout()">Logout</a></li>
         </ul>

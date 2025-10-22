@@ -5,9 +5,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/r
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { eventReservation } from '../../_models/station';
-
-
-
+import { themes } from '../theme';
 
 @Component({
   selector: 'app-nav',
@@ -15,9 +13,6 @@ import { eventReservation } from '../../_models/station';
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
-
-
-
 
 export class Nav implements OnInit{
   accountService = inject(AccountService);
@@ -28,9 +23,19 @@ export class Nav implements OnInit{
     route = inject(ActivatedRoute)
     showBalance = signal<boolean>(false);
 
+    protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
+    protected themes = themes;
+
+    handleSelectedTheme(theme: string){
+      this.selectedTheme.set(theme);
+      localStorage.setItem('theme',theme);
+      document.documentElement.setAttribute('data-theme', theme);
+    }
   ngOnInit(): void {
     this.driverService.loadWallet();
     this.GetEventReservation();
+    document.documentElement.setAttribute('data-theme', this.selectedTheme());
+
   }
   
   GetEventReservation(){

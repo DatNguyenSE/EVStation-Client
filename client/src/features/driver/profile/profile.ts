@@ -1,9 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { DriverService } from '../../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
-import { AccountService } from '../../../core/service/account-service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Vehicle } from "../../vehicle/vehicle";
 import { Driver } from '../../../_models/user';
 
 @Component({
