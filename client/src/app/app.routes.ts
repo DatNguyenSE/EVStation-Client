@@ -15,8 +15,10 @@ import { RegisterVehicle } from '../features/register-vehicle/register-vehicle';
 import { ChargingDashboard } from '../features/charging-dashboard/charging-dashboard';
 import { Vehicle } from '../features/vehicle/vehicle';
 import { ProfileDetails } from '../features/driver/profile-details/profile-details';
-import { driverResolver } from '../features/driver/driver-resolver';
 import { Reservation } from '../features/reservation/reservation';
+import { Event } from '../features/event/event';
+import { eventResolver } from '../core/resolvers/event-resolver';
+import { driverResolver } from '../features/driver/driver-resolver';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -29,6 +31,12 @@ export const routes: Routes = [
             { path: 'dich-vu', component: ServiceList },
             { path: 'thanh-toan', component: Payment },
             { path: 'thong-bao', component: Notification },
+            { 
+                path: 'su-kien',
+                resolve: {event: eventResolver},
+                runGuardsAndResolvers: 'always', 
+                component: Event 
+            },
             {
                 path: 'tai-khoan',
                 resolve: {driver: driverResolver},

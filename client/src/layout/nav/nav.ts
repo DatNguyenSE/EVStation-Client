@@ -1,9 +1,10 @@
 import { Component, inject, HostListener, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
+import { eventReservation } from '../../_models/station';
 
 
 
@@ -18,10 +19,16 @@ export class Nav implements OnInit{
   accountService = inject(AccountService);
   protected creds: any = {}
     driverService = inject(DriverService); 
+    reservations = signal<eventReservation[] | null> (null);
     routers = inject(Router);
+    route = inject(ActivatedRoute)
     showBalance = signal<boolean>(false);
+
   ngOnInit(): void {
     this.driverService.loadWallet();
+    this.driverService.GetEventReservation().subscribe({
+      next: response => this.reservations.set(response)
+    });
   }
 
   getCurrentBalance() {
