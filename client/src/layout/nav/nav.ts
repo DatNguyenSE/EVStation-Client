@@ -15,6 +15,10 @@ import { eventReservation } from '../../_models/station';
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
+
+
+
+
 export class Nav implements OnInit{
   accountService = inject(AccountService);
   protected creds: any = {}
@@ -26,9 +30,13 @@ export class Nav implements OnInit{
 
   ngOnInit(): void {
     this.driverService.loadWallet();
+    this.GetEventReservation();
+  }
+  
+  GetEventReservation(){
     this.driverService.GetEventReservation().subscribe({
-      next: response => this.reservations.set(response)
-    });
+      next: res => this.reservations.set(res)
+    })
   }
 
   getCurrentBalance() {

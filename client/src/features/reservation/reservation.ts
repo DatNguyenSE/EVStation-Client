@@ -3,10 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ReservationService } from '../../core/service/reservation-service';
 import { StationService } from '../../core/service/station-service';
 import { Vehicles } from '../../_models/user';
-import { VehicleService } from '../../core/service/vehicle-service';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../core/service/toast-service';
 
 @Component({
   selector: 'app-reservation',
@@ -22,6 +22,7 @@ export class Reservation {
    private cdf = inject(ChangeDetectorRef)
   private stationSvc = inject(StationService);
   private vehicleSvc = inject(DriverService)
+  toast = inject(ToastService);
 
   station : any;
   vehicleid? : number;
@@ -136,7 +137,7 @@ reserve() {
   const req = {
     vehicleId: this.vehicleid,
     chargingPostId: this.selectedPostId,
-    timeSlotStart: this.selectedSlot,  // ✅ Dùng trực tiếp, KHÔNG ghép chuỗi
+    timeSlotStart: this.selectedSlot,  //  Dùng trực tiếp, KHÔNG ghép chuỗi
     slotCount: this.slotCount
   };
 //   const req = {
@@ -153,9 +154,10 @@ reserve() {
   this.reservationSvc.createReservationChecked(req).subscribe({
     next: () => {
       this.loading = false;
-      this.message = `Đặt chỗ thành công tại ${this.station?.name}`;
+      this.message = `Đặt chỗ thành công tại ${this.station?.name} mã trụ đặt là '${this.selectedPostId}'`;
       this.cdf.detectChanges();
       setTimeout(() => {
+          this.toast.success(`Đặt chỗ thành công tại ${this.station?.name} mã trụ đặt là '${this.selectedPostId}'`,5000)
           this.router.navigate(['/']);
         }, 1500);
       
