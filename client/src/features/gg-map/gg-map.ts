@@ -105,15 +105,14 @@ export class GgMap implements AfterViewInit, OnDestroy {
     });
 
   }
-
 private addStationMarkers(): void {
   this.stations.forEach((s) => {
     //  Ép kiểu để gắn thêm dữ liệu tuỳ chỉnh cho marker
     const marker = L.marker([s.latitude, s.longitude], { icon: stationIcon }) as any;
     marker.stationData = s; // lưu trạm sạc vào marker
 
-    marker.addTo(this.map)
-      .bindPopup(this.createStationPopup(s), { maxWidth: 250 });
+    marker.bindPopup(this.createStationPopup(s), { maxWidth: 250 });
+    marker.addTo(this.map);
 
     // Zoom vào khi click icon trạm
     marker.on('click', () => {
@@ -121,51 +120,65 @@ private addStationMarkers(): void {
     });
   });
 
-   if(!this.map.hasLayer(this.stationLayer)){
-     this.stationLayer.addTo(this.map);
-   }
-    this.map.off('popupopen');
+  if (!this.map.hasLayer(this.stationLayer)) {
+    this.stationLayer.addTo(this.map);
+  }
+
+  this.map.off('popupopen');
+
   //  Gắn sự kiện cho popup khi mở
   this.map.on('popupopen', (e: any) => {
-   const source = e.popup._source as any;
-  const station = source.stationData;
-  const id = station.id || L.Util.stamp(station);
-  if (this.userMarker) {
-    const userPos = this.userMarker.getLatLng();
-    this.stationSvc.getDistance(
-      userPos.lat,
-      userPos.lng,
-      station.latitude,
-      station.longitude
-    ).subscribe({
-      next: (dist: any) => {
-        const distanceKm = typeof dist === 'number' ? dist : (dist?.distance ?? 0);
-        station.distance = distanceKm;
-
-        // Cập nhật lại nội dung popup ngay sau khi có kết quả
-        e.popup.setContent(this.createStationPopup(station));
-      },
-      error: (err) => console.error('Lỗi tính khoảng cách:', err),
-    });
+    const source = e.popup._source as any;
+    const station = source?.stationData;  // ✅ thêm ? để tránh undefined
+    if (!source || !source.stationData) {
+    console.warn('stationData bị undefined', source);
+    return;
   }
-   
-  setTimeout(() => {
-    const reserveBtn = document.getElementById(`reserve-${id}`);
-    const routeBtn = document.getElementById(`route-${id}`);
 
-    if (reserveBtn && station) {
-      reserveBtn.addEventListener('click', () => this.reserveStation(station));
-      
+    const id = station.id || L.Util.stamp(station);
+
+    if (this.userMarker) {
+      const userPos = this.userMarker.getLatLng();
+      this.stationSvc.getDistance(
+        userPos.lat,
+        userPos.lng,
+        station.latitude,
+        station.longitude
+      ).subscribe({
+        next: (dist: any) => {
+          const distanceKm = typeof dist === 'number' ? dist : (dist?.distance ?? 0);
+          station.distance = distanceKm;
+
+          // ✅ Cập nhật lại popup ngay sau khi có kết quả
+          e.popup.setContent(this.createStationPopup(station));
+          e.popup._source.stationData = station; // giữ liên kết
+
+          // ✅ Gắn lại event click sau khi render popup
+          setTimeout(() => {
+            const reserveBtn = document.getElementById(`reserve-${id}`);
+            const routeBtn = document.getElementById(`route-${id}`);
+
+            if (reserveBtn) reserveBtn.addEventListener('click', () => this.reserveStation(station));
+            if (routeBtn) routeBtn.addEventListener('click', () => this.routeToStation(station));
+          }, 50);
+        },
+        error: (err) => console.error('Lỗi tính khoảng cách:', err),
+      });
     }
 
-    if (routeBtn && station) {
-      routeBtn.addEventListener('click', () => this.routeToStation(station));
-     
-    }
-  }, 50);
-});
+    // ✅ Dù có hoặc không có userMarker đều gắn lại sự kiện (phòng trường hợp else)
+    setTimeout(() => {
+      const reserveBtn = document.getElementById(`reserve-${id}`);
+      const routeBtn = document.getElementById(`route-${id}`);
 
+      if (reserveBtn) reserveBtn.addEventListener('click', () => this.reserveStation(station));
+      if (routeBtn) routeBtn.addEventListener('click', () => this.routeToStation(station));
+    }, 50);
+  });
 }
+
+
+
 
   private createStationPopup(s: any): string {
    const id = s.id || L.Util.stamp(s); // tạo ID duy nhất
@@ -345,10 +358,12 @@ onSearchChange(): void {
 focusStation(s: any) {
   // Zoom tới trạm
   this.map.setView([s.latitude, s.longitude], 15);
+  
 
   // Mở popup của trạm (nếu có marker)
-  let temp = L.marker([s.latitude, s.longitude], { icon: stationIcon })
-    .addTo(this.searchLayer)
+  let temp = L.marker([s.latitude, s.longitude], { icon: stationIcon }) as any;
+  temp.stationData = s;
+    temp.addTo(this.searchLayer)
     .bindPopup(this.createStationPopup(s), { maxWidth: 250 })
     .openPopup();
   this.searchResults = [];
@@ -362,23 +377,17 @@ private showSearchResults(): void {
   this.searchLayer.clearLayers();
   // xóa marker cũ nếu có
   this.searchResults.forEach(s => {
-    L.marker([s.latitude, s.longitude], { icon: stationIcon })
-      .addTo(this.searchLayer)
-      .bindPopup(this.createStationPopup(s), { maxWidth: 250 });
-  });
+  const marker = L.marker([s.latitude, s.longitude], { icon: stationIcon }) as any;
+  marker.stationData = s; // ✅ thêm dòng này
+  marker.addTo(this.searchLayer)
+        .bindPopup(this.createStationPopup(s), { maxWidth: 250 });
+});
   if(!this.map.hasLayer(this.searchLayer)){
     this.searchLayer.addTo(this.map);
   }
   const first = this.searchResults[0];
   if(first) this.map.setView([first.latitude,first.longitude],14);
 }
-
-private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  return this.stationSvc.getDistance(lat1, lon1, lat2, lon2);
-}
-
-
-
 
   ngOnDestroy(): void {
     if (this.map) this.map.remove();

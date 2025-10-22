@@ -73,7 +73,6 @@ ngOnInit() {
       next : (data) =>{
         this.vehicles = data;
          this.cdf.detectChanges(); 
-         console.log('🚗 Xe chọn:', this.vehicleid);
       }
     });
   }
@@ -116,7 +115,7 @@ onVehicleChange() {
 
       this.cdf.detectChanges();
     },
-    error: (err) => console.error('❌ Lỗi lấy slot:', err)
+    error: (err) => console.error('Lỗi lấy slot:', err)
   });
 }
   // count slot
