@@ -58,6 +58,12 @@ export type Package = {
     price : number;
     durationsDay : number;
 }
+export type Payment = {
+   orderType:string;
+   amount:number;
+   orderDescription:string;
+   txnRef:string;
+}
 
 export interface VehicleModelDetail {
   model: string;
@@ -67,3 +73,4 @@ export interface VehicleModelDetail {
   connectorType: string;
   hasDualBattery: boolean;
 }
+

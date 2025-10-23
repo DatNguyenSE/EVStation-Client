@@ -5,7 +5,7 @@ import * as L from 'leaflet'
 import 'leaflet-routing-machine';
 import { FormsModule } from '@angular/forms';
 import { Route, Router } from '@angular/router';
-import { Post } from '../../_models/station';
+import { DtoStation, Post } from '../../_models/station';
 
 // Icon riêng cho trạm sạc
 const stationIcon = L.icon({
@@ -133,7 +133,8 @@ private addStationMarkers(): void {
     if (!source || !source.stationData) {
     console.warn('stationData bị undefined', source);
     return;
-  }
+  } 
+    this.getCount(station);
 
     const id = station.id || L.Util.stamp(station);
 
@@ -176,11 +177,19 @@ private addStationMarkers(): void {
     }, 50);
   });
 }
+ 
+getCount(s:DtoStation) : void{
+   this.stationSvc.getPost(s.id).subscribe({
+      next: (posts: any[]) => {
+      s.post = Array.isArray(posts) ? posts.length : 0;
+    },
+   })
+}
 
 
 
 
-  private createStationPopup(s: any): string {
+  private createStationPopup(s: DtoStation): string {
    const id = s.id || L.Util.stamp(s); // tạo ID duy nhất
 
   return `
@@ -188,7 +197,7 @@ private addStationMarkers(): void {
       <b>${s.name}</b><br/>
        ${s.address}<br/>
        ${s.openTime} - ${s.closeTime}<br/>
-       ${s.posts?.length || 0} cổng sạc<br/>
+       ${s.post ?? 0} cổng sạc<br/>
        ${s.distance?.toFixed(2)} km<br/>
       <button id="reserve-${id}"
               style="

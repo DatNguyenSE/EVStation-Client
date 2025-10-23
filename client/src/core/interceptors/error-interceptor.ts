@@ -67,10 +67,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             else if (typeof error.error === 'string') {
               toast.error(translateError(error.error), 4000);
             }
+            else if (error.error.message){
+              toast.error(translateError(error.error.message),4000)
+            }
 
             else {
               toast.error('Lỗi không xác định', 4000);
             }
+
 
             break;
 
