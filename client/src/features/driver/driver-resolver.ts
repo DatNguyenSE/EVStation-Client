@@ -8,3 +8,4 @@ export const driverResolver: ResolveFn<Driver> = (route, state) => {
   
   return driverService.GetProfile_Driver();
 };
+

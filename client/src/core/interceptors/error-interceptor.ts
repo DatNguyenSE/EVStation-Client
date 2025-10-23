@@ -60,6 +60,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 });
               }
             }
+            else if(error.error.message){
+              toast.error(error.error.message);
+            }
 
             else if (typeof error.error === 'string') {
               toast.error(translateError(error.error), 4000);

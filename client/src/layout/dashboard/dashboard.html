@@ -1,7 +1,7 @@
 @if (driverService.currentDriver(); as driver) {
-<div class=" bg-gray-100 flex flex-col ">
+<div class=" bg-base-300 flex flex-col ">
   <!-- Header -->
-  <header class="bg-white shadow p-4  flex items-center justify-between">
+  <header class="bg-base-100 shadow p-4  flex items-center justify-between">
     <h1 class="text-2xl font-bold text-blue-600">EV Charging Dashboard</h1>
     <div class="flex items-center gap-3">
       <img src="assets/logo.png" alt="Avatar" class="w-10 h-10 rounded-full" />
@@ -14,16 +14,16 @@
   <!-- Content -->
   <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Trạng thái trạm sạc -->
-    <section class="bg-white shadow rounded-2xl p-6 col-span-1 md:col-span-2">
+    <section class="bg-base-100 shadow rounded-2xl p-6 col-span-1 md:col-span-2">
       <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
       </h2>
-      <div class=" bg-gray-200 rounded-lg overflow-hidden relative">
+      <div class=" bg-base-100 rounded-lg overflow-hidden relative">
         <app-gg-map class="absolute inset-0"></app-gg-map>
       </div>
     </section>
     <!-- Thông tin xe [app-vehicle]-->
      
-    <section class="bg-white shadow rounded-2xl p-6 col-span-1 lg:col-span-1 pt-10">
+    <section class="bg-base-100 shadow rounded-2xl p-6 col-span-1 lg:col-span-1 pt-10">
       <h2 class="flex items-center text-xl font-semibold mb-6 text-gray-800 pb-10">
         <span class="text-blue-700">Phương tiện hiện tại</span>
       </h2>
@@ -31,12 +31,12 @@
     </section>
 
     <!-- Lịch sử sạc -->
-    <section class="bg-white shadow rounded-2xl p-6 col-span-1 lg:col-span-2">
-      <h2 class="text-xl font-semibold mb-3 text-gray-700 flex items-center gap-2">
+    <section class="bg-base-100 shadow rounded-2xl p-6 col-span-1 lg:col-span-2">
+      <h2 class="text-xl font-semibold mb-3 text-base-content flex items-center gap-2">
         <i class="fa-solid fa-clock-rotate-left text-green-600"></i> Lịch sử sạc
       </h2>
       <table class="wx-full text-left border-collapse">
-        <thead class="bg-gray-50 text-gray-700 font-semibold">
+        <thead class="bg-base-100 text-base-700 font-semibold">
           <tr>
             <th class="py-2 px-3">Ngày</th>
             <th class="py-2 px-3">Địa điểm</th>
@@ -56,9 +56,9 @@
       </table>
     </section>
     <!-- Gói cước hiện tại -->
-    <section class="bg-white shadow rounded-2xl p-6">
-      <h2 class="text-xl font-semibold mb-3 text-gray-700">Gói cước hiện tại</h2>
-      <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+    <section class="bg-base-100 shadow rounded-2xl p-6">
+      <h2 class="text-xl font-semibold mb-3 text-base-700">Gói cước hiện tại</h2>
+      <div class="bg-base-100 rounded-xl p-4 border border-blue-200">
         <!-- <p class="text-lg font-bold text-blue-700">{{ currentPackage.name }}</p>
           <p class="text-gray-600 mt-1">
             Hạn sử dụng: {{ currentPackage.expiry | date }}

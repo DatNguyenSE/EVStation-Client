@@ -1,12 +1,11 @@
 import { Component, inject, HostListener, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
-
-
-
+import { eventReservation } from '../../_models/station';
+import { themes } from '../theme';
 
 @Component({
   selector: 'app-nav',
@@ -14,14 +13,35 @@ import { CommonModule } from '@angular/common';
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
+
 export class Nav implements OnInit{
   accountService = inject(AccountService);
   protected creds: any = {}
     driverService = inject(DriverService); 
+    reservations = signal<eventReservation[] | null> (null);
     routers = inject(Router);
+    route = inject(ActivatedRoute)
     showBalance = signal<boolean>(false);
+
+    protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
+    protected themes = themes;
+
+    handleSelectedTheme(theme: string){
+      this.selectedTheme.set(theme);
+      localStorage.setItem('theme',theme);
+      document.documentElement.setAttribute('data-theme', theme);
+    }
   ngOnInit(): void {
     this.driverService.loadWallet();
+    this.GetEventReservation();
+    document.documentElement.setAttribute('data-theme', this.selectedTheme());
+
+  }
+  
+  GetEventReservation(){
+    this.driverService.GetEventReservation().subscribe({
+      next: res => this.reservations.set(res)
+    })
   }
 
   getCurrentBalance() {
