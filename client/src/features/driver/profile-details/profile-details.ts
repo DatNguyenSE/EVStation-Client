@@ -19,6 +19,4 @@ export class ProfileDetails implements OnInit {
       this.driver.set(data['driver'])
    })
   }
-
-
 }
