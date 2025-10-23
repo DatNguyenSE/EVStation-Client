@@ -58,10 +58,11 @@ export type Package = {
     price : number;
     durationsDay : number;
 }
-export type Payment = {
+export type Payments = {
    orderType:string;
    amount:number;
    orderDescription:string;
+   name : string;
    txnRef:string;
 }
 

@@ -1,3 +1,4 @@
+
 export type Post = {
     id: string,
     stationId: string;
@@ -22,4 +23,15 @@ export type Post = {
   status: string;
   distance:number;
   post:number;
+}
+
+export type eventReservation = {
+    id: string,
+    vehicleId: string,
+    chargingPostId: string,
+    driverId: string,
+    timeSlotStart: string,
+    timeSlotEnd: string,
+    status: string,
+    createdAt: string
 }
