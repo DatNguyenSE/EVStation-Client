@@ -75,7 +75,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             break;
 
           case 401:
-            toast.error("Bạn không có quyền truy cập");
+            toast.error(error.error,3500);
+            toast.error("Bạn không có quyền truy cập",3500);
             break;
           case 404:
             toast.error("Không tìm thấy trang");
