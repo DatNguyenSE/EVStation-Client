@@ -67,15 +67,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             else if (typeof error.error === 'string') {
               toast.error(translateError(error.error), 4000);
             }
+            else if (error.error.message){
+              toast.error(translateError(error.error.message),4000)
+            }
 
             else {
               toast.error('Lỗi không xác định', 4000);
             }
 
+
             break;
 
           case 401:
-            toast.error("Bạn không có quyền truy cập");
+            toast.error(error.error,3500);
+            toast.error("Bạn không có quyền truy cập",3500);
             break;
           case 404:
             toast.error("Không tìm thấy trang");

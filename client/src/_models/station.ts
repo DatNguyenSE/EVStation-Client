@@ -1,3 +1,4 @@
+
 export type Post = {
     id: string,
     stationId: string;
@@ -20,6 +21,8 @@ export type Post = {
   openTime: string;
   closeTime: string;
   status: string;
+  distance:number;
+  post:number;
 }
 
 export type eventReservation = {

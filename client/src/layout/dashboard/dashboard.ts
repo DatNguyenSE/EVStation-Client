@@ -3,6 +3,8 @@ import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from "../../features/vehicle/vehicle";
 import { GgMap } from "../../features/gg-map/gg-map";
+import { ActivatedRoute } from '@angular/router';
+import { Driver } from '../../_models/user';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,7 +14,8 @@ import { GgMap } from "../../features/gg-map/gg-map";
 })
 export class Dashboard implements OnInit {
   driverService = inject(DriverService);
-  
+
+  driver = signal<Driver | null> (null);
   ngOnInit(): void {
     this.GetProfile_Driver();
   }
@@ -20,7 +23,7 @@ export class Dashboard implements OnInit {
   GetProfile_Driver(){
     this.driverService.GetProfile_Driver().subscribe({
       next: driver => {
-        this.driverService.currentDriver.set(driver);
+        this.driver.set(driver);
       }   
     })
   }

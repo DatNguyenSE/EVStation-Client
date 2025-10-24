@@ -26,6 +26,7 @@ export class ReservationService {
   const start = new Date(req.timeSlotStart);
   const now = new Date();
   const diffMs = start.getTime() - now.getTime();
+  const countSlot = 1;
 
   if (diffMs < 0) {
     return throwError(() => new Error('Thời gian bắt đầu không được ở quá khứ.'));
@@ -33,6 +34,7 @@ export class ReservationService {
   if (diffMs > 24 * 60 * 60 * 1000) {
     return throwError(() => new Error('Chỉ được đặt chỗ trong 24h tới.'));
   }
+  
 
   return this.checkAvailableSlots(req.chargingPostId).pipe(
     switchMap((availableSlotsMap) => {
@@ -52,6 +54,8 @@ export class ReservationService {
       if (!isSlotAvailable) {
         return throwError(() => new Error('Khung giờ này đã được đặt hoặc không khả dụng.'));
       }
+      
+      
       return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation`,req);
     })
   );

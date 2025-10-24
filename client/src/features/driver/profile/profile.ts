@@ -14,14 +14,12 @@ export class Profile implements OnInit {
   driverService = inject(DriverService);
   protected driver = signal<Driver | undefined>(undefined);
   protected route = inject(ActivatedRoute);
-  protected router = inject(Router);
   ngOnInit(): void {
 
     this.route.data.subscribe({
       next: data => this.driver.set(data['driver'])
     });
 
-  
   }
 
   

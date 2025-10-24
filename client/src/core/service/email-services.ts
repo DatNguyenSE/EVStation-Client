@@ -13,10 +13,10 @@ export class EmailServices {
   baseUrl = 'https://localhost:5001/api';
  constructor(private http: HttpClient) {}
  
-  confirmEmail(userId: string, token: string): Observable<{ message: string;}> {
-    return this.http.get<{ message: string}>(
-      `${this.baseUrl}/account/confirm-email?userId=${userId}&token=${encodeURIComponent(token)}`
-    );
-  }
+ confirmEmail(userId: string, token: string) {
+  const params = { userId, token };
+  return this.http.get<{ message: string }>(`${this.baseUrl}/account/confirm-email`, { params });
+}
+
   
 }
