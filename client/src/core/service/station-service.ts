@@ -26,9 +26,9 @@ export class StationService {
   getStationByid(idStaion: string) {
     return this.http.get<DtoStation>(this.baseUrl+"/station/"+idStaion);
   }
-  getPost(id:number){
-     return this.http.get<DtoStation[]>(this.baseUrl + "/posts/" + id);
-  }
+  // getPost(id:number){
+  //    return this.http.get<DtoStation[]>(this.baseUrl + "/posts/" + id);
+  // }
 
   searchStations(address: string) {
     return this.http.get<DtoStation[]>(`${this.baseUrl}/station/search?address=${encodeURIComponent(address)}`);

@@ -178,13 +178,19 @@ private addStationMarkers(): void {
   });
 }
  
-getCount(s:DtoStation) : void{
-   this.stationSvc.getPost(s.id).subscribe({
-      next: (posts: any[]) => {
-      s.post = Array.isArray(posts) ? posts.length : 0;
+getCount(s: DtoStation): void {
+  this.stationSvc.getStations().subscribe({
+    next: (stations: DtoStation[]) => {
+      const found = stations.find(st => st.id === s.id);
+      const count = found?.chargingPosts?.length ?? 0;
+      console.log(`Station ${s.name} has ${count} posts.`);
+      // hoặc nếu bạn muốn lưu luôn:
+      (s as any).count = count;
     },
-   })
+    error: (err) => console.error('Error fetching stations', err)
+  });
 }
+
 
 
 
@@ -197,7 +203,7 @@ getCount(s:DtoStation) : void{
       <b>${s.name}</b><br/>
        ${s.address}<br/>
        ${s.openTime} - ${s.closeTime}<br/>
-       ${s.post ?? 0} cổng sạc<br/>
+       ${s.chargingPosts?.length ?? 0} cổng sạc<br/>
        ${s.distance?.toFixed(2)} km<br/>
       <button id="reserve-${id}"
               style="
