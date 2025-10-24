@@ -19,6 +19,16 @@ export class DriverService {
     return this.http.get<Driver>(
       `${this.baseUrl}users/profile-driver`);
   }
+  loadDriverProfile() {
+  this.GetProfile_Driver().subscribe({
+    next: (driver) => {
+      this.currentDriver.set(driver);
+    },
+    error: (err) => {
+      console.error('Không thể tải thông tin tài xế:', err);
+    }
+  });
+}
 
   GetVehicles() {
     return this.http.get<Vehicles[]>(

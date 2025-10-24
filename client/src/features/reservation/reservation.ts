@@ -116,7 +116,7 @@ onVehicleChange() {
 
       this.cdf.detectChanges();
     },
-    error: (err) => console.error('Lỗi lấy slot:', err)
+    error: (err) => this.message= err.message
   });
 }
   // count slot
@@ -165,7 +165,7 @@ reserve() {
     
     error: (err) => {
       this.loading = false;
-      this.message = err.message || 'Không thể đặt chỗ.';
+      this.message = err.error?.message || err.message || 'Đã Xảy Ra Lỗi Vui Lòng Thử Lại'
       this.cdf.detectChanges();
     }
   });

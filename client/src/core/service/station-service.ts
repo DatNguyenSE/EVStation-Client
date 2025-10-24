@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { DtoStation, Post } from '../../_models/station';
 import { Observable } from 'rxjs';
 
-export interface Station {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  distance: number;
-}
+// export interface Station {
+//   id: number;
+//   name: string;
+//   latitude: number;
+//   longitude: number;
+//   distance: number;
+//   post:number;
+// }
 
 @Injectable({
   providedIn: 'root'
@@ -19,15 +20,18 @@ export class StationService {
   private baseUrl = 'https://localhost:5001/api';
 
   getStations() {
-    return this.http.get<Station[]>(`${this.baseUrl}/station`);
+    return this.http.get<DtoStation[]>(`${this.baseUrl}/station`);
   }
 
   getStationByid(idStaion: string) {
     return this.http.get<DtoStation>(this.baseUrl+"/station/"+idStaion);
   }
+  getPost(id:number){
+     return this.http.get<DtoStation[]>(this.baseUrl + "/posts/" + id);
+  }
 
   searchStations(address: string) {
-    return this.http.get<Station[]>(`${this.baseUrl}/station/search?address=${encodeURIComponent(address)}`);
+    return this.http.get<DtoStation[]>(`${this.baseUrl}/station/search?address=${encodeURIComponent(address)}`);
   }
 
   getPostById(postId: string) {
@@ -40,7 +44,7 @@ export class StationService {
     });
   }
   getNearby(location: { lat: number; lon: number }) {
-    return this.http.get<Station>(`${this.baseUrl}/station/nearest?lat=${location.lat}&lon=${location.lon}`);
+    return this.http.get<DtoStation>(`${this.baseUrl}/station/nearest?lat=${location.lat}&lon=${location.lon}`);
   }
   getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     return this.http.get<{ distance: number }>(`${this.baseUrl}/station/distance`, {
