@@ -6,6 +6,7 @@ import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { eventReservation } from '../../_models/station';
 import { themes } from '../theme';
+import { BusyService } from '../../core/service/busy-service';
 
 @Component({
   selector: 'app-nav',
@@ -18,19 +19,13 @@ export class Nav implements OnInit{
   accountService = inject(AccountService);
   protected creds: any = {}
     driverService = inject(DriverService); 
+    busyService = inject(BusyService);
     reservations = signal<eventReservation[] | null> (null);
     routers = inject(Router);
     route = inject(ActivatedRoute)
     showBalance = signal<boolean>(false);
 
-    protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
-    protected themes = themes;
-
-    handleSelectedTheme(theme: string){
-      this.selectedTheme.set(theme);
-      localStorage.setItem('theme',theme);
-      document.documentElement.setAttribute('data-theme', theme);
-    }
+    
   ngOnInit(): void {
     this.driverService.loadWallet();
     this.GetEventReservation();
@@ -44,10 +39,6 @@ export class Nav implements OnInit{
     })
   }
 
-  getCurrentBalance() {
-    return this.driverService.walletBalance();
-  }
-
   logout() {
     this.accountService.logout();
     this.routers.navigateByUrl('/' );
@@ -56,6 +47,16 @@ export class Nav implements OnInit{
    toggleBalance() {
     this.showBalance.update((v) => !v);
   }
+
+  protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
+    protected themes = themes;
+
+    handleSelectedTheme(theme: string){
+      this.selectedTheme.set(theme);
+      localStorage.setItem('theme',theme);
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
 
    // thêm biến quản lý menu mobile
   isMenuOpen = false;

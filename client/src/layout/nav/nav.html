@@ -52,7 +52,7 @@
           </span>
         </div>
       </a>
-
+      
       <div class="dropdown dropdown-end mr-5">
         <button tabindex="1"
           class="flex flex-col justify-center items-center cursor-pointer uppercase text-xs text-base-content hover:text-primary transition-colors">
@@ -71,6 +71,11 @@
           }
         </ul>
       </div>
+      
+      @if(busyService.busyRequestCount() >0 ){
+        <span class="loading loading-spinner text-accent"></span>
+      }
+
       <a routerLink="/profile" (click)="isMenuOpen = false" class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài
         khoản</a>
       @if(accountService.currentAccount()) {
@@ -91,7 +96,7 @@
       <div class="bg-base-100 shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
         <span class="text-sm text-gray-600 font-semibold">Số dư:</span>
         <span class="text-base font-bold text-base-content">
-          {{ showBalance() ? (getCurrentBalance() | number) + ' đ' : '•••••• đ' }}
+          {{ showBalance() ? (this.driverService.walletBalance()| number) + ' đ' : '•••••• đ' }}
         </span>
         <button (click)="toggleBalance()" class="text-base-content hover:text-gray-700 transition" title="Ẩn/Hiện số dư">
           <svg *ngIf="showBalance()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

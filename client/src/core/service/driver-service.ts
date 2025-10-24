@@ -13,7 +13,6 @@ export class DriverService {
   baseUrl = 'https://localhost:5001/api/';
   
   currentDriver = signal<Driver | null>(null);
-  Vehicles = signal<Vehicles[] >([]);
   walletBalance = signal<number>(0);
 
   GetProfile_Driver() {

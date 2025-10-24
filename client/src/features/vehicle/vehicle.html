@@ -1,6 +1,6 @@
 <!-- Current vehicle with carousel navigation -->
 
-@if (driverService.Vehicles().length === 0) {
+@if (this.Vehicles().length ===0 ) {
   <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center ">
 
     <p class="text-gray-500 text-lg">Hiện chưa có phương tiện</p>
@@ -11,11 +11,11 @@
     <div class="flex items-center gap-2">
       <span class="text-sm font-medium text-gray-600">Phương tiện</span>
       <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-        {{ currentVehicleIndex() + 1 }} / {{ driverService.Vehicles().length }}
+        {{ currentVehicleIndex() + 1 }} / {{ this.Vehicles().length }}
       </span>
     </div>
     
-    @if (driverService.Vehicles().length > 1) {
+    @if (this.Vehicles().length > 1) {
       <div class="flex items-center gap-2">
         <button 
           (click)="previousVehicle()"
@@ -28,7 +28,7 @@
         <button 
           (click)="nextVehicle()"
           class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          [disabled]="currentVehicleIndex() === driverService.Vehicles().length - 1">
+          [disabled]="currentVehicleIndex() === this.Vehicles().length - 1">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
           </svg>
@@ -39,7 +39,7 @@
 
   <!-- Vehicle Card with transition -->
   <div class="relative overflow-hidden">
-    @for (vehicle of driverService.Vehicles(); track vehicle.vehicleId; let i = $index) {
+    @for (vehicle of this.Vehicles(); track vehicle.vehicleId; let i = $index) {
       @if (i === currentVehicleIndex()) {
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden animate-fadeIn">
           <!-- Header -->
@@ -132,9 +132,9 @@
   </div>
 
   <!-- Dots Indicator (for multiple vehicles) -->
-  @if (driverService.Vehicles().length > 1) {
+  @if (this.Vehicles().length > 1) {
     <div class="flex justify-center gap-2 mt-4">
-      @for (vehicle of driverService.Vehicles(); track vehicle.vehicleId; let i = $index) {
+      @for (vehicle of this.Vehicles(); track vehicle.vehicleId; let i = $index) {
         <button
           (click)="setCurrentVehicle(i)"
           class="w-2 h-2 rounded-full transition-all duration-300"
