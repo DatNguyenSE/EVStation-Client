@@ -15,17 +15,8 @@ import { Driver } from '../../_models/user';
 export class Dashboard implements OnInit {
   driverService = inject(DriverService);
 
-  driver = signal<Driver | null> (null);
   ngOnInit(): void {
-    this.GetProfile_Driver();
-  }
-
-  GetProfile_Driver(){
-    this.driverService.GetProfile_Driver().subscribe({
-      next: driver => {
-        this.driver.set(driver);
-      }   
-    })
+    this.driverService.loadDriverProfile();
   }
   
 }

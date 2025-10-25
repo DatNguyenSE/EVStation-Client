@@ -7,5 +7,5 @@ import { eventReservation } from '../../_models/station';
 export const eventResolver: ResolveFn<eventReservation[]> = (route, state) => {
   const driverService = inject(DriverService);
   
-  return driverService.GetEventReservation();
+  return driverService.LoadEventReservation();
 };

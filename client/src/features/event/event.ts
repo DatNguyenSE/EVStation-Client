@@ -22,8 +22,7 @@ export class Event implements OnInit{
       next: data => this.reservations.set(data['event'])
     });
   }
-  
- 
+
   tatusBadgeClasses(status: string) {
 const base = 'text-white';
 switch ((status || '').toLowerCase()) {

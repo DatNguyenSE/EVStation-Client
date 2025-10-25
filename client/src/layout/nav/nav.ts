@@ -34,7 +34,7 @@ export class Nav implements OnInit{
   }
   
   GetEventReservation(){
-    this.driverService.GetEventReservation().subscribe({
+    this.driverService.LoadEventReservation().subscribe({
       next: res => this.reservations.set(res)
     })
   }
@@ -70,28 +70,5 @@ export class Nav implements OnInit{
     if (!this.isMobile) {
       this.isMenuOpen = false;
     }
-  }
-
-   showNotification = false;
-
-  notifications = [
-    { message: "Bạn được mời tham gia cuộc họp 'Phiên họp check trùng 2' vào 14/10/2025 10:15 - 12:15.", time: '08:53 15/10/2025' },
-    { message: "Bạn được mời tham gia cuộc họp 'Phiên họp test trùng 1' vào 14/10/2025 10:14 - 12:14.", time: '04:16 14/10/2025' },
-  ];
-
-  toggleNotification() {
-    this.showNotification = !this.showNotification;
-  }
-
-  closeNotification() {
-    this.showNotification = false;
-  }
-
-  removeNotification(item: any) {
-    this.notifications = this.notifications.filter(n => n !== item);
-  }
-
-  clearAll() {
-    this.notifications = [];
   }
 }
