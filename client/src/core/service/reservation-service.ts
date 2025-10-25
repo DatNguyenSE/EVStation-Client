@@ -78,7 +78,7 @@ checkAvailableSlots(postId: number) {
     return this.http.get<any[]>(`${this.baseUrl}/station/${stationId}/compatible-posts/${vehicleId}`);
   }
   
-  cancelReservation(id:number){
+  cancelReservation(id:string){
     return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation/${id}/cancel`,{});
   }
 }

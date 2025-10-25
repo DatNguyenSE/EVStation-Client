@@ -19,8 +19,11 @@ export class AccountService {
     return this.http.post<Account>(this.baseUrl+'account/login',creds).pipe(        //.pipe(...): Cho phép bạn xử lý dữ liệu trả về trước khi gửi ra ngoài.
       map(account => {                                                           //map() dùng để biến đổi dữ liệu.
         if(account) {
-          localStorage.setItem("user", JSON.stringify(account));               // đổi về dạng object -> txtjson sau đó muốn lấy thì JSON.parse(localStorage.getItem("user")) 
+          localStorage.setItem("user", JSON.stringify(account)); 
+                     // đổi về dạng object -> txtjson sau đó muốn lấy thì JSON.parse(localStorage.getItem("user")) 
           this.currentAccount.set(account);
+          
+          
         }
       })
     )
@@ -31,7 +34,7 @@ export class AccountService {
   }
 
   logout() {
-    localStorage.removeItem("user");
+    localStorage.removeItem("user"); 
     this.currentAccount.set(null);
     this.router.navigate(['/']);
   }
