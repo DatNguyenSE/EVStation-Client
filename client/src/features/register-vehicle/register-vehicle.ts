@@ -119,6 +119,7 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     this.vehicleservice.register(vehicle).subscribe({
         next: (res) => {
             this.message = "Đăng ký xe thành công!";
+             window.location.href = '/';
             this.isError = false;
             this.registerForm.reset();
             this.registerForm.get('model')?.disable();
