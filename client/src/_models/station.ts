@@ -22,7 +22,7 @@ export type Post = {
   closeTime: string;
   status: string;
   distance:number;
-  post:number;
+  chargingPosts: Post[];
 }
 
 export type eventReservation = {

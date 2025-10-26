@@ -52,10 +52,17 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-6 flex flex-wrap gap-3 justify-end">
-          <button class="btn btn-outline btn-sm">Xem chi tiết</button>
-          <button class="btn bg-red-700 btn-sm  text-white">Hủy</button>
-        </div>
+       <div class="mt-6 flex flex-wrap gap-3 justify-end">
+  <button class="btn btn-outline btn-sm">Xem chi tiết</button>
+  <button
+    class="btn bg-red-700 btn-sm text-white"
+    (click)="cancelReservation(r.id)"
+    [disabled]="r.status === 'Cancelled'"
+  >
+    {{ r.status === 'Cancelled' ? 'Đã hủy' : 'Hủy' }}
+  </button>
+</div>
+
 
         <!-- Accent border -->
         <div

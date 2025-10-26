@@ -23,7 +23,7 @@ export class VehicleService {
         if (response) {
           // Tinh chỉnh: Đổi key trong localStorage để rõ ràng hơn rằng đây là
           // kết quả trả về từ API, không phải dữ liệu gửi đi.
-          localStorage.setItem("vehicle_response", JSON.stringify(response));
+          // localStorage.setItem("vehicle_response", JSON.stringify(response));
         }
         return response; // Trả về response gốc cho component xử lý.
       }),

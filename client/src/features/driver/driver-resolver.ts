@@ -6,6 +6,6 @@ import { Driver } from '../../_models/user';
 export const driverResolver: ResolveFn<Driver> = (route, state) => {
   const driverService = inject(DriverService)
   
-  return driverService.GetProfile_Driver();
+  return driverService.loadDriverResolver();
 };
 

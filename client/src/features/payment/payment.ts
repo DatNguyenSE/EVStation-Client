@@ -5,7 +5,7 @@ import { Payments } from '../../_models/user';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CurrencyFormatDirective } from '../../app/directives/currency-format';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 
 
@@ -20,7 +20,6 @@ export class Payment implements OnInit{
   driverService = inject(DriverService);
   paymentScv = inject(PaymentService)
   route = inject(ActivatedRoute)
-  router = inject(Router);
   cdf = inject(ChangeDetectorRef)
    amount: number = 0;
    message ='';
@@ -50,7 +49,7 @@ export class Payment implements OnInit{
    }
 
    const payments : Payments ={
-       orderType: 'other',
+      orderType: 'other',
       amount: this.amount,
       orderDescription: 'Nạp tiền vào ví tài xế',
       name: user.name, 
@@ -62,7 +61,7 @@ export class Payment implements OnInit{
       window.location.href= res.paymentUrl;
     },
     error :(err) =>{
-      this.message=err.message
+      this.message=err.message;
     }
    })
   }
@@ -75,7 +74,7 @@ export class Payment implements OnInit{
             await this.driverService.loadWallet();
             this.cdf.detectChanges();
             setTimeout(() =>{
-              this.router.navigate(['/']);
+              window.location.href = '/';
             },3000)
 
           }

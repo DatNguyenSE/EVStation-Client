@@ -2,10 +2,11 @@ import { ResolveFn } from '@angular/router';
 import { DriverService } from '../service/driver-service';
 import { inject } from '@angular/core';
 import { eventReservation } from '../../_models/station';
+import { ReservationService } from '../service/reservation-service';
 
 
 export const eventResolver: ResolveFn<eventReservation[]> = (route, state) => {
-  const driverService = inject(DriverService);
+  const reservationService = inject(ReservationService);
   
-  return driverService.GetEventReservation();
+  return reservationService.LoadEventReservation();
 };

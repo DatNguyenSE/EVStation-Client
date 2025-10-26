@@ -31,12 +31,7 @@ export const routes: Routes = [
             { path: 'dich-vu', component: ServiceList },
             { path: 'thanh-toan', component: Payment },
             { path: 'thong-bao', component: Notification },
-            { 
-                path: 'su-kien',
-                resolve: {event: eventResolver},
-                runGuardsAndResolvers: 'always', 
-                component: Event 
-            },
+            { path: 'su-kien',component: Event },
             {
                 path: 'tai-khoan',
                 resolve: {driver: driverResolver},
