@@ -1,12 +1,12 @@
-import { Component, inject, HostListener, signal, OnInit } from '@angular/core';
+import { Component, inject, HostListener, signal, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/service/account-service';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
-import { eventReservation } from '../../_models/station';
 import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
+import { ReservationService } from '../../core/service/reservation-service';
 
 @Component({
   selector: 'app-nav',
@@ -20,28 +20,36 @@ export class Nav implements OnInit{
   protected creds: any = {}
     driverService = inject(DriverService); 
     busyService = inject(BusyService);
-    reservations = signal<eventReservation[] | null> (null);
     routers = inject(Router);
     route = inject(ActivatedRoute)
     showBalance = signal<boolean>(false);
-
+    reservationService = inject(ReservationService);
     
-  ngOnInit(): void {
-    this.driverService.loadWallet();
-    this.GetEventReservation();
-    document.documentElement.setAttribute('data-theme', this.selectedTheme());
+      constructor() {
+    // lắng nghe currentAccount thay đổi (login/logout)
+     effect(() => {
+      const acc = this.accountService.currentAccount();
+      if (acc) {
+        // login -> load lại data
+        this.driverService.loadWallet();
+        this.reservationService.LoadEventReservation().subscribe({
+          next: res => this.reservationService.upcomingReservations.set(res)
+        });
+      } else {
+        // logout -> clear reservationCount
+        this.reservationService.upcomingReservations.set([]);
+        this.driverService.walletBalance.set(0);
+      }
+    });
+  }
 
+  ngOnInit(): void {
+    document.documentElement.setAttribute('data-theme', this.selectedTheme());
   }
   
-  GetEventReservation(){
-    this.driverService.LoadEventReservation().subscribe({
-      next: res => this.reservations.set(res)
-    })
-  }
 
   logout() {
     this.accountService.logout();
-    this.routers.navigateByUrl('/' );
   }
 
    toggleBalance() {

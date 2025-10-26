@@ -4,6 +4,7 @@ export type Account = {
     email: string;
     token: string;
     emailConfirmed: boolean;
+    roles: string[];
 }
 
 export type User = {
@@ -13,20 +14,6 @@ export type User = {
     dateOfBirth: string;
     fullName: string;
     roles: string[];
-}
-
-export type Vehicles = {
-  vehicleId: number;
-  model: string;
-  type: string;
-  batteryCapacityKWh: number;
-  maxChargingPowerKW: number;
-  connectorType: string;
-  plate: string;
-};
-export interface VehicleResponse {
-  message: string;
-  data: Vehicles;
 }
 
 export type Driver = {
@@ -74,4 +61,19 @@ export interface VehicleModelDetail {
   connectorType: string;
   hasDualBattery: boolean;
 }
+
+export type Vehicles = {
+  vehicleId: number;
+  model: string;
+  type: string;
+  batteryCapacityKWh: number;
+  maxChargingPowerKW: number;
+  connectorType: string;
+  plate: string;
+};
+export interface VehicleResponse {
+  message: string;
+  data: Vehicles;
+}
+
 

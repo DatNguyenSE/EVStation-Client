@@ -21,9 +21,9 @@ export class Event implements OnInit{
   constructor(private route: ActivatedRoute) {}
   
   ngOnInit(): void {
-  this.route.data.subscribe({
-      next: data => this.reservations.set(data['event'])
-    });
+  this.reservationSvc.LoadEventReservation().subscribe({
+    next: res => this.reservations.set(res)
+  });
   }
 
   tatusBadgeClasses(status: string) {
@@ -45,10 +45,9 @@ cancelReservation(reservation : string){
   if(!confirm('Bạn có chắc muốn hủy đặt chỗ này không?')) return;
     this.reservationSvc.cancelReservation(reservation).subscribe({
   next: () => {
-    this.driverService.GetEventReservation().subscribe(res => this.reservations.set(res));
+    this.reservationSvc.LoadEventReservation().subscribe(res => this.reservations.set(res));
   }
 });
 
-  
 }
 }

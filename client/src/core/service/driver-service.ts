@@ -34,10 +34,6 @@ export class DriverService {
       `${this.baseUrl}vehicle/my`);
   }
 
-  LoadEventReservation() {
-    return this.http.get<eventReservation[]>(`${this.baseUrl}reservation/upcoming`);
-  }
-
   loadWallet() {
     this.http.get<{ balance: number }>(`${this.baseUrl}wallet/my`).subscribe({
       next: (res) => {

@@ -27,4 +27,10 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
       busyService.idle()
     })
   );
+  
 };
+export function clearHttpCache() {
+  cache.clear();
+  console.log(' HTTP cache cleared!');
+}
+
