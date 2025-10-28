@@ -3,8 +3,8 @@ import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from "../../features/vehicle/vehicle";
 import { GgMap } from "../../features/gg-map/gg-map";
-import { ActivatedRoute } from '@angular/router';
-import { Driver, MyPackage, Package } from '../../_models/user';
+
+import {  MyPackage  } from '../../_models/user';
 import { PackagesService } from '../../core/service/packages-service';
 
 @Component({
