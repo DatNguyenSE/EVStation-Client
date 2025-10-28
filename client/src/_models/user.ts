@@ -43,8 +43,17 @@ export type Package = {
     description:string;
     vehicleType : number;
     price : number;
-    durationsDay : number;
+    durationDays : number;
 }
+export type MyPackage ={
+    packageName:string;
+    description:string;
+    startDate:Date;
+    endDate:Date;
+    isActive:boolean;
+    vehicleType:string;
+}
+
 export type Payments = {
    orderType:string;
    amount:number;
@@ -75,5 +84,15 @@ export interface VehicleResponse {
   message: string;
   data: Vehicles;
 }
+export interface TransactionDto {
+  transactionType: string;
+  balanceBefore: number;
+  balanceAfter: number;
+  amount: number;
+  description: string;
+  createdAt: Date;
+  status: string;
+}
+
 
 
