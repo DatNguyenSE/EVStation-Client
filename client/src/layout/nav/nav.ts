@@ -7,10 +7,13 @@ import { CommonModule } from '@angular/common';
 import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
+import { HasRoleDirective } from '../../core/_directive/has-role.directive';
+
 
 @Component({
   selector: 'app-nav',
-  imports: [FormsModule, RouterLink, RouterLinkActive, CommonModule],
+  standalone: true,
+  imports: [FormsModule, RouterLink, RouterLinkActive, CommonModule, HasRoleDirective],
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
@@ -24,13 +27,14 @@ export class Nav implements OnInit{
     route = inject(ActivatedRoute)
     showBalance = signal<boolean>(false);
     reservationService = inject(ReservationService);
-    
+  
       constructor() {
     // lắng nghe currentAccount thay đổi (login/logout)
      effect(() => {
       const acc = this.accountService.currentAccount();
       if (acc) {
         // login -> load lại data
+        console.log('User roles:', this.accountService.currentAccount()?.roles);
         this.driverService.loadWallet();
         this.reservationService.LoadEventReservation().subscribe({
           next: res => this.reservationService.upcomingReservations.set(res)

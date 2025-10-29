@@ -16,7 +16,8 @@ export class InitService {
     const accountString = localStorage.getItem('account');
     if(!accountString) return of(null);
     const account = JSON.parse(accountString);
-    this.accountService.currentAccount.set(account);
+    this.accountService.setCurrentUser(account);
+    //signalR 
     if(this.presenceService.hubConnection?.state !== HubConnectionState.Connected) {
             this.presenceService.createHubConnection(account);
             this.reservationService.createHubConnection(account);

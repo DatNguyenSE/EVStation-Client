@@ -10,25 +10,23 @@
 
 
     <!-- Navigation (ẩn trên mobile, hiện trên desktop hoặc khi mở menu) -->
-    <nav class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium  text-white
+    <nav *appHasRole="['Driver']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium  text-white
              absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0 shadow-lg sm:shadow-none
              transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
 
+<!--nav này chỉ dành cho Driver-->
 
-      <a routerLink="/dang-nhap" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
-        class="hover:text-cyan-600 cursor-pointer text-lg font-medium block sm:hidden">
-        Đăng nhập
-      </a>
-
+       <!-- Dich vu List -->
       <a routerLink="/dich-vu" routerLinkActive="text-cyan-600 " (click)="isMenuOpen = false"
         class=" hover:text-cyan-600 cursor-pointer">Dịch vụ
       </a>
       <a routerLink="/thanh-toan" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
         class=" hover:text-cyan-600 cursor-pointer">Thanh
-        toán</a>
-      |
-      <a routerLink="/su-kien" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
-        class=" hover:text-cyan-600 cursor-pointer pl-2">
+        toán </a><span >|</span>
+       
+      <!-- reservationSigalR -->
+      <a routerLink="/su-kien" routerLinkActive="text-cyan-600"
+        (click)="isMenuOpen = false" class=" hover:text-cyan-600 cursor-pointer pl-2">
         <div class="relative inline-block">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="size-6">
@@ -40,19 +38,18 @@
           </span>
         </div>
       </a>
-
+       <!-- Badge số thông báo -->
       <a routerLink="/thong-bao" routerLinkActive="text-gray-300" (click)="isMenuOpen = false"
         class=" cursor-pointer flex items-center ">
         <div class="relative inline-block">
           <span class="material-icons text-3xl cursor-pointer">notifications</span>
-
-          <!-- Badge số thông báo -->
           <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
             0
           </span>
         </div>
-      </a>
-      
+        <span class="ml-6">|</span>
+      </a> 
+
       <div class="dropdown dropdown-end mr-5">
         <button tabindex="1"
           class="flex flex-col justify-center items-center cursor-pointer uppercase text-xs text-base-content hover:text-primary transition-colors">
@@ -63,7 +60,8 @@
           </svg>
         </button>
 
-        <ul tabindex="1" class="dropdown-content menu bg-base-100 text-base-content rounded-box w-52 p-2 shadow">
+        <ul tabindex="1"
+          class="dropdown-content menu bg-base-100 text-base-content rounded-box w-52 p-2 shadow max-h-60 overflow-y-auto scroll-smooth">
           @for (theme of themes; track $index) {
           <li (click)="handleSelectedTheme(theme)">
             <a class="capitalize hover:bg-base-200">{{ theme }}</a>
@@ -71,9 +69,9 @@
           }
         </ul>
       </div>
-      
+
       @if(busyService.busyRequestCount() >0 ){
-        <span class="loading loading-spinner text-accent"></span>
+      <span class="loading loading-spinner text-accent"></span>
       }
 
       <a routerLink="/profile" (click)="isMenuOpen = false" class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài
@@ -85,20 +83,15 @@
 
     </nav>
 
-    @if (accountService.currentAccount() ; as account ) {
+    <div class="hidden sm:flex align-middle ml-auto gap-3" *ngIf="(accountService.currentAccount() ) as account">
 
-    <!-- User Logo (chỉ hiện khi đăng nhập) -->
-
-    @if(account.emailConfirmed){
-
-    <div class="hidden sm:flex align-middle ml-auto gap-3">
-
-      <div class="bg-base-100 shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
+      <div *appHasRole="['Driver']" class="bg-base-100 shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
         <span class="text-sm text-gray-600 font-semibold">Số dư:</span>
         <span class="text-base font-bold text-base-content">
           {{ showBalance() ? (this.driverService.walletBalance()| number) + ' đ' : '•••••• đ' }}
         </span>
-        <button (click)="toggleBalance()" class="text-base-content hover:text-gray-700 transition" title="Ẩn/Hiện số dư">
+        <button (click)="toggleBalance()" class="text-base-content hover:text-gray-700 transition"
+          title="Ẩn/Hiện số dư">
           <svg *ngIf="showBalance()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -125,7 +118,7 @@
           <div class="flex flex-col items-start">
             <span class="text-sm">Xin chào,
               <span class="text-xl font-bold ">
-                {{account.username | titlecase}}
+                {{ account.username | titlecase}}
               </span>
             </span>
           </div>
@@ -140,16 +133,15 @@
         <ul tabindex="0" class=" text-base-content
          bg-base-100 dark:bg-gray-800 dropdown-content menu rounded-box z-1 w-52 p-2 shadow-sm">
           <li><a routerLink="/tai-khoan">Profile</a></li>
-          <li><a class="" (click)="logout()">Logout</a></li>
-          <li><a routerLink="/lichsugiaodich">Transaction</a></li>
+          <li *appHasRole="['Driver']"><a routerLink="/lichsugiaodich">Transaction</a></li>
+          <li><a class="bg-red-500 text-white" (click)="logout()">Logout</a></li>
         </ul>
       </div>
     </div>
 
-    }
-    } @else {
 
-    <div class="ml-auto">
+
+    <div class="ml-auto" *ngIf="(accountService.currentAccount() ) === null">
       <!-- Nút hamburger (chỉ hiện trên mobile) -->
       <button class="sm:hidden ml-auto text-white focus:outline-none" (click)="isMenuOpen = !isMenuOpen">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
@@ -165,6 +157,6 @@
       </a>
 
     </div>
-    }
+
   </div>
 </header>

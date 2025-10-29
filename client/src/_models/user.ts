@@ -1,6 +1,6 @@
 import { Vehicles } from "./vehicle";
 
-export type Account = {
+export interface Account  {
     id: string;
     username: string;
     email: string;

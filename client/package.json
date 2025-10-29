@@ -33,6 +33,7 @@
     "@tailwindcss/postcss": "^4.1.13",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "leaflet-geosearch": "^4.2.2",
     "leaflet-routing-machine": "^3.2.12",

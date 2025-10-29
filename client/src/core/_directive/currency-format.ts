@@ -4,7 +4,7 @@ import { Directive, ElementRef, HostListener, Input, OnChanges, SimpleChanges } 
   selector: '[appCurrencyFormat]'
 })
 export class CurrencyFormatDirective implements OnChanges {
-  @Input() appCurrencyFormatModel: any; // ✅ đổi tên tránh conflict với ngModel
+  @Input() appCurrencyFormatModel: any; //  đổi tên tránh conflict với ngModel
   private el: HTMLInputElement;
 
   constructor(private elementRef: ElementRef) {
