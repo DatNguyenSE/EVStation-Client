@@ -1,7 +1,6 @@
-@if (this.driverService.currentDriver(); as driver) {
-<div class=" bg-base-300 flex flex-col ">
+<div *ngIf="driverService.currentDriver() as driver" class="bg-base-300 flex flex-col">
   <!-- Header -->
-  <header class="bg-base-100 shadow p-4  flex items-center justify-between">
+  <header class="bg-base-100 shadow p-4 flex items-center justify-between">
     <h1 class="text-2xl font-bold text-blue-600">EV Charging Dashboard</h1>
     <div class="flex items-center gap-3">
       <img src="assets/logo.png" alt="Avatar" class="w-10 h-10 rounded-full" />
@@ -11,18 +10,17 @@
       </div>
     </div>
   </header>
-  <!-- Content -->
+
+  <!-- Main content -->
   <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Trạng thái trạm sạc -->
+    <!-- Bản đồ -->
     <section class="bg-base-100 shadow rounded-2xl p-6 col-span-1 md:col-span-2">
-      <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
-      </h2>
-      <div class=" bg-base-100 rounded-lg overflow-hidden relative">
+      <div class="bg-base-100 rounded-lg overflow-hidden relative">
         <app-gg-map class="absolute inset-0"></app-gg-map>
       </div>
     </section>
-    <!-- Thông tin xe [app-vehicle]-->
-     
+
+    <!-- Phương tiện -->
     <section class="bg-base-100 shadow rounded-2xl p-6 col-span-1 lg:col-span-1 pt-10">
       <h2 class="flex items-center text-xl font-semibold mb-6 text-gray-800 pb-10">
         <span class="text-blue-700">Phương tiện hiện tại</span>
@@ -45,35 +43,63 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Ví dụ: -->
           <!-- <tr *ngFor="let item of chargeHistory" class="border-t hover:bg-gray-50">
               <td class="py-2 px-3">{{ item.date | date:'short' }}</td>
               <td class="py-2 px-3">{{ item.location }}</td>
               <td class="py-2 px-3">{{ item.duration }} phút</td>
               <td class="py-2 px-3">{{ item.cost | currency:'VND' }}</td>
-            </tr> -->
-
+          </tr> -->
         </tbody>
       </table>
     </section>
+
     <!-- Gói cước hiện tại -->
-    <section class="bg-base-100 shadow rounded-2xl p-6">
-      <h2 class="text-xl font-semibold mb-3 text-base-700">Gói cước hiện tại</h2>
-      <div class="bg-base-100 rounded-xl p-4 border border-blue-200">
-        <!-- <p class="text-lg font-bold text-blue-700">{{ currentPackage.name }}</p>
-          <p class="text-gray-600 mt-1">
-            Hạn sử dụng: {{ currentPackage.expiry | date }}
-          </p>
-          <p class="text-gray-600">
-            Giá: {{ currentPackage.price | currency:'VND' }}
-          </p> -->
-        <tr>
-          <td class="py-2 px-3">Hiện chưa có gói</td>
-        </tr>
-        <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">
-          Gia hạn gói
-        </button>
+   <section class="bg-base-100 shadow rounded-2xl p-6">
+  <h2 class="text-xl font-semibold mb-3 text-base-700">Danh sách gói của bạn</h2>
+
+  <div *ngIf="driverPackage.length > 0; else noPackage">
+    <div
+      *ngFor="let pack of driverPackage"
+      class="bg-base-100 rounded-xl p-4 mb-4 border border-blue-200"
+    >
+      <!-- Header -->
+      <div class="flex justify-between items-center">
+        <p class="text-lg font-bold text-blue-700">{{ pack.packageName }}</p>
+
+        <!-- Badge -->
+        <span
+          class="px-3 py-1 text-sm font-semibold rounded-full"
+          [ngClass]="pack.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'"
+        >
+          {{ pack.isActive ? 'Đang hoạt động' : 'Đã hết hạn' }}
+        </span>
       </div>
-    </section>
+      <!-- Loại xe -->
+      <p class="text-gray-600 mt-1">Loại xe: {{ pack.vehicleType }}</p>
+
+      <!-- ✅ Số ngày còn lại -->
+      <p class="text-gray-600 mt-1">
+        Còn lại:
+        <span class="font-semibold text-blue-600">
+          {{ getRemainingDays(pack.endDate) }} ngày
+        </span>
+      </p>
+
+      <button
+        class="mt-3 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition"
+      >
+        Gia hạn gói
+      </button>
+    </div>
+  </div>
+
+  <ng-template #noPackage>
+    <p class="text-gray-500">Hiện bạn chưa đăng ký gói nào.</p>
+  </ng-template>
+</section>
+
+
+
   </main>
 </div>
-}

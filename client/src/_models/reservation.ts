@@ -11,3 +11,14 @@ export interface ReservationResponse {
   success?: boolean;
   createdAt?: string;
 }
+
+export type eventReservation = {
+    id: string,
+    vehicleId: string,
+    chargingPostId: string,
+    driverId: string,
+    timeSlotStart: string,
+    timeSlotEnd: string,
+    status: string,
+    createdAt: string
+}

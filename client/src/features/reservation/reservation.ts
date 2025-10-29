@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReservationService } from '../../core/service/reservation-service';
-import { Account, Vehicles } from '../../_models/user';
+import { Vehicles } from '../../_models/vehicle';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -135,16 +135,6 @@ export class Reservation {
       timeSlotStart: this.selectedSlot,  //  Dùng trực tiếp, KHÔNG ghép chuỗi
       slotCount: this.slotCount
     };
-    //   const req = {
-    //   vehicleId: Number(this.vehicleid),
-    //   chargingPostId: Number(this.selectedPostId),
-    //   timeSlotStart: this.selectedSlot,
-    //   slotCount: this.slotCount
-    // };
-
-
-
-
     this.loading = true;
     this.reservationSvc.createReservationChecked(req).subscribe({
       next: () => {
@@ -166,13 +156,4 @@ export class Reservation {
       }
     });
   }
-
-
-
-
-
-
-
-
-
 }

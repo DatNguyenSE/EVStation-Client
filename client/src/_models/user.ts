@@ -1,3 +1,5 @@
+import { Vehicles } from "./vehicle";
+
 export type Account = {
     id: string;
     username: string;
@@ -7,7 +9,7 @@ export type Account = {
     roles: string[];
 }
 
-export type User = {
+export interface User  {
     id: string
     userName: string;
     email: string;

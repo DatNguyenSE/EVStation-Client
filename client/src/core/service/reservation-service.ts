@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { HubConnection } from '@microsoft/signalr';
-import { eventReservation } from '../../_models/station';
+import { eventReservation } from '../../_models/reservation';
 import { Account } from '../../_models/user';
 import * as signalR from '@microsoft/signalr';
 import { ToastService } from './toast-service';
@@ -72,9 +72,14 @@ export class ReservationService {
     return this.http.get<eventReservation[]>(`${this.baseUrl}/reservation/upcoming`);
   }
 
+  
+
   cancelReservation(id:string){
     return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation/${id}/cancel`,{});
   }
+  
+
+
 
   //signalR Reservation
     private hubUrl = environment.hubUrl;
@@ -94,7 +99,12 @@ export class ReservationService {
     this.upcomingReservations.set(reservations);
     this.toast.success('Danh sách đặt chỗ đã được cập nhật', 2500);
   });
-
+  // this.hubConnection.on('ReservationCancelled', (reservationId: string) => {
+  //     const current = this.upcomingReservations();
+  //     const updated = current.filter(r => r.id !== reservationId);
+  //     this.upcomingReservations.set(updated);
+  //     this.toast.info(`Đặt chỗ #${reservationId} đã bị huỷ`, 2500);
+  //   });
   try {
     await this.hubConnection.start();
     console.log('Successfully, Connected to ReservationHub');
