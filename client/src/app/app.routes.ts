@@ -19,6 +19,7 @@ import { Reservation } from '../features/reservation/reservation';
 import { Event } from '../features/event/event';
 import { eventResolver } from '../core/resolvers/event-resolver';
 import { driverResolver } from '../features/driver/driver-resolver';
+import { Transactions } from '../features/transactions/transactions';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -47,7 +48,8 @@ export const routes: Routes = [
             { path: 'map', component: GgMap },
             { path: 'dangki-xe', component: RegisterVehicle },
             { path: 'thongtinsac/:idPost', component: ChargingDashboard },
-            {path:'datcho',component:Reservation}
+            {path:'datcho',component:Reservation},
+            {path:'lichsugiaodich',component:Transactions}
 
         ]
     },

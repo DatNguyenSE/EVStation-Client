@@ -1,3 +1,4 @@
+<!-- Các box chọn gói của bạn -->
 <div class="flex flex-wrap justify-center gap-8 w-full max-w-[1400px] mx-auto px-4">
   <div
     *ngFor="let p of package"
@@ -57,10 +58,59 @@
   </div>
 </div>
 
+<!-- ✅ Nút thanh toán -->
 <div class="mt-8 text-center" *ngIf="selectedPackageId">
   <button
+    (click)="openConfirmModal(packageToBuy!)"
+     [disabled]="!packageToBuy"
     class="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-blue-600"
   >
     Tiếp tục thanh toán
   </button>
 </div>
+
+<!-- ✅ Modal xác nhận -->
+<div
+  *ngIf="showConfirmModal"
+  class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
+>
+  <div
+    class="bg-white text-gray-800 rounded-xl shadow-2xl p-8 w-[90%] max-w-md transform transition-all duration-300 scale-100"
+  >
+    <h3 class="text-2xl font-bold text-center mb-4 text-blue-600">
+      Xác nhận mua gói
+    </h3>
+
+    <div *ngIf="packageToBuy" class="space-y-2 text-gray-700">
+      <p><strong>Tên gói:</strong> {{ packageToBuy.name }}</p>
+      <p><strong>Mô tả:</strong> {{ packageToBuy.description }}</p>
+      <p>
+        <strong>Loại xe:</strong>
+        {{ packageToBuy.vehicleType }}
+      </p>
+      <p><strong>Thời hạn:</strong> {{ packageToBuy.durationDays }} ngày</p>
+      <p class="text-green-600 font-semibold text-lg">
+         Giá: {{ packageToBuy.price | currency:'VND':'symbol':'1.0-0' }}
+      </p>
+    </div>
+
+    <div class="flex justify-end gap-4 mt-6">
+      <button
+        (click)="closeModal()"
+        class="px-5 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg font-medium"
+      >
+        Hủy
+      </button>
+      <button
+        (click)="confirmPurchase()"
+        [disabled]="isLoading"
+        class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+      >
+        {{ isLoading ? 'Đang xử lý...' : 'Xác nhận mua' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
