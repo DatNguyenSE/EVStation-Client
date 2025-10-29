@@ -15,11 +15,10 @@ export interface Vehicles  {
   maxChargingPowerKW: number;
   connectorType: string;
   plate: string;
+  registrationStatus: string;
 };
 
 export interface VehicleResponse {
   message: string;
   data: Vehicles;
 }
-
-
