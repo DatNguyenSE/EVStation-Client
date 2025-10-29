@@ -1,3 +1,5 @@
+import { Vehicles } from "./vehicle";
+
 export type Account = {
     id: string;
     username: string;
@@ -7,7 +9,7 @@ export type Account = {
     roles: string[];
 }
 
-export type User = {
+export interface User  {
     id: string
     userName: string;
     email: string;
@@ -37,43 +39,8 @@ export type RegisterCreds = {
     dateOfBirth: string;
     password: string;
 }
-export type Package = {
-    id:number;
-    name:string;
-    description:string;
-    vehicleType : number;
-    price : number;
-    durationsDay : number;
-}
-export type Payments = {
-   orderType:string;
-   amount:number;
-   orderDescription:string;
-   name : string;
-   txnRef:string;
-}
 
-export interface VehicleModelDetail {
-  model: string;
-  type: string;
-  batteryCapacityKWh: number;
-  maxChargingPowerKW: number;
-  connectorType: string;
-  hasDualBattery: boolean;
-}
 
-export type Vehicles = {
-  vehicleId: number;
-  model: string;
-  type: string;
-  batteryCapacityKWh: number;
-  maxChargingPowerKW: number;
-  connectorType: string;
-  plate: string;
-};
-export interface VehicleResponse {
-  message: string;
-  data: Vehicles;
-}
+
 
 

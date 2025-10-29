@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { DriverService } from '../../core/service/driver-service';
 import { PaymentService } from '../../core/service/payment-service';
-import { Payments } from '../../_models/user';
+import { Payments } from '../../_models/payment';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CurrencyFormatDirective } from '../../app/directives/currency-format';

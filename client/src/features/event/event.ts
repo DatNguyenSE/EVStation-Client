@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
-import { eventReservation } from '../../_models/station';
+import { eventReservation } from '../../_models/reservation';
 
 import { ActivatedRoute } from '@angular/router';
 import { ReservationService } from '../../core/service/reservation-service';

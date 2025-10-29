@@ -3,7 +3,7 @@ import { VehicleService } from '../../core/service/vehicle-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Vehicles, VehicleModelDetail } from '../../_models/user'; // Đảm bảo import VehicleModelDetail
+import { Vehicles, VehicleModelDetail } from '../../_models/vehicle'; // Đảm bảo import VehicleModelDetail
 
 @Component({
   selector: 'app-register-vehicle',

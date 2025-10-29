@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DriverService } from '../../core/service/driver-service';
-import { Vehicles } from '../../_models/user';
+import { Vehicles } from '../../_models/vehicle';
 
 @Component({
   selector: 'app-vehicle',

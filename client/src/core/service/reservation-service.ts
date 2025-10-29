@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { HubConnection } from '@microsoft/signalr';
-import { eventReservation } from '../../_models/station';
+import { eventReservation } from '../../_models/reservation';
 import { Account } from '../../_models/user';
 import * as signalR from '@microsoft/signalr';
 import { ToastService } from './toast-service';

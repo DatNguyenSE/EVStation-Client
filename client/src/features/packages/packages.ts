@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { PackagesService } from '../../core/service/packages-service';
-import { Package } from '../../_models/user';
+import { Package } from '../../_models/payment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

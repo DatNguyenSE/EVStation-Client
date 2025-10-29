@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReservationService } from '../../core/service/reservation-service';
-import { Account, Vehicles } from '../../_models/user';
+import { Vehicles } from '../../_models/vehicle';
 import { DriverService } from '../../core/service/driver-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
