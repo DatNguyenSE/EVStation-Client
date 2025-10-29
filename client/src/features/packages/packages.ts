@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { PackagesService } from '../../core/service/packages-service';
-import { Package } from '../../_models/payment';
+import { Package } from '../../_models/package';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../core/service/toast-service';
@@ -77,6 +77,7 @@ export class Packages {
         })
         this.showConfirmModal = false;
         this.cdRef.detectChanges();
+        window.location.href = '/';
       },
       error: (err) => {
         this.message = err.error?.message || 'Mua gói thất bại.';

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { TransactionService } from '../../core/service/transaction-service';
-import { TransactionDto } from '../../_models/user';
+import { TransactionDto } from '../../_models/payment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

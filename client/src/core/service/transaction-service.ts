@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { TransactionDto } from '../../_models/user';
+import { TransactionDto } from '../../_models/payment';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 

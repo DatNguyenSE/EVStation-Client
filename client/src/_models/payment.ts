@@ -5,11 +5,13 @@ export type Payments = {
    name : string;
    txnRef:string;
 }
-export type Package = {
-    id:number;
-    name:string;
-    description:string;
-    vehicleType : number;
-    price : number;
-    durationsDay : number;
+
+export interface TransactionDto {
+  transactionType: string;
+  balanceBefore: number;
+  balanceAfter: number;
+  amount: number;
+  description: string;
+  createdAt: Date;
+  status: string;
 }
