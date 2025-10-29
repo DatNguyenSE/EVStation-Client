@@ -61,7 +61,7 @@ export class Payment implements OnInit{
       window.location.href= res.paymentUrl;
     },
     error :(err) =>{
-      this.message=err.message;
+      // this.message=err.message;
     }
    })
   }

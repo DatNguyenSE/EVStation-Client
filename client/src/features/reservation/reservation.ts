@@ -54,7 +54,7 @@ export class Reservation {
       }
 
       // Load danh sách xe
-      this.vehicleSvc.GetVehicles().subscribe({
+      this.vehicleSvc.GetVehiclesApproved().subscribe({
         next: (vehicles) => {
           this.vehicles = vehicles;
           this.cdf.detectChanges();
@@ -65,7 +65,7 @@ export class Reservation {
   }
 
   loadVehicle() {
-    this.vehicleSvc.GetVehicles().subscribe({
+    this.vehicleSvc.GetVehiclesApproved().subscribe({
       next: (data) => {
         this.vehicles = data;
         this.cdf.detectChanges();

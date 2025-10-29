@@ -1,48 +1,47 @@
-<!-- Current vehicle with carousel navigation -->
+<!-- vehicle.html (sửa) -->
+<!-- Hiện chưa có phương tiện -->
+<div *ngIf="Vehicles().length === 0" class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center ">
+  <p class="text-gray-500 text-lg">Hiện chưa có phương tiện</p>
+</div>
 
-@if (this.Vehicles().length ===0 ) {
-  <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center ">
-
-    <p class="text-gray-500 text-lg">Hiện chưa có phương tiện</p>
-  </div>
-} @else {
-  <!-- Vehicle Counter and Navigation -->
+<!-- Có phương tiện -->
+<ng-template #withVehicles>
   <div class="flex items-center justify-between mb-4">
     <div class="flex items-center gap-2">
       <span class="text-sm font-medium text-gray-600">Phương tiện</span>
       <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-        {{ currentVehicleIndex() + 1 }} / {{ this.Vehicles().length }}
+        {{ currentVehicleIndex() + 1 }} / {{ Vehicles().length }}
       </span>
     </div>
-    
-    @if (this.Vehicles().length > 1) {
-      <div class="flex items-center gap-2">
-        <button 
-          (click)="previousVehicle()"
-          class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          [disabled]="currentVehicleIndex() === 0">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-        <button 
-          (click)="nextVehicle()"
-          class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          [disabled]="currentVehicleIndex() === this.Vehicles().length - 1">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-          </svg>
-        </button>
-      </div>
-    }
+
+    <div *ngIf="Vehicles().length > 1" class="flex items-center gap-2">
+      <button
+        (click)="previousVehicle()"
+        class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="currentVehicleIndex() === 0">
+        <!-- icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <button
+        (click)="nextVehicle()"
+        class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="currentVehicleIndex() === Vehicles().length - 1">
+        <!-- icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- Vehicle Card with transition -->
   <div class="relative overflow-hidden">
-    @for (vehicle of this.Vehicles(); track vehicle.vehicleId; let i = $index) {
-      @if (i === currentVehicleIndex()) {
+    <ng-container *ngFor="let vehicle of Vehicles(); let i = index">
+      <div *ngIf="i === currentVehicleIndex()">
+        <!-- Lấy status trực tiếp từ hàm component -->
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden animate-fadeIn">
-          <!-- Header -->
           <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 border-b border-blue-200">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
@@ -52,25 +51,25 @@
                   <p class="text-sm text-gray-600">{{ vehicle.type }}</p>
                 </div>
               </div>
-              <span class="bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                Đang hoạt động
+
+              <span
+                [ngClass]="getStatusStyles(vehicle.registrationStatus).cssClass"
+                class="px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                {{ getStatusStyles(vehicle.registrationStatus).text }}
               </span>
+
             </div>
           </div>
-          
-          <!-- Body -->
+
           <div class="p-6">
-            <!-- License Plate -->
             <div class="flex items-center gap-2 mb-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg px-4 py-3 w-fit">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-gray-700">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
               </svg>
               <span class="font-bold text-gray-800 text-lg tracking-wider">{{ vehicle.plate }}</span>
             </div>
-            
-            <!-- Vehicle Stats Grid -->
+
             <div class="grid grid-cols-2 gap-4 mb-6">
-              <!-- Battery Capacity -->
               <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <div class="flex items-center gap-2 mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
@@ -80,8 +79,7 @@
                 </div>
                 <p class="text-2xl font-bold text-blue-700">{{ vehicle.batteryCapacityKWh }} <span class="text-sm font-normal text-gray-600">kWh</span></p>
               </div>
-              
-              <!-- Charging Power -->
+
               <div class="bg-green-50 rounded-lg p-4 border border-green-200">
                 <div class="flex items-center gap-2 mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-green-600">
@@ -91,8 +89,7 @@
                 </div>
                 <p class="text-2xl font-bold text-green-700">{{ vehicle.maxChargingPowerKW }} <span class="text-sm font-normal text-gray-600">kW</span></p>
               </div>
-              
-              <!-- Connector Type -->
+
               <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div class="flex items-center gap-2 mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-purple-600">
@@ -102,8 +99,7 @@
                 </div>
                 <p class="text-lg font-bold text-purple-700">{{ vehicle.connectorType }}</p>
               </div>
-              
-              <!-- Vehicle ID -->
+
               <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div class="flex items-center gap-2 mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
@@ -114,8 +110,7 @@
                 <p class="text-lg font-bold text-gray-700">{{ vehicle.vehicleId }}</p>
               </div>
             </div>
-            
-            <!-- Action Button -->
+
             <div class="flex space-x-3">
               <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -127,23 +122,21 @@
             </div>
           </div>
         </div>
-      }
-    }
+      </div>
+    </ng-container>
   </div>
 
-  <!-- Dots Indicator (for multiple vehicles) -->
-  @if (this.Vehicles().length > 1) {
-    <div class="flex justify-center gap-2 mt-4">
-      @for (vehicle of this.Vehicles(); track vehicle.vehicleId; let i = $index) {
-        <button
-          (click)="setCurrentVehicle(i)"
-          class="w-2 h-2 rounded-full transition-all duration-300"
-          [class.bg-blue-600]="i === currentVehicleIndex()"
-          [class.w-8]="i === currentVehicleIndex()"
-          [class.bg-gray-300]="i !== currentVehicleIndex()">
-        </button>
-      }
-    </div>
-  }
-}
+  <div *ngIf="Vehicles().length > 1" class="flex justify-center gap-2 mt-4">
+    <button
+      *ngFor="let vehicle of Vehicles(); let i = index"
+      (click)="setCurrentVehicle(i)"
+      class="w-2 h-2 rounded-full transition-all duration-300"
+      [class.bg-blue-600]="i === currentVehicleIndex()"
+      [class.w-8]="i === currentVehicleIndex()"
+      [class.bg-gray-300]="i !== currentVehicleIndex()">
+    </button>
+  </div>
+</ng-template>
 
+<!-- Kết hợp ngIf/else -->
+<ng-container *ngIf="Vehicles().length === 0; else withVehicles"></ng-container>

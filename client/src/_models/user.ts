@@ -39,8 +39,3 @@ export type RegisterCreds = {
     dateOfBirth: string;
     password: string;
 }
-
-
-
-
-
