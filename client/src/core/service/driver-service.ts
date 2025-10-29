@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Driver, Vehicles } from '../../_models/user';
-import { eventReservation } from '../../_models/station';
+import { Driver } from '../../_models/user';
+import { Vehicles } from '../../_models/vehicle';
+
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,11 @@ export class DriverService {
   GetVehicles() {
     return this.http.get<Vehicles[]>(
       `${this.baseUrl}vehicle/my`);
+  }
+
+  GetVehiclesApproved() {
+    return this.http.get<Vehicles[]>(
+      `${this.baseUrl}vehicle/my-approved`);
   }
 
   loadWallet() {

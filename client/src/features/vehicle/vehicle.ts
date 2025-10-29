@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DriverService } from '../../core/service/driver-service';
-import { Vehicles } from '../../_models/user';
+import { Vehicles } from '../../_models/vehicle';
 
 @Component({
   selector: 'app-vehicle',
@@ -47,5 +47,34 @@ export class Vehicle implements OnInit {
 
   setCurrentVehicle(index: number) {
     this.currentVehicleIndex.set(index);
+  }
+  
+  /**
+   * Trả về text và class CSS dựa trên trạng thái đăng ký của xe.
+   * @param status Giá trị string từ backend (Pending, Approved, Rejected)
+   */
+  getStatusStyles(status: string): { text: string; cssClass: string } {
+    switch (status) {
+      case 'Approved':
+        return { 
+          text: 'Đã xác thực', 
+          cssClass: 'bg-green-500 text-white' 
+        };
+      case 'Pending':
+        return { 
+          text: 'Chờ duyệt', 
+          cssClass: 'bg-yellow-500 text-white' 
+        };
+      case 'Rejected':
+        return { 
+          text: 'Bị từ chối', 
+          cssClass: 'bg-red-500 text-white' 
+        };
+      default:
+        return { 
+          text: 'Không rõ', 
+          cssClass: 'bg-gray-400 text-white' 
+        };
+    }
   }
 }

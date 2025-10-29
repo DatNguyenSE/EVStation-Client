@@ -1,9 +1,9 @@
-import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy, viewChild, ElementRef, ViewChild } from '@angular/core';
 import { VehicleService } from '../../core/service/vehicle-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Vehicles, VehicleModelDetail } from '../../_models/user'; // Đảm bảo import VehicleModelDetail
+import { Vehicles, VehicleModelDetail } from '../../_models/vehicle'; // Đảm bảo import VehicleModelDetail
 
 @Component({
   selector: 'app-register-vehicle',
@@ -32,6 +32,10 @@ export class RegisterVehicle implements OnInit, OnDestroy {
   
   message = '';
   isError = false;
+
+  // MỚI: Thêm 2 thuộc tính để quản lý file
+  selectedFile: File | null = null;
+  @ViewChild('fileInput') fileInput?: ElementRef;
   
   private typeChangesSub?: Subscription;
   private modelChangesSub?: Subscription;
@@ -45,7 +49,9 @@ export class RegisterVehicle implements OnInit, OnDestroy {
       maxChargingPowerKW: [{ value: null, disabled: true }, [Validators.required, Validators.min(1)]],
       connectorType: [{ value: '', disabled: true }, Validators.required],
       useDualBattery: [false],
-      plate: ['', Validators.required]
+      plate: ['', Validators.required],
+      // MỚI: Thêm form control cho file (chủ yếu để validation)
+      registrationImage: [null, Validators.required]
     });
   }
 
@@ -53,6 +59,22 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     this.listenToTypeChanges();
     this.listenToModelChanges();
     this.listenToDualBatteryChanges();
+  }
+
+  // MỚI: Hàm để xử lý khi người dùng chọn file
+  onFileSelected(event: any): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (file) {
+      this.selectedFile = file;
+      // Cập nhật form control để validator biết là đã có file
+      this.registerForm.patchValue({ registrationImage: file.name });
+      this.registerForm.get('registrationImage')?.updateValueAndValidity();
+    } else {
+      this.selectedFile = null;
+      this.registerForm.patchValue({ registrationImage: null });
+      this.registerForm.get('registrationImage')?.updateValueAndValidity();
+    }
   }
 
   private listenToTypeChanges(): void {
@@ -109,22 +131,57 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     });
   }
 
+  // SỬA: Viết lại hoàn toàn hàm onSubmit
   onSubmit(): void {
-    if (this.registerForm.invalid) {
-      this.message = 'Vui lòng điền đầy đủ thông tin.';
+    // SỬA: Cập nhật thông báo lỗi
+    if (this.registerForm.invalid || !this.selectedFile) {
+      this.message = 'Vui lòng điền đầy đủ thông tin và tải lên ảnh cà vẹt.';
       this.isError = true;
+      // Đảm bảo tất cả các trường đều bị "touched" để hiển thị lỗi validation (nếu có)
+      this.registerForm.markAllAsTouched(); 
       return;
     }
-    const vehicle: Vehicles = this.registerForm.getRawValue();
-    this.vehicleservice.register(vehicle).subscribe({
+
+    // MỚI: Tạo FormData thay vì JSON
+    const formData = new FormData();
+    const formValue = this.registerForm.getRawValue(); // Lấy tất cả giá trị, kể cả disabled
+
+    // Thêm từng trường vào FormData
+    // Tên (key) phải khớp chính xác với tên thuộc tính trong AddVehicleRequestDto ở backend
+    formData.append('model', formValue.model);
+    formData.append('type', formValue.type.toString());
+    formData.append('batteryCapacityKWh', formValue.batteryCapacityKWh.toString());
+    formData.append('maxChargingPowerKW', formValue.maxChargingPowerKW.toString());
+    formData.append('connectorType', formValue.connectorType.toString()); // Đảm bảo backend có thể parse giá trị này (enum)
+    formData.append('plate', formValue.plate);
+    
+    // MỚI: Thêm file vào FormData
+    // Key "registrationImage" phải khớp với tên thuộc tính IFormFile trong DTO
+    formData.append('registrationImage', this.selectedFile, this.selectedFile.name);
+
+    // MỚI: Gọi service với formData
+    // Bạn SẼ CẦN phải cập nhật 'vehicleservice.register' để chấp nhận FormData
+    this.vehicleservice.register(formData).subscribe({
         next: (res) => {
-            this.message = "Đăng ký xe thành công!";
-             window.location.href = '/';
+            this.message = "Đăng ký xe thành công! Xe của bạn đang chờ duyệt.";
             this.isError = false;
+            // Chờ 2 giây rồi redirect (cho người dùng đọc thông báo)
+            setTimeout(() => {
+               window.location.href = '/'; // Chuyển đến trang quản lý xe
+            }, 2000);
+
+            // Reset form
             this.registerForm.reset();
             this.registerForm.get('model')?.disable();
             this.vehicleModels = [];
             this.canHaveDualBattery = false;
+            this.selectedFile = null;
+
+            // MỚI: Reset trường input file
+            if (this.fileInput) {
+              this.fileInput.nativeElement.value = "";
+            }
+            
             this.cdRef.detectChanges();
         },
         error: (err) => {

@@ -25,13 +25,4 @@ export type Post = {
   chargingPosts: Post[];
 }
 
-export type eventReservation = {
-    id: string,
-    vehicleId: string,
-    chargingPostId: string,
-    driverId: string,
-    timeSlotStart: string,
-    timeSlotEnd: string,
-    status: string,
-    createdAt: string
-}
+
