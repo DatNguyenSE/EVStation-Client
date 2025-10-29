@@ -15,8 +15,8 @@ export class VehicleService {
    * Đăng ký một phương tiện mới.
    * @param vehicle Dữ liệu phương tiện cần đăng ký.
    */
-  register(vehicle: Vehicles): Observable<VehicleResponse> {
-    return this.http.post<VehicleResponse>(`${this.baseurl}/vehicle/add`, vehicle).pipe(
+  register(formData: FormData): Observable<VehicleResponse> {
+    return this.http.post<VehicleResponse>(`${this.baseurl}/vehicle/add`, formData).pipe(
       map(response => {
         // Tinh chỉnh: Đổi tên biến `vehicle` thành `response` để tránh nhầm lẫn
         // với tham số `vehicle` đầu vào của hàm.

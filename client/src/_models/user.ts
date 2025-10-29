@@ -70,6 +70,7 @@ export type Vehicles = {
   maxChargingPowerKW: number;
   connectorType: string;
   plate: string;
+  registrationStatus: string;
 };
 export interface VehicleResponse {
   message: string;

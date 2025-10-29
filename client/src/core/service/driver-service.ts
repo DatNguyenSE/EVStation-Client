@@ -34,6 +34,11 @@ export class DriverService {
       `${this.baseUrl}vehicle/my`);
   }
 
+  GetVehiclesApproved() {
+    return this.http.get<Vehicles[]>(
+      `${this.baseUrl}vehicle/my-approved`);
+  }
+
   loadWallet() {
     this.http.get<{ balance: number }>(`${this.baseUrl}wallet/my`).subscribe({
       next: (res) => {
