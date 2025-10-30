@@ -17,6 +17,10 @@
         "@schematics/angular:resolver": {
           "skipTests": true,
           "path": "src"
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true,
+          "path":"src/core/_directive"
         }
       },
       "root": "",

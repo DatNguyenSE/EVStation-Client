@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Account } from '../../_models/user';
-import { map } from 'rxjs';
+import { map, ReplaySubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { clearHttpCache } from '../interceptors/loading-interceptor';
+import {jwtDecode} from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,13 @@ export class AccountService {
   baseUrl = 'https://localhost:5001/api/';
   currentAccount = signal<Account | null>(null);
 
+  setCurrentUser(acc: Account) {
+    const decodedToken: any = jwtDecode(acc.token);
+    const roles = this.getRolesFromDecodedToken(decodedToken);
+    Array.isArray(roles) ? acc.roles = roles : acc.roles.push(roles);
+    localStorage.setItem('account', JSON.stringify(acc));
+    this.currentAccount.set(acc);
+  }
 
   login(creds: any) {
     return this.http.post<Account>(this.baseUrl+'account/login',creds).pipe(        //.pipe(...): Cho phép bạn xử lý dữ liệu trả về trước khi gửi ra ngoài.
@@ -21,7 +29,7 @@ export class AccountService {
         if(account) {
           localStorage.setItem("account", JSON.stringify(account)); 
                      // đổi về dạng object -> txtjson sau đó muốn lấy thì JSON.parse(localStorage.getItem("user")) 
-          this.currentAccount.set(account);         
+          this.setCurrentUser(account);      
         }
       })
     )
@@ -32,10 +40,17 @@ export class AccountService {
   }
 
   logout() {
-    localStorage.removeItem("account"); 
+    localStorage.removeItem('account');
     this.currentAccount.set(null);
     clearHttpCache();
     this.router.navigate(['/']);
   }
 
+  private getRolesFromDecodedToken(decodedToken: any): string[] {
+    let roles = decodedToken.role;
+    if (!Array.isArray(roles)) {
+      roles = [roles]; // nếu có 1 role thì p chuyển thành mảng vì ở bên HasRoleDirective phải là mảng mới xài được  '.some()'
+    }
+    return roles;
+  }
 }
