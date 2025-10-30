@@ -4,7 +4,7 @@ import { PaymentService } from '../../core/service/payment-service';
 import { Payments } from '../../_models/payment';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CurrencyFormatDirective } from '../../core/_directive/currency-format';
+import { CurrencyFormatDirective } from '../../shared/_directive/currency-format';
 import { ActivatedRoute } from '@angular/router';
 
 

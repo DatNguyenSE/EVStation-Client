@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { SlideCarouselComponent } from "../slide-carousel/slide-carousel";
 import { AccountService } from '../../core/service/account-service';
 import { News } from '../more-information/news/news';
@@ -18,8 +18,9 @@ import { Dashboard } from "../dashboard/dashboard";
 })
 export class Home {
   protected registerMode = signal(false);
-  userService = inject(AccountService);
-
+  accService = inject(AccountService);
+  
+  //yes -> register, no-> login
   showRegister(value: boolean) {
     this.registerMode.set(value);
   }

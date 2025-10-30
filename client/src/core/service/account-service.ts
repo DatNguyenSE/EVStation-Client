@@ -5,6 +5,7 @@ import { map, ReplaySubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { clearHttpCache } from '../interceptors/loading-interceptor';
 import {jwtDecode} from 'jwt-decode';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import {jwtDecode} from 'jwt-decode';
 export class AccountService {
   private http = inject(HttpClient);
   protected router = inject(Router);
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = environment.apiUrl;
   currentAccount = signal<Account | null>(null);
 
   setCurrentUser(acc: Account) {
@@ -43,7 +44,8 @@ export class AccountService {
     localStorage.removeItem('account');
     this.currentAccount.set(null);
     clearHttpCache();
-    this.router.navigate(['/']);
+    window.location.href = '/';
+
   }
 
   private getRolesFromDecodedToken(decodedToken: any): string[] {
@@ -53,4 +55,11 @@ export class AccountService {
     }
     return roles;
   }
+
+  //  private getRolesFromToken(acc: Account): string[] {
+  //   const payload = acc.token.split('.')[1];
+  //   const decoded = atob(payload);
+  //   const jsonPayload = JSON.parse(decoded);
+  //   return Array.isArray(jsonPayload.role) ? jsonPayload.role : [jsonPayload.role]
+  // }
 }

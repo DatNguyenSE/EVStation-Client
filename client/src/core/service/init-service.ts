@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { PresenceService } from './presence-service';
 import { HubConnectionState } from '@microsoft/signalr';
 import { ReservationService } from './reservation-service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +13,16 @@ export class InitService {
   private accountService = inject(AccountService);
   private presenceService = inject(PresenceService);
   private reservationService =inject(ReservationService)
+  private router = inject(Router);
   init() {
     const accountString = localStorage.getItem('account');
     if(!accountString) return of(null);
     const account = JSON.parse(accountString);
     this.accountService.setCurrentUser(account);
+    const currentUrl = this.router.url;
+      if (account.role === 'Admin' && !currentUrl.startsWith('/quan-tri-vien')) {
+        this.router.navigate(['/quan-tri-vien']);
+      }
     //signalR 
     if(this.presenceService.hubConnection?.state !== HubConnectionState.Connected) {
             this.presenceService.createHubConnection(account);
