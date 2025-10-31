@@ -8,7 +8,7 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
-import { InitService } from '../../core/service/init-service';
+
 
 @Component({
   selector: 'app-nav',
@@ -37,7 +37,7 @@ export class Nav implements OnInit {
     this.menuItems = this.getMenuForRole(role);
   }
 
-  
+
   /* Lấy danh sách menu theo role hiện tại */
 
   getMenuForRole(role: string) {
