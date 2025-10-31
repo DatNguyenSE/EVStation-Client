@@ -35,11 +35,13 @@ export class Nav implements OnInit {
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
     const role = this.accountService.currentAccount()?.roles?.[0] || '';
     this.menuItems = this.getMenuForRole(role);
-    if (this.accountService.currentAccount()?.emailConfirmed) {
+    if (this.accountService.currentAccount()?.emailConfirmed && this.accountService.currentAccount()?.roles.includes('Driver')) {
+     //chỉ driver mới chạy loadWallet & upcommingReser
       this.driverService.loadWallet();
       this.reservationService.LoadEventReservation().subscribe({
         next: res => this.reservationService.upcomingReservations.set(res)
       });
+      //LoadEventReser -> return [] 
     }
   }
 
@@ -59,7 +61,11 @@ export class Nav implements OnInit {
         { label: 'Giao dịch', link: '/lich-su-giao-dich' },
         { label: 'Báo cáo', link: '/bao-cao' },
       ],
-     
+      Operator: [
+        { label: 'Lịch sạc', link: '/quan-ly-tai-xe' },
+        { label: 'Giao dịch', link: '/lich-su-giao-dich' },
+        { label: 'Báo cáo', link: '/bao-cao' },
+      ]
     };
     return menus[role] ?? [];
   }

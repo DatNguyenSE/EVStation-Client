@@ -26,6 +26,7 @@ import { ManagerDriver } from '../features/admin/manager-driver/manager-driver';
 import { ManagerStation } from '../features/admin/manager-station/manager-station';
 import { Report } from '../features/admin/report/report';
 import { Transaction } from '../features/admin/transaction/transaction';
+import { Operator } from '../features/operator/operator';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -72,6 +73,15 @@ export const routes: Routes = [
              {path:'lich-su-giao-dich',component:Transaction}
         ]
     },
+    {
+        path: 'nhan-vien-tram/trang-chu', component: Operator,
+        runGuardsAndResolvers: 'always',
+        canActivate: [authGuard] ,
+        children: [
+              
+        ]
+    },
+
   
 
     //public routerlink

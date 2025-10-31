@@ -9,14 +9,14 @@
     </a>
 
     <!-- Nav chỉ hiện với Driver hoặc Admin -->
-    <nav *appHasRole="['Driver', 'Admin']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
+    <nav *appHasRole="['Driver', 'Admin', 'Operator']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
             shadow-lg sm:shadow-none transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
       <!-- Lặp menu theo role -->
       <a *ngFor="let item of menuItems" [routerLink]="item.link" routerLinkActive="text-cyan-600"
         (click)="isMenuOpen = false" class="hover:text-cyan-600 cursor-pointer flex items-center gap-2">
         <span>{{ item.label }}</span>
       </a>
-      
+
       <!--  Chỉ hiển thị phần riêng của Driver -->
       <ng-container *appHasRole="['Driver']"> <!--ngContainer: xóa khi sai đk | còn div thì vẫn giữ thẻ div -->
         <a routerLink="/su-kien" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
