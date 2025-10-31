@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { AccountService } from '../../core/service/account-service';
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-admin',
-  imports: [],
+  imports: [RouterOutlet],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })

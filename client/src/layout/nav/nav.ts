@@ -41,11 +41,11 @@ export class Nav implements OnInit {
       { label: 'Sự kiện', link: '/su-kien' },
     ],
     Admin: [
-      { label: 'Bảng điều khiển', link: '/dashboard' },
-      { label: 'Quản lý tài xế', link: '/quan-ly-tai-xe' },
-      { label: 'Quản lý trạm sạc', link: '/quan-ly-tram'},
-      { label: 'Giao dịch', link: '/lich-su-giao-dich' },
-      { label: 'Báo cáo', link: '/bao-cao' },
+      { label: 'Bảng điều khiển', link: '/quan-tri-vien/dashboard' },
+      { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
+      { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
+      { label: 'Giao dịch', link: '/quan-tri-vien/lich-su-giao-dich' },
+      { label: 'Báo cáo', link: '/quan-tri-vien/bao-cao' },
     ],
   };
   return menus[role] ?? [];
