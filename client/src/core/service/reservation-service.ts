@@ -97,7 +97,6 @@ export class ReservationService {
   this.hubConnection.on('UpdateUpcomingReservations', (reservations: eventReservation[]) => {
     console.log('Realtime update:', reservations);
     this.upcomingReservations.set(reservations);
-    this.toast.success('Danh sách đặt chỗ đã được cập nhật', 2500);
   });
   // this.hubConnection.on('ReservationCancelled', (reservationId: string) => {
   //     const current = this.upcomingReservations();

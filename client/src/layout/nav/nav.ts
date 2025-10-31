@@ -35,6 +35,12 @@ export class Nav implements OnInit {
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
     const role = this.accountService.currentAccount()?.roles?.[0] || '';
     this.menuItems = this.getMenuForRole(role);
+    if (this.accountService.currentAccount()?.emailConfirmed) {
+      this.driverService.loadWallet();
+      this.reservationService.LoadEventReservation().subscribe({
+        next: res => this.reservationService.upcomingReservations.set(res)
+      });
+    }
   }
 
 
@@ -44,21 +50,21 @@ export class Nav implements OnInit {
     const menus: Record<string, { label: string; link: string }[]> = {
       Driver: [
         { label: 'Dịch vụ', link: '/dich-vu' },
-        { label: 'Thanh toán', link: '/thanh-toan' },
-        { label: 'Sự kiện', link: '/su-kien' },
+        { label: 'Nạp Tiền', link: '/thanh-toan' },
       ],
       Admin: [
-        { label: 'Bảng điều khiển', link: '/dashboard' },
+        { label: 'Bảng điều khiển', link: '/admin-dashboard' },
         { label: 'Quản lý tài xế', link: '/quan-ly-tai-xe' },
         { label: 'Quản lý trạm sạc', link: '/quan-ly-tram' },
         { label: 'Giao dịch', link: '/lich-su-giao-dich' },
         { label: 'Báo cáo', link: '/bao-cao' },
       ],
+     
     };
     return menus[role] ?? [];
   }
 
-  
+
 
   onLogoClick() {
     const acc = this.accountService.currentAccount()?.roles;
