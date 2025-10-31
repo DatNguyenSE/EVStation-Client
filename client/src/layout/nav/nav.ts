@@ -7,8 +7,8 @@ import { CommonModule } from '@angular/common';
 import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
-import { HasRoleDirective } from '../../core/_directive/has-role.directive';
-
+import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
+import { InitService } from '../../core/service/init-service';
 
 @Component({
   selector: 'app-nav',
@@ -18,21 +18,43 @@ import { HasRoleDirective } from '../../core/_directive/has-role.directive';
   styleUrl: './nav.css'
 })
 
-export class Nav implements OnInit{
+export class Nav implements OnInit {
+  private initService = inject(InitService)
+  private router = inject(Router);
+
   accountService = inject(AccountService);
   protected creds: any = {}
-    driverService = inject(DriverService); 
-    busyService = inject(BusyService);
-    routers = inject(Router);
-    route = inject(ActivatedRoute)
-    showBalance = signal<boolean>(false);
-    reservationService = inject(ReservationService);
-  
-      constructor() {
+  driverService = inject(DriverService);
+  busyService = inject(BusyService);
+  routers = inject(Router);
+  route = inject(ActivatedRoute)
+  showBalance = signal<boolean>(false);
+  reservationService = inject(ReservationService);
+
+  /** 🧩 Lấy danh sách menu theo role hiện tại */
+
+  getMenuForRole(role: string) {
+  const menus: Record<string, { label: string; link: string}[]> = {
+    Driver: [
+      { label: 'Dịch vụ', link: '/dich-vu' },
+      { label: 'Thanh toán', link: '/thanh-toan' },
+      { label: 'Sự kiện', link: '/su-kien' },
+    ],
+    Admin: [
+      { label: 'Bảng điều khiển', link: '/quan-tri-vien/dashboard' },
+      { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
+      { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
+      { label: 'Giao dịch', link: '/quan-tri-vien/lich-su-giao-dich' },
+      { label: 'Báo cáo', link: '/quan-tri-vien/bao-cao' },
+    ],
+  };
+  return menus[role] ?? [];
+}
+  constructor() {
     // lắng nghe currentAccount thay đổi (login/logout)
-     effect(() => {
+    effect(() => {
       const acc = this.accountService.currentAccount();
-      if (acc) {
+      if (acc?.roles.includes('Driver')) {
         // login -> load lại data
         console.log('User roles:', this.accountService.currentAccount()?.roles);
         this.driverService.loadWallet();
@@ -48,29 +70,41 @@ export class Nav implements OnInit{
   }
 
   ngOnInit(): void {
+
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
   }
-  
+
+  onLogoClick() {
+    
+    const acc = this.accountService.currentAccount()?.roles;
+    if (acc?.includes('Admin')) {
+      window.location.href = '/quan-tri-vien';
+    } else if (acc?.includes('Staff')) {
+      window.location.href = '/#';
+    } else {
+      window.location.href = '/';
+    }
+  }
 
   logout() {
     this.accountService.logout();
   }
 
-   toggleBalance() {
+  toggleBalance() {
     this.showBalance.update((v) => !v);
   }
 
   protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
-    protected themes = themes;
+  protected themes = themes;
 
-    handleSelectedTheme(theme: string){
-      this.selectedTheme.set(theme);
-      localStorage.setItem('theme',theme);
-      document.documentElement.setAttribute('data-theme', theme);
-    }
+  handleSelectedTheme(theme: string) {
+    this.selectedTheme.set(theme);
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }
 
 
-   // thêm biến quản lý menu mobile
+  // thêm biến quản lý menu mobile
   isMenuOpen = false;
   isMobile = window.innerWidth < 640; // sm:640px 
 

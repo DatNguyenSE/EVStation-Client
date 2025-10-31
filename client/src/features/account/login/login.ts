@@ -28,7 +28,12 @@ export class Login {
         console.log(result),
         this.creds ={};
         this.toast.success('Đăng nhập thành công!');
-        this.router.navigate(['/']);
+        if((this.accountService.currentAccount()?.roles)?.includes('Admin')){
+          window.location.href = '/quan-tri-vien';
+        }else{
+          window.location.href = '/';
+        }
+        
       },
       error: err => {
         console.error('Error:', err.error);
@@ -48,7 +53,4 @@ export class Login {
   togglePassword() {
   this.showPassword = !this.showPassword;
 }
-  
-
-
 }

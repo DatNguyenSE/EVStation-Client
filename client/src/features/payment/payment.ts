@@ -4,7 +4,6 @@ import { PaymentService } from '../../core/service/payment-service';
 import { Payments } from '../../_models/payment';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CurrencyFormatDirective } from '../../core/_directive/currency-format';
 import { ActivatedRoute } from '@angular/router';
 
 
@@ -12,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-payment',
   standalone:true,
-  imports: [FormsModule,CommonModule,CurrencyFormatDirective],
+  imports: [FormsModule,CommonModule],
   templateUrl: './payment.html',
   styleUrl: './payment.css'
 })
