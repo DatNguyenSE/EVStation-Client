@@ -39,6 +39,7 @@ export class Nav implements OnInit {
       { label: 'Dịch vụ', link: '/dich-vu' },
       { label: 'Thanh toán', link: '/thanh-toan' },
       { label: 'Sự kiện', link: '/su-kien' },
+      { label: 'Biên lai', link: '/bien-lai' },
     ],
     Admin: [
       { label: 'Bảng điều khiển', link: '/quan-tri-vien/dashboard' },

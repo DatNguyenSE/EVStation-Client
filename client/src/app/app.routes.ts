@@ -26,6 +26,7 @@ import { ManagerDriver } from '../features/admin/manager-driver/manager-driver';
 import { ManagerStation } from '../features/admin/manager-station/manager-station';
 import { Report } from '../features/admin/report/report';
 import { Transaction } from '../features/admin/transaction/transaction';
+import { Receipt } from '../features/receipt/receipt';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -55,8 +56,8 @@ export const routes: Routes = [
             { path: 'dangki-xe', component: RegisterVehicle },
             { path: 'thongtinsac/:idPost', component: ChargingDashboard },
             {path:'datcho',component:Reservation},
-            {path:'lichsugiaodich',component:Transactions}
-
+            {path:'lichsugiaodich',component:Transactions},
+            {path:'bien-lai',component:Receipt}
         ]
     },
     {
@@ -69,7 +70,7 @@ export const routes: Routes = [
              {path:'quan-ly-tai-xe',component:ManagerDriver},
              {path:'quan-ly-tram',component:ManagerStation},
              {path:'bao-cao',component:Report},
-             {path:'lich-su-giao-dich',component:Transaction}
+             {path:'lich-su-giao-dich',component:Transaction},
         ]
     },
   
