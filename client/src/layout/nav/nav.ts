@@ -19,8 +19,7 @@ import { InitService } from '../../core/service/init-service';
 })
 
 export class Nav implements OnInit {
-  private initService = inject(InitService)
-  private router = inject(Router);
+  menuItems: { label: string; link: string }[] = [];
 
   accountService = inject(AccountService);
   protected creds: any = {}
@@ -31,51 +30,37 @@ export class Nav implements OnInit {
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
 
-  /** 🧩 Lấy danh sách menu theo role hiện tại */
-
-  getMenuForRole(role: string) {
-  const menus: Record<string, { label: string; link: string}[]> = {
-    Driver: [
-      { label: 'Dịch vụ', link: '/dich-vu' },
-      { label: 'Thanh toán', link: '/thanh-toan' },
-      { label: 'Sự kiện', link: '/su-kien' },
-    ],
-    Admin: [
-      { label: 'Bảng điều khiển', link: '/dashboard' },
-      { label: 'Quản lý tài xế', link: '/quan-ly-tai-xe' },
-      { label: 'Quản lý trạm sạc', link: '/quan-ly-tram'},
-      { label: 'Giao dịch', link: '/lich-su-giao-dich' },
-      { label: 'Báo cáo', link: '/bao-cao' },
-    ],
-  };
-  return menus[role] ?? [];
-}
-  constructor() {
-    // lắng nghe currentAccount thay đổi (login/logout)
-    effect(() => {
-      const acc = this.accountService.currentAccount();
-      if (acc?.roles.includes('Driver')) {
-        // login -> load lại data
-        console.log('User roles:', this.accountService.currentAccount()?.roles);
-        this.driverService.loadWallet();
-        this.reservationService.LoadEventReservation().subscribe({
-          next: res => this.reservationService.upcomingReservations.set(res)
-        });
-      } else {
-        // logout -> clear reservationCount
-        this.reservationService.upcomingReservations.set([]);
-        this.driverService.walletBalance.set(0);
-      }
-    });
-  }
 
   ngOnInit(): void {
-
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
+    const role = this.accountService.currentAccount()?.roles?.[0] || '';
+    this.menuItems = this.getMenuForRole(role);
   }
 
+  
+  /* Lấy danh sách menu theo role hiện tại */
+
+  getMenuForRole(role: string) {
+    const menus: Record<string, { label: string; link: string }[]> = {
+      Driver: [
+        { label: 'Dịch vụ', link: '/dich-vu' },
+        { label: 'Thanh toán', link: '/thanh-toan' },
+        { label: 'Sự kiện', link: '/su-kien' },
+      ],
+      Admin: [
+        { label: 'Bảng điều khiển', link: '/dashboard' },
+        { label: 'Quản lý tài xế', link: '/quan-ly-tai-xe' },
+        { label: 'Quản lý trạm sạc', link: '/quan-ly-tram' },
+        { label: 'Giao dịch', link: '/lich-su-giao-dich' },
+        { label: 'Báo cáo', link: '/bao-cao' },
+      ],
+    };
+    return menus[role] ?? [];
+  }
+
+  
+
   onLogoClick() {
-    
     const acc = this.accountService.currentAccount()?.roles;
     if (acc?.includes('Admin')) {
       window.location.href = '/quan-tri-vien';
@@ -87,6 +72,8 @@ export class Nav implements OnInit {
   }
 
   logout() {
+    this.reservationService.upcomingReservations.set([]);
+    this.driverService.walletBalance.set(0);
     this.accountService.logout();
   }
 
