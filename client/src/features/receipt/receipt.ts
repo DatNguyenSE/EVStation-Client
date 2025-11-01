@@ -1,106 +1,75 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { Observable, EMPTY } from 'rxjs';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { EMPTY, Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { 
   PaginatedResult, 
   ReceiptDto,          // Dùng cho danh sách
   ReceiptDetailsDto,   // Dùng cho chi tiết
-  PagingParams 
+  PagingParams,
+  ReceiptSummaryDto 
 } from '../../_models/receipt';
 import { ReceiptService } from '../../core/service/receipt-service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-receipt',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './receipt.html',
-  styleUrl: './receipt.css',
+  styleUrls: ['./receipt.css'],
 })
-export class Receipt implements OnInit{
-  public paginatedReceipts$!: Observable<PaginatedResult<ReceiptDto>>;
-  public selectedReceipt$?: Observable<ReceiptDetailsDto>;
-  public pagingParams: PagingParams = {
-    PageNumber: 1,
-    PageSize: 10 // Đặt kích thước trang mặc định
-  };
-  public totalCount: number = 0;
-  public totalPages: number = 0;
-  public errorMessage: string = '';
-  private receipt = inject(ReceiptService)
-  ngOnInit(): void {
-    // Tải danh sách hóa đơn ngay khi component được khởi tạo
-    this.loadUserReceipts();
+export class Receipt implements OnInit {
+  private receiptService = inject(ReceiptService);
+  private cdr = inject(ChangeDetectorRef); 
+
+  receipts: ReceiptSummaryDto[] = [];
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 0;
+  totalItems = 0;
+  isLoading = false;
+
+  ngOnInit() {
+    this.loadReceipts();
   }
 
-  loadUserReceipts(): void {
-    this.errorMessage = ''; // Xóa lỗi cũ
-    
-    this.paginatedReceipts$ = this.receipt.getUserReceipts(this.pagingParams).pipe(
-      tap(result => {
-        // Lưu lại tổng số lượng để tính toán phân trang
-        this.totalCount = result.TotalCount;
-        this.totalPages = Math.ceil(this.totalCount / this.pagingParams.PageSize);
-      }),
-      catchError(err => {
-        // Xử lý lỗi (ví dụ: 401 Unauthorized)
-        console.error('Lỗi khi tải lịch sử hóa đơn:', err);
-        this.errorMessage = 'Không thể tải lịch sử hóa đơn. Vui lòng thử lại sau.';
-        return EMPTY; // Trả về Observable rỗng để không làm hỏng chuỗi
-      })
-    );
-  }
-  
-  viewDetails(id: number): void {
-    this.errorMessage = ''; // Xóa lỗi cũ
-    
-    this.selectedReceipt$ = this.receipt.getReceiptDetails(id).pipe(
-      catchError(err => {
-        // Xử lý lỗi (ví dụ: 404 Not Found hoặc không có quyền)
-        console.error('Lỗi khi xem chi tiết hóa đơn:', err);
-        this.errorMessage = 'Không tìm thấy hóa đơn hoặc bạn không có quyền xem.';
-        return EMPTY;
-      })
-    );
+  loadReceipts(page: number = 1) {
+    this.isLoading = true;
+    this.receiptService.getUserReceipts(page, this.pageSize).subscribe({
+      next: (res) => {
+        console.log('📄 API:', res);
+        this.receipts = res.items;
+        this.currentPage = res.pageNumber;
+        this.pageSize = res.pageSize;
+        this.totalPages = res.pageCount;
+        this.totalItems = res.totalItemCount;
+        this.isLoading = false;
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
-  closeDetails(): void {
-    this.selectedReceipt$ = undefined; // Đặt observable về undefined
-    this.errorMessage = ''; // Xóa lỗi (nếu có)
-  }
-
-  // === CÁC PHƯƠNG THỨC PHÂN TRANG ===
-
-  /**
-   * Chuyển đến trang trước đó.
-   */
-  prevPage(): void {
-    if (this.pagingParams.PageNumber > 1) {
-      this.pagingParams.PageNumber--;
-      this.loadUserReceipts();
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadReceipts(this.currentPage);
     }
   }
 
-  /**
-   * Chuyển đến trang kế tiếp.
-   */
-  nextPage(): void {
-    if (this.pagingParams.PageNumber < this.totalPages) {
-      this.pagingParams.PageNumber++;
-      this.loadUserReceipts();
-    }
-  }
-
-  /**
-   * Chuyển đến một trang cụ thể.
-   * (Hữu ích nếu bạn làm pagination có số trang)
-   * @param pageNumber Số trang muốn đến.
-   */
-  goToPage(pageNumber: number): void {
-    const totalPages = Math.ceil(this.totalCount / this.pagingParams.PageSize);
-    if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== this.pagingParams.PageNumber) {
-      this.pagingParams.PageNumber = pageNumber;
-      this.loadUserReceipts();
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      console.log('👉 nextPage clicked, currentPage:', this.currentPage);
+      this.currentPage++;
+      console.log('👉 nextPage new page:', this.currentPage);
+      this.loadReceipts(this.currentPage);
     }
   }
 }

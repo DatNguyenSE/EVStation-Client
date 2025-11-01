@@ -27,6 +27,7 @@ import { ManagerStation } from '../features/admin/manager-station/manager-statio
 import { Report } from '../features/admin/report/report';
 import { Transaction } from '../features/admin/transaction/transaction';
 import { Receipt } from '../features/receipt/receipt';
+import { ReceiptDetail } from '../features/receipt-detail/receipt-detail';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -57,7 +58,8 @@ export const routes: Routes = [
             { path: 'thongtinsac/:idPost', component: ChargingDashboard },
             {path:'datcho',component:Reservation},
             {path:'lichsugiaodich',component:Transactions},
-            {path:'bien-lai',component:Receipt}
+            {path:'bien-lai',component:Receipt},
+            {path:'bien-lai/:id',component:ReceiptDetail}
         ]
     },
     {

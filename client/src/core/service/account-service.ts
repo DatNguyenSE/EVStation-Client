@@ -16,7 +16,7 @@ export class AccountService {
   baseUrl = environment.apiUrl;
   currentAccount = signal<Account | null>(null);
 
-  setCurrentUser(acc: Account) {
+  setCurrentAccount(acc: Account) {
     const decodedToken: any = jwtDecode(acc.token);
     const roles = this.getRolesFromDecodedToken(decodedToken);
     Array.isArray(roles) ? acc.roles = roles : acc.roles.push(roles);
@@ -30,7 +30,7 @@ export class AccountService {
         if(account) {
           localStorage.setItem("account", JSON.stringify(account)); 
                      // đổi về dạng object -> txtjson sau đó muốn lấy thì JSON.parse(localStorage.getItem("user")) 
-          this.setCurrentUser(account);      
+          this.setCurrentAccount(account);      
         }
       })
     )
@@ -45,7 +45,6 @@ export class AccountService {
     this.currentAccount.set(null);
     clearHttpCache();
     window.location.href = '/';
-
   }
 
   private getRolesFromDecodedToken(decodedToken: any): string[] {

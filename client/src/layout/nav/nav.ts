@@ -8,7 +8,7 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
-import { InitService } from '../../core/service/init-service';
+
 
 @Component({
   selector: 'app-nav',
@@ -19,8 +19,7 @@ import { InitService } from '../../core/service/init-service';
 })
 
 export class Nav implements OnInit {
-  private initService = inject(InitService)
-  private router = inject(Router);
+  menuItems: { label: string; link: string }[] = [];
 
   accountService = inject(AccountService);
   protected creds: any = {}
@@ -71,12 +70,12 @@ export class Nav implements OnInit {
   }
 
   ngOnInit(): void {
-
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
+    const role = this.accountService.currentAccount()?.roles?.[0] || '';
+    this.menuItems = this.getMenuForRole(role);
   }
 
   onLogoClick() {
-    
     const acc = this.accountService.currentAccount()?.roles;
     if (acc?.includes('Admin')) {
       window.location.href = '/quan-tri-vien';
@@ -88,6 +87,8 @@ export class Nav implements OnInit {
   }
 
   logout() {
+    this.reservationService.upcomingReservations.set([]);
+    this.driverService.walletBalance.set(0);
     this.accountService.logout();
   }
 

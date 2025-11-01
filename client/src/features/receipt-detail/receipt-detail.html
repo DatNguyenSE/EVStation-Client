@@ -1,0 +1,87 @@
+<div class="max-w-4xl mx-auto px-4 py-10 pt-24 font-sans">
+  <div *ngIf="isLoading" class="text-center text-gray-500 py-16">
+    <i class="bi bi-arrow-repeat animate-spin text-blue-500 text-xl"></i>
+    <p>Đang tải chi tiết...</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="text-center text-red-500 py-16">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && receipt" class="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-blue-700">Biên lai #{{ receipt.id }}</h2>
+        <p class="text-gray-500 text-sm">Tạo lúc {{ receipt.createAt | date: 'HH:mm:ss dd/MM/yyyy' }}</p>
+      </div>
+
+      <span
+        class="px-3 py-1 rounded-full text-sm font-semibold"
+        [ngClass]="{
+          'bg-green-100 text-green-700': receipt.status === 'Paid',
+          'bg-red-100 text-red-700': receipt.status === 'Refunded',
+          'bg-gray-100 text-gray-700': receipt.status === 'Pending'
+        }"
+      >
+        {{ receipt.status }}
+      </span>
+    </div>
+
+    <!-- Main Info -->
+    <div class="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
+      <p><strong>👤 Người dùng:</strong> {{ receipt.appUserName || 'N/A' }}</p>
+      <p><strong>💳 Phương thức thanh toán:</strong> {{ receipt.paymentMethod || '---' }}</p>
+      <p><strong>📦 Gói sạc:</strong> {{ receipt.packageName || 'Không có' }}</p>
+      <p><strong>🔋 Tiêu thụ năng lượng:</strong> {{ receipt.energyConsumed }} kWh</p>
+      <p><strong>⚡ Giá điện (snapshot):</strong> {{ receipt.pricePerKwhSnapshot | number }} ₫/kWh</p>
+      <p><strong>🏷️ Bảng giá:</strong> {{ receipt.pricingName }}</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <!-- Fee Info -->
+    <div class="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
+      <p>💰 Phí năng lượng: {{ receipt.energyCost | number }} ₫</p>
+      <p>🕓 Phí chờ: {{ receipt.idleFee | number }} ₫</p>
+      <p>⏱️ Phí quá giờ: {{ receipt.overstayFee | number }} ₫</p>
+      <p>💸 Giảm giá: -{{ receipt.discountAmount | number }} ₫</p>
+    </div>
+
+    <div class="mt-5 flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-800">Tổng thanh toán</h3>
+      <p class="text-xl font-bold text-blue-700">{{ receipt.totalCost | number }} ₫</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <!-- Charging Sessions -->
+    <div>
+      <h3 class="text-lg font-semibold mb-2 text-gray-800">🔌 Các phiên sạc</h3>
+      <ul class="list-disc pl-5 text-sm text-gray-700">
+        <li *ngFor="let s of receipt.chargingSessions">
+          Trụ <strong>{{ s.chargingPostCode }}</strong> —
+          {{ s.energyUsed }} kWh ({{ s.startTime | date: 'short' }} → {{ s.endTime | date: 'short' }})
+        </li>
+      </ul>
+    </div>
+
+    <!-- Wallet Transactions -->
+    <div class="mt-5">
+      <h3 class="text-lg font-semibold mb-2 text-gray-800">💰 Giao dịch ví liên quan</h3>
+      <ul class="list-disc pl-5 text-sm text-gray-700">
+        <li *ngFor="let t of receipt.walletTransactions">
+          {{ t.transactionDate | date: 'short' }} – <strong>{{ t.type }}</strong> – 
+          {{ t.amount | number }} ₫ ({{ t.description }})
+        </li>
+      </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 flex justify-end">
+      <button class="btn btn-outline btn-sm" (click)="goBack()">
+        ← Quay lại danh sách
+      </button>
+    </div>
+  </div>
+</div>

@@ -13,23 +13,23 @@ export type ReceiptStatus = 'Pending' | 'Paid' | 'Cancelled' | 'Refunded';
  * Tương ứng với C# CancelRequestDto
  */
 export interface CancelRequestDto {
-  Reason: string;
+  reason: string;
 }
 
 /**
  * Tương ứng với C# ConfirmPaymentRequestDto
  */
 export interface ConfirmPaymentRequestDto {
-  PaymentMethod: string;
+  paymentMethod: string;
 }
 
 /**
  * Tương ứng với C# RefundRequestDto
  */
 export interface RefundRequestDto {
-  ReceiptId: number;
-  Amount: number;
-  Reason: string;
+  receiptId: number;
+  amount: number;
+  reason: string;
 }
 
 // === CÁC DTO CHO RESPONSE DATA ===
@@ -39,28 +39,28 @@ export interface RefundRequestDto {
  * (Dùng cho danh sách hóa đơn của USER)
  */
 export interface ReceiptDto {
-  Id: number;
-  SessionIds?: number[];
-  CreateAt: string; // DateTime -> string
-  Status: ReceiptStatus;
-  DriverId?: string;
-  DriverName?: string;
-  DriverEmail?: string;
-  PackageId?: number;
-  PackageName?: string;
-  EnergyConsumed: number;
-  EnergyCost: number;
-  IdleFee: number;
-  OverstayFee: number;
-  DiscountAmount: number;
-  TotalCost: number;
-  IdleStartTime?: string; // DateTime? -> string?
-  IdleEndTime?: string; // DateTime? -> string?
-  PricingName: string;
-  PricePerKwhSnapshot: number;
-  VehiclePlate?: string;
-  StationName?: string;
-  PostCode?: string;
+  id: number;
+  sessionIds?: number[];
+  createAt: string; // DateTime -> string
+  status: ReceiptStatus;
+  driverId?: string;
+  driverName?: string;
+  driverEmail?: string;
+  packageId?: number;
+  packageName?: string;
+  energyConsumed: number;
+  energyCost: number;
+  idleFee: number;
+  overstayFee: number;
+  discountAmount: number;
+  totalCost: number;
+  idleStartTime?: string; // DateTime? -> string?
+  idleEndTime?: string; // DateTime? -> string?
+  pricingName: string;
+  pricePerKwhSnapshot: number;
+  vehiclePlate?: string;
+  stationName?: string;
+  postCode?: string;
 }
 
 /**
@@ -68,31 +68,30 @@ export interface ReceiptDto {
  * (Dùng cho trang chi tiết hóa đơn)
  */
 export interface ReceiptDetailsDto {
-  Id: number;
-  CreateAt: string; // DateTime -> string
-  Status: ReceiptStatus;
-  AppUserId?: string;
-  AppUserName?: string;
-  PackageId?: number;
-  PackageName?: string;
-  EnergyConsumed: number;
-  EnergyCost: number;
-  IdleStartTime?: string; // DateTime? -> string?
-  IdleEndTime?: string; // DateTime? -> string?
-  IdleFee: number;
-  OverstayFee: number;
-  DiscountAmount: number;
-  TotalCost: number;
-  PricingName: string;
-  PricePerKwhSnapshot: number;
-  PaymentMethod?: string;
-  ConfirmedByStaffId?: string;
-  ConfirmedByStaffName?: string;
-  ConfirmedAt?: string; // DateTime? -> string?
+  id: number;
+  createAt: string; // DateTime -> string
+  status: ReceiptStatus;
+  appUserId?: string;
+  appUserName?: string;
+  packageId?: number;
+  packageName?: string;
+  energyConsumed: number;
+  energyCost: number;
+  idleStartTime?: string; // DateTime? -> string?
+  idleEndTime?: string; // DateTime? -> string?
+  idleFee: number;
+  overstayFee: number;
+  discountAmount: number;
+  totalCost: number;
+  pricingName: string;
+  pricePerKwhSnapshot: number;
+  paymentMethod?: string;
+  confirmedByStaffId?: string;
+  confirmedByStaffName?: string;
+  confirmedAt?: string; // DateTime? -> string?
   
-  // Bạn cần định nghĩa các interface này
-  ChargingSessions: ChargingSessionSummaryDto[];
-  WalletTransactions: WalletTransactionSummaryDto[];
+  chargingSessions: ChargingSessionSummaryDto[];
+  walletTransactions: WalletTransactionSummaryDto[];
 }
 
 /**
@@ -100,16 +99,16 @@ export interface ReceiptDetailsDto {
  * (Dùng cho danh sách hóa đơn của ADMIN/STAFF)
  */
 export interface ReceiptSummaryDto {
-  Id: number;
-  CreateAt: string; // DateTime -> string
-  Status: ReceiptStatus;
-  AppUserId?: string;
-  AppUserName?: string;
-  TotalCost: number;
-  PricingName: string;
-  PaymentMethod?: string;
-  ConfirmedAt?: string; // DateTime? -> string?
-  ConfirmedByStaffName?: string;
+  id: number;
+  createAt: string; // DateTime -> string
+  status: ReceiptStatus;
+  appUserId?: string;
+  appUserName?: string;
+  totalCost: number;
+  pricingName: string;
+  paymentMethod?: string;
+  confirmedAt?: string; // DateTime? -> string?
+  confirmedByStaffName?: string;
 }
 
 // === CÁC DTO PHỤ (CHƯA ĐƯỢC ĐỊNH NGHĨA) ===
@@ -119,11 +118,11 @@ export interface ReceiptSummaryDto {
  * (Bạn cần cập nhật các trường chính xác)
  */
 export interface ChargingSessionSummaryDto {
-  Id: number;
-  StartTime: string;
-  EndTime: string;
-  EnergyUsed: number;
-  ChargingPostCode: string;
+  id: number;
+  startTime: string;
+  endTime: string;
+  energyUsed: number;
+  chargingPostCode: string;
 }
 
 /**
@@ -131,11 +130,11 @@ export interface ChargingSessionSummaryDto {
  * (Bạn cần cập nhật các trường chính xác)
  */
 export interface WalletTransactionSummaryDto {
-  Id: number;
-  TransactionDate: string;
-  Amount: number;
-  Type: string; // 'Deposit', 'Withdrawal', 'Payment'
-  Description: string;
+  id: number;
+  transactionDate: string;
+  amount: number;
+  type: string; // 'Deposit', 'Withdrawal', 'Payment'
+  description: string;
 }
 
 
@@ -145,20 +144,20 @@ export interface WalletTransactionSummaryDto {
  * Tương ứng với C# ReceiptFilterParams
  */
 export interface ReceiptFilterParams {
-  Status?: ReceiptStatus;
-  StartDate?: string; // DateTime? -> string?
-  EndDate?: string; // DateTime? -> string?
-  IsWalkInOnly?: boolean;
-  StationId?: number;
-  SearchTerm?: string;
+  status?: ReceiptStatus;
+  startDate?: string; // DateTime? -> string?
+  endDate?: string; // DateTime? -> string?
+  isWalkInOnly?: boolean;
+  stationId?: number;
+  searchTerm?: string;
 }
 
 /**
  * Tương ứng với C# PagingParams
  */
 export interface PagingParams {
-  PageNumber: number;
-  PageSize: number;
+  pageNumber: number;
+  pageSize: number;
 }
 
 // === CẤU TRÚC KẾT QUẢ CHUNG ===
@@ -168,9 +167,9 @@ export interface PagingParams {
  * (Giả định dựa trên logic API)
  */
 export interface PaginatedResult<T> {
-  Items: T[];
-  PageNumber: number;
-  PageSize: number;
-  TotalCount: number;
-  TotalPages: number;
+  items: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalItemCount: number;
+  pageCount: number;
 }

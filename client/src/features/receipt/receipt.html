@@ -1,137 +1,84 @@
-<div class="receipt-container">
-  <h2>Lịch sử Hóa đơn</h2>
+<div class="max-w-5xl mx-auto px-4 py-8 pt-24">
+  <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+    <i class="bi bi-receipt-cutoff text-blue-600"></i>
+    Danh sách biên lai
+  </h2>
 
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
+  <div *ngIf="isLoading" class="text-center text-gray-500 py-8">
+    <i class="bi bi-arrow-repeat animate-spin text-blue-500 text-xl"></i>
+    <p>Đang tải dữ liệu...</p>
   </div>
 
-  <div *ngIf="selectedReceipt$ | async as detail; else listContainer" class="receipt-detail">
-    
-    <button (click)="closeDetails()" class="back-button">&larr; Quay lại danh sách</button>
-    
-    <h3>Chi tiết Hóa đơn #{{ detail.Id }}</h3>
-    
-    <div class="detail-grid">
-      <div class="detail-item">
-        <strong>Trạng thái:</strong>
-        <span class="status-badge status-{{ detail.Status | lowercase }}">{{ detail.Status }}</span>
-      </div>
-      <div class="detail-item">
-        <strong>Tổng tiền:</strong>
-        <span class="total-cost">{{ detail.TotalCost | number: '1.0-0' }} VND</span>
-      </div>
-      <div class="detail-item">
-        <strong>Ngày tạo:</strong>
-        <span>{{ detail.CreateAt | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
-      </div>
-      <div class="detail-item">
-        <strong>Thanh toán:</strong>
-        <span>{{ detail.PaymentMethod || 'Chưa thanh toán' }}</span>
-      </div>
-      <div class="detail-item">
-        <strong>Năng lượng tiêu thụ:</strong>
-        <span>{{ detail.EnergyConsumed | number: '1.1-2' }} kWh</span>
-      </div>
-      <div class="detail-item">
-        <strong>Đơn giá:</strong>
-        <span>{{ detail.PricePerKwhSnapshot | number: '1.0-0' }} VND/kWh ({{ detail.PricingName }})</span>
+  <div *ngIf="!isLoading && receipts.length === 0" class="text-center text-gray-500 py-12">
+    <i class="bi bi-inbox text-3xl mb-2"></i>
+    <p>Không có hóa đơn nào để hiển thị.</p>
+  </div>
+
+  <div *ngIf="!isLoading && receipts.length > 0" class="space-y-4">
+    <div
+      *ngFor="let r of receipts"
+      class="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all p-5"
+    >
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">{{ r.pricingName }}</h3>
+          <p class="text-sm text-gray-500">Mã hóa đơn: #{{ r.id }}</p>
+        </div>
+        <span
+          class="px-3 py-1 rounded-full text-sm font-semibold"
+          [ngClass]="{
+            'bg-green-100 text-green-700': r.status === 'Paid',
+            'bg-red-100 text-red-700': r.status === 'Refunded',
+            'bg-gray-100 text-gray-700': r.status === 'Pending'
+          }"
+        >
+          {{ r.status }}
+        </span>
       </div>
 
-      <h4>Chi tiết Phí:</h4>
-      <div class="detail-item">
-        <strong>Tiền sạc:</strong>
-        <span>{{ detail.EnergyCost | number: '1.0-0' }} VND</span>
-      </div>
-      <div class="detail-item">
-        <strong>Phí đỗ xe (Idle):</strong>
-        <span>{{ detail.IdleFee | number: '1.0-0' }} VND</span>
-      </div>
-      <div class="detail-item">
-        <strong>Phí quá giờ (Overstay):</strong>
-        <span>{{ detail.OverstayFee | number: '1.0-0' }} VND</span>
-      </div>
-      <div class="detail-item">
-        <strong>Giảm giá:</strong>
-        <span class="discount">-{{ detail.DiscountAmount | number: '1.0-0' }} VND</span>
+      <div class="grid sm:grid-cols-2 gap-3 text-sm text-gray-600">
+        <p>👤 Người dùng: <span class="text-gray-800 font-medium">{{ r.appUserName || 'N/A' }}</span></p>
+        <p>📅 Ngày tạo: <span class="text-gray-800">{{ r.createAt | date: 'HH:mm:ss dd/MM/yyyy' }}</span></p>
+        <p>💳 Thanh toán: <span class="text-gray-800">{{ r.paymentMethod || '---' }}</span></p>
+        <p>👨‍💼 Xác nhận: <span class="text-gray-800">{{ r.confirmedByStaffName || 'N/A' }}</span></p>
       </div>
 
-      <div *ngIf="detail.ConfirmedByStaffName" class="staff-info">
-        <hr>
-        <p>Xác nhận thanh toán (tiền mặt/thẻ) bởi <strong>{{ detail.ConfirmedByStaffName }}</strong>
-          lúc {{ detail.ConfirmedAt | date: 'dd/MM/yyyy HH:mm' }}
-        </p>
+      <hr class="my-4" />
+
+      <div class="flex justify-between items-center">
+        <span class="text-gray-700 font-medium">Tổng thanh toán</span>
+        <span class="text-xl font-bold text-blue-700">{{ r.totalCost | number }} ₫</span>
+      </div>
+
+      <div class="mt-4 text-right">
+        <button
+          class="btn btn-outline btn-sm text-blue-600 hover:bg-blue-600 hover:text-white"
+          [routerLink]="['/bien-lai', r.id]"
+        >
+          Xem chi tiết
+        </button>
       </div>
     </div>
   </div>
 
-  <ng-template #listContainer>
-    
-    <div *ngIf="paginatedReceipts$ | async as result; else loading" class="list-wrapper">
-
-      <div *ngIf="result.Items.length > 0; else emptyState" class="receipt-list-container">
-        
-        <table class="receipt-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Ngày tạo</th>
-              <th>Trạm sạc</th>
-              <th>Tổng tiền</th>
-              <th>Trạng thái</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let receipt of result.Items">
-              <td>#{{ receipt.Id }}</td>
-              <td>{{ receipt.CreateAt | date: 'dd/MM/yyyy' }}</td>
-              <td>{{ receipt.StationName || 'N/A' }}</td>
-              <td class="total-cost">{{ receipt.TotalCost | number: '1.0-0' }} VND</td>
-              <td>
-                <span class="status-badge status-{{ receipt.Status | lowercase }}">{{ receipt.Status }}</span>
-              </td>
-              <td>
-                <button (click)="viewDetails(receipt.Id)" class="view-detail-btn">
-                  Xem chi tiết
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div *ngIf="totalCount > pagingParams.PageSize" class="pagination-controls">
-          <button (click)="prevPage()" 
-                  [disabled]="pagingParams.PageNumber <= 1" 
-                  class="pagination-btn">
-            &larr; Trang trước
-          </button>
-          
-          <span class="pagination-info">
-            Trang {{ pagingParams.PageNumber }} / {{ totalPages }}
-            (Hiển thị {{ result.Items.length }} / {{ totalCount }} hóa đơn)
-          </span>
-
-          <button (click)="nextPage()" 
-                  [disabled]="pagingParams.PageNumber >= totalPages"
-                  class="pagination-btn">
-            Trang sau &rarr;
-          </button>
-        </div>
-
-      </div>
-    </div>
-    
-    <ng-template #emptyState>
-      <div class="empty-state">
-        <p>Bạn chưa có lịch sử hóa đơn nào.</p>
-      </div>
-    </ng-template>
-
-    <ng-template #loading>
-      <div class="loading-spinner">
-        <p>Đang tải dữ liệu, vui lòng chờ...</p>
-        </div>
-    </ng-template>
-    
-  </ng-template>
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-6 gap-2">
+    <button
+      class="btn btn-sm"
+      [disabled]="currentPage === 1"
+      (click)="prevPage()"
+    >
+      « Trước
+    </button>
+    <span class="text-sm text-gray-700">
+      Trang <strong>{{ currentPage }}</strong> / {{ totalPages }}
+    </span>
+    <button
+      class="btn btn-sm"
+      [disabled]="currentPage === totalPages"
+      (click)="nextPage()"
+    >
+      Sau »
+    </button>
+  </div>
 </div>
