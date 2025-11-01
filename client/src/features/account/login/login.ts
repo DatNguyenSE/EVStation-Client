@@ -30,7 +30,10 @@ export class Login {
         this.toast.success('Đăng nhập thành công!');
         if((this.accountService.currentAccount()?.roles)?.includes('Admin')){
           window.location.href = '/quan-tri-vien';
-        }else{
+        }else  if((this.accountService.currentAccount()?.roles)?.includes('Operator')){
+          window.location.href = '/nhan-vien-tram/trang-chu';
+        }
+        else{
           window.location.href = '/';
         }
         

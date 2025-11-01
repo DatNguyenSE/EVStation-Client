@@ -73,6 +73,14 @@ export class Nav implements OnInit {
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
     const role = this.accountService.currentAccount()?.roles?.[0] || '';
     this.menuItems = this.getMenuForRole(role);
+    if (this.accountService.currentAccount()?.emailConfirmed && this.accountService.currentAccount()?.roles.includes('Driver')) {
+     //chỉ driver mới chạy loadWallet & upcommingReser
+      this.driverService.loadWallet();
+      this.reservationService.LoadEventReservation().subscribe({
+        next: res => this.reservationService.upcomingReservations.set(res)
+      });
+      //LoadEventReser -> return [] 
+    }
   }
 
   onLogoClick() {
