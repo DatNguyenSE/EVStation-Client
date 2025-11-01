@@ -11,7 +11,31 @@ import { ReceiptService } from '../../core/service/receipt-service';
   styleUrl: './receipt-detail.css',
 })
 export class ReceiptDetail implements OnInit {
-  receipt?: ReceiptDetailsDto;
+  receipt: ReceiptDetailsDto = {
+    id: 0,
+    createAt: new Date().toISOString(),
+    status: 'Pending',
+    appUserId: undefined,
+    appUserName: undefined,
+    packageId: undefined,
+    packageName: undefined,
+    energyConsumed: 0,
+    energyCost: 0,
+    idleStartTime: undefined,
+    idleEndTime: undefined,
+    idleFee: 0,
+    overstayFee: 0,
+    discountAmount: 0,
+    totalCost: 0,
+    pricingName: '',
+    pricePerKwhSnapshot: 0,
+    paymentMethod: undefined,
+    confirmedByStaffId: undefined,
+    confirmedByStaffName: undefined,
+    confirmedAt: undefined,
+    chargingSessions: [],
+    walletTransactions: []
+  };
   isLoading = true;
   errorMessage = '';
   private cdr = inject(ChangeDetectorRef); 

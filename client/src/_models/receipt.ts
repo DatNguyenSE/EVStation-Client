@@ -148,8 +148,7 @@ export interface ReceiptFilterParams {
   startDate?: string; // DateTime? -> string?
   endDate?: string; // DateTime? -> string?
   isWalkInOnly?: boolean;
-  stationId?: number;
-  searchTerm?: string;
+  appUserName?: string;
 }
 
 /**

@@ -26,7 +26,7 @@ export class Receipt implements OnInit {
 
   receipts: ReceiptSummaryDto[] = [];
   currentPage = 1;
-  pageSize = 5;
+  pageSize = 10;
   totalPages = 0;
   totalItems = 0;
   isLoading = false;

@@ -10,7 +10,7 @@ import { RouterOutlet } from "@angular/router";
 })
 export class Admin {
   protected accountService = inject(AccountService);
-   activeTab = 'photos';
+  activeTab = 'photos';
   tabs = [
     {label: 'A', value: 'sss'},
     {label: 'B', value: 'yyy'},

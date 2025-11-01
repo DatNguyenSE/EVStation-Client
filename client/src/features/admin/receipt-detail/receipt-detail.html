@@ -2,7 +2,7 @@
   class="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-10 font-sans bg-gray-50"
 >
   <div class="w-full max-w-6xl">
-    <div class="min-h-screen max-w-6xl mx-auto px-4 py-10 pt-20 font-sans bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 py-10 pt-20 font-sans bg-gray-50 min-h-screen">
       <div *ngIf="isLoading" class="text-center text-gray-500 py-16">
         <span class="loading loading-spinner loading-lg text-blue-500"></span>
         <p class="mt-2 text-lg">Đang tải chi tiết...</p>
@@ -27,11 +27,11 @@
                 Thông tin Giao dịch
               </h3>
               <span
-                class="badge badge-sm font-semibold"
+                class="px-3 py-1 rounded-full text-xs font-bold"
                 [ngClass]="{
-                  'badge-success badge-outline': receipt.status === 'Paid',
-                  'badge-error badge-outline': receipt.status === 'Refunded',
-                  'badge-ghost': receipt.status === 'Pending'
+                  'bg-green-100 text-green-800': receipt.status === 'Paid',
+                  'bg-red-100 text-red-800': receipt.status === 'Refunded',
+                  'bg-gray-100 text-gray-800': receipt.status === 'Pending'
                 }"
               >
                 {{ receipt.status }}
@@ -39,19 +39,25 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
               <div>
-                <label class="block text-sm font-medium text-gray-500">ID Biên lai</label>
-                <p class="text-base font-semibold text-gray-800">#{{ receipt.id }}</p>
+                <label class="block text-sm font-medium text-gray-500">Khách hàng</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.appUserName || 'N/A' }}
+                </p>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-500">Phương thức TT</label>
-                <p class="text-base font-semibold text-gray-800">
-                  {{ receipt.paymentMethod || '---' }}
-                </p>
+                <label class="block text-sm font-medium text-gray-500">ID Biên lai</label>
+                <p class="text-base font-semibold text-gray-800">#{{ receipt.id }}</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-500">Ngày tạo</label>
                 <p class="text-base font-semibold text-gray-800">
                   {{ receipt.createAt | date : 'HH:mm:ss dd/MM/yyyy' }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Phương thức TT</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.paymentMethod || '---' }}
                 </p>
               </div>
             </div>
@@ -90,46 +96,6 @@
                 </p>
               </div>
             </div>
-            <div *ngIf="receipt.chargingSessions.length > 0">
-              <hr class="my-4 border-gray-200" />
-              <h4 class="text-sm font-semibold mb-2 text-gray-700">Chi tiết các lần sạc:</h4>
-              <ul class="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                <li *ngFor="let s of receipt.chargingSessions">
-                  Trụ <strong>{{ s.chargingPostCode }}</strong> —
-                  <span class="font-medium text-gray-900">{{ s.energyUsed }} kWh</span>
-                  ({{ s.startTime | date : 'short' }} → {{ s.endTime | date : 'short' }})
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div
-            *ngIf="receipt.walletTransactions.length > 0"
-            class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-          >
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <i class="bi bi-wallet2 text-blue-600"></i>
-              Giao dịch Ví liên quan
-            </h3>
-            <ul class="space-y-2 text-sm text-gray-700">
-              <li
-                *ngFor="let t of receipt.walletTransactions"
-                class="flex justify-between items-center"
-              >
-                <div>
-                  <p class="font-semibold text-gray-800">{{ t.type }}</p>
-                  <p class="text-xs text-gray-500">
-                    {{ t.transactionDate | date : 'short' }} - {{ t.description }}
-                  </p>
-                </div>
-                <span
-                  class="font-semibold"
-                  [ngClass]="t.amount > 0 ? 'text-green-600' : 'text-red-600'"
-                >
-                  {{ t.amount | number }} ₫
-                </span>
-              </li>
-            </ul>
           </div>
         </div>
 
@@ -149,7 +115,7 @@
                 <span>{{ receipt.idleFee | number }} ₫</span>
               </div>
               <div class="flex justify-between">
-                H <span>Phí quá giờ</span>
+                <span>Phí quá giờ</span>
                 <span>{{ receipt.overstayFee | number }} ₫</span>
               </div>
               <div class="flex justify-between">
@@ -167,8 +133,91 @@
               <p class="text-2xl font-bold text-blue-700">{{ receipt.totalCost | number }} ₫</p>
             </div>
           </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+              <i class="bi bi-gear text-blue-600"></i>
+              Hành động
+            </h3>
+            <div class="flex flex-col gap-3">
+              <button
+                class="btn btn-warning text-white w-full"
+                (click)="openCancelModal()"
+                [disabled]="receipt.status === 'Refunded' || receipt.status === 'Cancelled'"
+              >
+                Hủy hóa đơn
+              </button>
+
+              <button
+                class="btn btn-error text-white w-full"
+                (click)="openRefundModal()"
+                [disabled]="receipt.status !== 'Paid'"
+              >
+                Hoàn tiền
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <dialog #cancelDialog class="modal">
+      <form method="dialog" class="modal-box bg-white">
+        <h3 class="font-bold text-lg mb-4 text-yellow-600">
+          <i class="bi bi-exclamation-triangle-fill"></i> Hủy hóa đơn
+        </h3>
+        <p class="text-sm text-gray-600 mb-3">
+          Bạn có chắc chắn muốn hủy hóa đơn này? Hành động này không thể hoàn tác.
+        </p>
+        <label class="block text-sm font-medium text-gray-600 mb-1"
+          >Nhập lý do hủy (bắt buộc):</label
+        >
+        <textarea
+          [(ngModel)]="cancelReason"
+          name="cancelReason"
+          class="textarea textarea-bordered w-full"
+          rows="3"
+          placeholder="VD: Hóa đơn tạo nhầm"
+        ></textarea>
+        <div class="mt-5 flex justify-end gap-3">
+          <button class="btn btn-sm btn-ghost" (click)="closeCancelModal()">Đóng</button>
+          <button class="btn btn-sm btn-warning text-white" (click)="confirmCancel()">
+            Xác nhận Hủy
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog #refundDialog class="modal">
+      <form method="dialog" class="modal-box bg-white">
+        <h3 class="font-bold text-lg mb-4 text-red-600">
+          <i class="bi bi-arrow-counterclockwise"></i> Thực hiện Hoàn tiền
+        </h3>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Số tiền hoàn:</label>
+        <input
+          type="number"
+          [(ngModel)]="refundAmount"
+          name="refundAmount"
+          placeholder="Số tiền hoàn"
+          class="input input-bordered w-full mb-3"
+        />
+        <label class="block text-sm font-medium text-gray-600 mb-1"
+          >Lý do hoàn tiền (bắt buộc):</label
+        >
+        <textarea
+          [(ngModel)]="refundReason"
+          name="refundReason"
+          class="textarea textarea-bordered w-full"
+          rows="3"
+          placeholder="VD: Khách hàng khiếu nại"
+        ></textarea>
+        <div class="mt-5 flex justify-end gap-3">
+          <button class="btn btn-sm btn-ghost" (click)="closeRefundModal()">Đóng</button>
+          <button class="btn btn-sm btn-error text-white" (click)="confirmRefund()">
+            Xác nhận Hoàn tiền
+          </button>
+        </div>
+      </form>
+    </dialog>
   </div>
 </div>

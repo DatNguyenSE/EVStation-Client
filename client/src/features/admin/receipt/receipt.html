@@ -2,11 +2,55 @@
   class="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-10 font-sans bg-gray-50"
 >
   <div class="w-full max-w-6xl">
-    <div class="min-h-screen max-w-7xl mx-auto px-4 py-8 pt-24">
-      <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-        <i class="bi bi-receipt-cutoff text-blue-600"></i>
-        Lịch sử Biên lai
-      </h2>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div [class]="'flex justify-between items-center mb-6'">
+        <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+          <i class="bi bi-receipt-cutoff text-blue-600"></i>
+          Quản lý biên lai
+        </h2>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Trạng thái</label>
+            <select [(ngModel)]="filter.status" class="select select-bordered w-full">
+              <option value="">Tất cả</option>
+              <option value="Paid">Đã thanh toán</option>
+              <option value="Refunded">Đã hoàn tiền</option>
+              <option value="Pending">Đang chờ</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Từ ngày</label>
+            <input type="date" [(ngModel)]="filter.startDate" class="input input-bordered w-full" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Đến ngày</label>
+            <input type="date" [(ngModel)]="filter.endDate" class="input input-bordered w-full" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Tên người dùng</label>
+            <input
+              type="text"
+              [(ngModel)]="filter.appUserName"
+              placeholder="Nhập tên người dùng"
+              class="input input-bordered w-full"
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-4">
+          <button class="btn btn-ghost btn-sm" (click)="resetFilter()">Đặt lại</button>
+          <button class="btn btn-primary btn-sm" (click)="applyFilter()">
+            <i class="bi bi-funnel-fill"></i>
+            Lọc
+          </button>
+        </div>
+      </div>
 
       <div *ngIf="isLoading" class="text-center text-gray-500 py-12">
         <span class="loading loading-spinner loading-lg text-blue-500"></span>
@@ -18,8 +62,8 @@
         class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl"
       >
         <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-700">Bạn chưa có biên lai nào</h3>
-        <p class="text-gray-500">Tất cả biên lai sau khi sạc sẽ xuất hiện ở đây.</p>
+        <h3 class="text-xl font-semibold text-gray-700">Không tìm thấy biên lai</h3>
+        <p class="text-gray-500">Hãy thử thay đổi bộ lọc của bạn.</p>
       </div>
 
       <div
@@ -30,12 +74,10 @@
           <table class="table w-full">
             <thead>
               <tr class="bg-gray-50">
-                <th class="font-semibold text-gray-700">Mã hóa đơn</th>
+                <th class="font-semibold text-gray-700">ID Biên lai</th>
                 <th class="font-semibold text-gray-700">Gói dịch vụ</th>
                 <th class="font-semibold text-gray-700">Ngày tạo</th>
                 <th class="font-semibold text-gray-700">Trạng thái</th>
-                <th class="font-semibold text-gray-700">Thanh toán</th>
-                <th class="font-semibold text-gray-700">Xác nhận bởi</th>
                 <th class="font-semibold text-gray-700 text-right">Tổng chi phí</th>
                 <th class="font-semibold text-gray-700"></th>
               </tr>
@@ -44,11 +86,10 @@
               <tr *ngFor="let r of receipts" class="hover:bg-gray-50">
                 <td>
                   <div class="font-semibold text-gray-800">#{{ r.id }}</div>
+                  <div class="text-xs text-gray-500">{{ r.appUserName }}</div>
                 </td>
                 <td class="text-gray-700">{{ r.pricingName }}</td>
-                <td class="text-gray-700">
-                  {{ r.createAt | date : 'HH:mm dd/MM/yyyy' }}
-                </td>
+                <td class="text-gray-700">{{ r.createAt | date : 'dd/MM/yyyy' }}</td>
                 <td>
                   <span
                     class="badge badge-sm font-semibold"
@@ -61,17 +102,13 @@
                     {{ r.status }}
                   </span>
                 </td>
-                <td class="text-gray-700">{{ r.paymentMethod || '---' }}</td>
-                <td class="text-gray-700">
-                  {{ r.confirmedByStaffName || 'N/A' }}
-                </td>
                 <td class="font-semibold text-blue-700 text-right">{{ r.totalCost | number }} ₫</td>
                 <td class="text-right">
                   <button
                     class="btn btn-ghost btn-sm text-blue-600"
-                    [routerLink]="['/bien-lai', r.id]"
+                    [routerLink]="['/quan-tri-vien/bien-lai', r.id]"
                   >
-                    Xem chi tiết
+                    Xem
                   </button>
                 </td>
               </tr>

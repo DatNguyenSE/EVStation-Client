@@ -29,6 +29,8 @@ import { Transaction } from '../features/admin/transaction/transaction';
 import { Receipt } from '../features/receipt/receipt';
 import { ReceiptDetail } from '../features/receipt-detail/receipt-detail';
 import { Operator } from '../features/operator/operator';
+import { ReceiptAdmin } from '../features/admin/receipt/receipt';
+import { ReceiptDetailAdmin } from '../features/admin/receipt-detail/receipt-detail';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -74,6 +76,8 @@ export const routes: Routes = [
              {path:'quan-ly-tram',component:ManagerStation},
              {path:'bao-cao',component:Report},
              {path:'lich-su-giao-dich',component:Transaction},
+             {path:'bien-lai',component:ReceiptAdmin},
+             {path:'bien-lai/:id',component:ReceiptDetailAdmin}
         ]
     },
     {
