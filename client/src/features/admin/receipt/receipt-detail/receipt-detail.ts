@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ReceiptService } from '../../../core/service/receipt-service';
-import { ReceiptDetailsDto } from '../../../_models/receipt';
+import { ReceiptService } from '../../../../core/service/receipt-service';
+import { ReceiptDetailsDto } from '../../../../_models/receipt';
 import { FormsModule } from '@angular/forms';
-import { clearHttpCache } from '../../../core/interceptors/loading-interceptor';
+import { clearHttpCache } from '../../../../core/interceptors/loading-interceptor';
 
 @Component({
   selector: 'app-receipt-detail',
@@ -114,7 +114,7 @@ export class ReceiptDetailAdmin implements OnInit{
           clearHttpCache();
           this.router.navigate(['/quan-tri-vien/bien-lai'], { queryParams: { refresh: Date.now() } });
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error(err);
           alert('Không thể hoàn tiền.');
         },

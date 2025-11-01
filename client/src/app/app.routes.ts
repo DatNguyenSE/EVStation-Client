@@ -30,7 +30,7 @@ import { Receipt } from '../features/receipt/receipt';
 import { ReceiptDetail } from '../features/receipt/receipt-detail/receipt-detail';
 import { Operator } from '../features/operator/operator';
 import { ReceiptAdmin } from '../features/admin/receipt/receipt';
-import { ReceiptDetailAdmin } from '../features/admin/receipt-detail/receipt-detail';
+import { ReceiptDetailAdmin } from '../features/admin/receipt/receipt-detail/receipt-detail';
 import QRCode from '@zxing/library/esm/core/qrcode/encoder/QRCode';
 import { QrCodeComponent } from '../features/qr-code/qr-code';
 
