@@ -1,5 +1,5 @@
 
-export type Post = {
+export interface Post  {
     id: string,
     stationId: string;
     code: string,

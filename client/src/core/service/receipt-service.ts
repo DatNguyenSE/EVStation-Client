@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import {
   CancelRequestDto,
   PaginatedResult,
@@ -10,11 +9,11 @@ import {
   ReceiptSummaryDto,
   RefundRequestDto,
 } from '../../_models/receipt';
-import { ReceiptDetail } from '../../features/receipt-detail/receipt-detail';
+
 
 @Injectable({ providedIn: 'root' })
 export class ReceiptService {
-  // 📌 Base URL lấy từ environment để dễ cấu hình khi deploy
+  //  Base URL lấy từ environment để dễ cấu hình khi deploy
   private baseUrl = 'https://localhost:5001/api/receipts';
 
   constructor(private http: HttpClient) {}

@@ -27,10 +27,12 @@ import { ManagerStation } from '../features/admin/manager-station/manager-statio
 import { Report } from '../features/admin/report/report';
 import { Transaction } from '../features/admin/transaction/transaction';
 import { Receipt } from '../features/receipt/receipt';
-import { ReceiptDetail } from '../features/receipt-detail/receipt-detail';
+import { ReceiptDetail } from '../features/receipt/receipt-detail/receipt-detail';
 import { Operator } from '../features/operator/operator';
 import { ReceiptAdmin } from '../features/admin/receipt/receipt';
 import { ReceiptDetailAdmin } from '../features/admin/receipt-detail/receipt-detail';
+import QRCode from '@zxing/library/esm/core/qrcode/encoder/QRCode';
+import { QrCodeComponent } from '../features/qr-code/qr-code';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -62,7 +64,8 @@ export const routes: Routes = [
             {path:'datcho',component:Reservation},
             {path:'lichsugiaodich',component:Transactions},
             {path:'bien-lai',component:Receipt},
-            {path:'bien-lai/:id',component:ReceiptDetail}
+            {path:'bien-lai/:id',component:ReceiptDetail},
+            { path:'quet-ma',component: QrCodeComponent}
         ]
     },
     {

@@ -1,9 +1,14 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 import { DecimalPipe, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DtoStation, Post } from '../../_models/station';
 import { StationService } from '../../core/service/station-service';
-import { switchMap, tap } from 'rxjs';
+import { ChargingSessionService } from '../../core/service/charging-service';
+import { ChargingHubService } from '../../core/service/charging-hub-service';
+import { DtoStation, Post } from '../../_models/station';
+
+import { Subscription } from 'rxjs';
+import { ToastService } from '../../core/service/toast-service';
+
 @Component({
   selector: 'app-charging-dashboard',
   standalone: true,
@@ -12,83 +17,142 @@ import { switchMap, tap } from 'rxjs';
   styleUrl: './charging-dashboard.css'
 })
 export class ChargingDashboard implements OnInit, OnDestroy {
+  // === Inject services ===
+  private chargingService = inject(ChargingSessionService);
+  private hubService = inject(ChargingHubService);
+  private route = inject(ActivatedRoute);
+  protected router = inject(Router);
+  private stationService = inject(StationService);
+  protected isStopping = false;
+  private toast = inject(ToastService);
+  
+  // === Trạng thái ===
   idPost!: string;
-  route = inject(ActivatedRoute)
-  stationService = inject(StationService);
-  currentPost = signal<Post | null>(null);
-  currentStation = signal<DtoStation | null> (null);
-  router = inject(Router)
+  postInfo!: Post;
+  sessionId!: number;
+  currentStation = signal<DtoStation | null>(null);
   errorMessage = signal<string | null>(null);
+  private cdr = inject(ChangeDetectorRef);
 
-validateScan() {
-  this.stationService.validateScan(this.idPost).subscribe({
-    next: response => {
-      if (response.status === 200) {
-        console.log(' Validate thành công', response.body);
-        this.errorMessage.set(null); // clear lỗi nếu có
-      }
-    },
-    error: err => {
-      if (err.status === 409) {
-        console.error('Validate lỗi:', err.error?.message);
-        this.errorMessage.set(err.error?.message || 'Có lỗi xảy ra');
-      } else {
-        console.error(' Lỗi khác:', err);
-        this.errorMessage.set('Không thể kết nối đến server');
-      }
-    }
-  });
-}
-  // Dữ liệu sạc động
-  pricePerKwh = 4000; // VNĐ
+  // === Dữ liệu realtime ===
   chargedKwh = 0;
   totalPrice = 0;
-  batteryPercent = 20;
-  chargingInterval: any;
-  timeElapsed = 0; // giây
+  batteryPercent = 0;
+  timeRemain = 0;
+
+  // === Đăng ký lắng nghe realtime ===
+  private realtimeSub?: Subscription;
+  private stopSub?: Subscription;
+  private fullSub?: Subscription;
 
   ngOnInit() {
-    this.startChargingSimulation();
     this.idPost = this.route.snapshot.paramMap.get('idPost')!;
-    this.getPostById();
-    this.validateScan();
+    this.getPostInfo();
   }
 
-  startChargingSimulation() {
-    this.chargingInterval = setInterval(() => {
-      this.timeElapsed += 5; // 5 giây mỗi tick
-      this.chargedKwh += 0.05; // giả lập tăng dần
-      this.totalPrice = this.chargedKwh * this.pricePerKwh;
-      this.batteryPercent = Math.min(100, this.batteryPercent + 0.5);
-    }, 1000);
+  // --- Lấy thông tin trụ, trạm ---
+  getPostInfo() {
+    this.stationService.getPostById(this.idPost).subscribe({
+      next: res => {
+        this.postInfo = res;
+        this.getStationInfo(this.postInfo.stationId);
+
+        if (this.postInfo.status === 'Available') {
+          this.startSession();
+        } else {
+          this.errorMessage.set('Trụ đang bận hoặc không sẵn sàng.');
+        }
+      },
+      error: err => {
+        console.error('Lỗi lấy thông tin trụ:', err);
+        this.errorMessage.set('Không thể tải thông tin trụ sạc.');
+      }
+    });
+  }
+
+  // thông tin trạm 
+  getStationInfo(idStation: string) {
+    this.stationService.getStationByid(idStation).subscribe({
+      next: res => this.currentStation.set(res),
+      error: err => console.error('Lỗi khi lấy thông tin trạm:', err)
+    });
+  }
+
+  // --- Bắt đầu phiên sạc ---
+  //code cứng
+  startSession() {
+    this.chargingService.startSession({
+      postId: Number(this.idPost),
+      vehicleId: 1,
+      vehiclePlate: '68C1-10368',
+      reservationId: 1
+    }).subscribe({
+      next: session => {
+        console.log(' Phiên sạc bắt đầu:', session);
+        this.sessionId = session.id;
+
+        //  Kết nối SignalR
+        this.hubService.startConnection();
+        setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
+
+        // Lắng nghe realtime từ Hub
+        this.realtimeSub = this.hubService.chargingUpdate$.subscribe(data => {
+          if (!data) return;
+          console.log(' Dữ liệu realtime:', data);
+
+          // Đồng bộ với key từ backend
+          this.batteryPercent = data.batteryPercentage ?? this.batteryPercent;
+          this.chargedKwh = data.energyConsumed ?? this.chargedKwh;
+          this.totalPrice = data.cost ?? this.totalPrice;
+          this.timeRemain = data.timeRemain ?? this.timeRemain;
+
+          this.cdr.detectChanges();
+        });
+        // Khi phiên bị dừng
+        this.stopSub = this.hubService.sessionStopped$.subscribe(id => {
+          console.warn(`Phiên sạc ${id} đã dừng.`);
+        });
+
+        // Khi sạc đầy
+        this.fullSub = this.hubService.sessionCompleted$.subscribe(id => {
+          console.log(`Phiên sạc ${id} đã đầy pin.`);
+        });
+      },
+      error: err => {
+        console.error('Start session failed:', err);
+        this.errorMessage.set('Không thể bắt đầu phiên sạc.');
+      }
+    });
+  }
+
+
+  pressEndSession() {
+    if (!this.sessionId) return;
+
+    const confirmed = confirm('Bạn có chắc muốn dừng phiên sạc này không?');
+    if (!confirmed) return;
+
+    this.isStopping = true;
+    this.cdr.detectChanges();
+
+    this.chargingService.stopSession(this.sessionId).subscribe({
+      next: () => {
+        this.isStopping = false;
+        this.cdr.detectChanges();
+        this.toast.success('Đã dừng sạc thành công ');
+      },
+      error: () => {
+        this.isStopping = false;
+        this.cdr.detectChanges();
+        this.toast.error('Dừng sạc thất bại');
+      }
+    });
   }
 
   ngOnDestroy() {
-    clearInterval(this.chargingInterval);
+    if (this.sessionId) this.hubService.leaveSession(this.sessionId);
+    this.realtimeSub?.unsubscribe();
+    this.stopSub?.unsubscribe();
+    this.fullSub?.unsubscribe();
   }
-
-  getPostById() {
-    console.log('🟢 Gửi validate với postId:', this.idPost); // 👉 in ra xem có đúng là "11" không
-  this.stationService.getPostById(this.idPost).pipe(
-    tap(post => {
-      console.log(' Nhận được post:', post);
-      this.currentPost.set(post);
-    }),
-
-    switchMap(post => {
-      console.log('Gọi stationId:', post.stationId);
-      return this.stationService.getStationByid(post.stationId);
-    }),
-    tap(station => {
-      console.log(' Nhận được station:', station);
-      this.currentStation.set(station);
-    })
-  ).subscribe({
-    next: () => console.log('Đã load post + station'),
-    error: err => {
-      console.error(' Lỗi khi load post/station:', err);
-      console.error(' idPost:', this.idPost);
-    }
-  });
-}
 }

@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { ReceiptDetailsDto } from '../../_models/receipt';
+import { ReceiptDetailsDto } from '../../../_models/receipt';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReceiptService } from '../../core/service/receipt-service';
+import { ReceiptService } from '../../../core/service/receipt-service';
 
 @Component({
   selector: 'app-receipt-detail',

@@ -30,14 +30,13 @@ export class Nav implements OnInit {
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
 
-  /** 🧩 Lấy danh sách menu theo role hiện tại */
+  /**  Lấy danh sách menu theo role hiện tại */
 
   getMenuForRole(role: string) {
   const menus: Record<string, { label: string; link: string}[]> = {
     Driver: [
       { label: 'Dịch vụ', link: '/dich-vu' },
-      { label: 'Thanh toán', link: '/thanh-toan' },
-      { label: 'Sự kiện', link: '/su-kien' },
+      { label: 'Nạp tiền', link: '/thanh-toan' },
       { label: 'Biên lai', link: '/bien-lai' },
     ],
     Admin: [
