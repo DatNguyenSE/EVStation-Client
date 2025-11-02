@@ -8,7 +8,7 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
-import { InitService } from '../../core/service/init-service';
+
 
 @Component({
   selector: 'app-nav',
@@ -19,8 +19,7 @@ import { InitService } from '../../core/service/init-service';
 })
 
 export class Nav implements OnInit {
-  private initService = inject(InitService)
-  private router = inject(Router);
+  menuItems: { label: string; link: string }[] = [];
 
   accountService = inject(AccountService);
   protected creds: any = {}
@@ -31,14 +30,14 @@ export class Nav implements OnInit {
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
 
-  /** 🧩 Lấy danh sách menu theo role hiện tại */
+  /**  Lấy danh sách menu theo role hiện tại */
 
   getMenuForRole(role: string) {
   const menus: Record<string, { label: string; link: string}[]> = {
     Driver: [
       { label: 'Dịch vụ', link: '/dich-vu' },
-      { label: 'Thanh toán', link: '/thanh-toan' },
-      { label: 'Sự kiện', link: '/su-kien' },
+      { label: 'Nạp tiền', link: '/thanh-toan' },
+      { label: 'Biên lai', link: '/bien-lai' },
     ],
     Admin: [
       { label: 'Bảng điều khiển', link: '/quan-tri-vien/dashboard' },
@@ -46,6 +45,7 @@ export class Nav implements OnInit {
       { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
       { label: 'Giao dịch', link: '/quan-tri-vien/lich-su-giao-dich' },
       { label: 'Báo cáo', link: '/quan-tri-vien/bao-cao' },
+      { label: 'Biên lai', link: '/quan-tri-vien/bien-lai' },
     ],
   };
   return menus[role] ?? [];
@@ -70,12 +70,20 @@ export class Nav implements OnInit {
   }
 
   ngOnInit(): void {
-
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
+    const role = this.accountService.currentAccount()?.roles?.[0] || '';
+    this.menuItems = this.getMenuForRole(role);
+    if (this.accountService.currentAccount()?.emailConfirmed && this.accountService.currentAccount()?.roles.includes('Driver')) {
+     //chỉ driver mới chạy loadWallet & upcommingReser
+      this.driverService.loadWallet();
+      this.reservationService.LoadEventReservation().subscribe({
+        next: res => this.reservationService.upcomingReservations.set(res)
+      });
+      //LoadEventReser -> return [] 
+    }
   }
 
   onLogoClick() {
-    
     const acc = this.accountService.currentAccount()?.roles;
     if (acc?.includes('Admin')) {
       window.location.href = '/quan-tri-vien';
@@ -87,6 +95,8 @@ export class Nav implements OnInit {
   }
 
   logout() {
+    this.reservationService.upcomingReservations.set([]);
+    this.driverService.walletBalance.set(0);
     this.accountService.logout();
   }
 

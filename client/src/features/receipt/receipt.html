@@ -1,0 +1,100 @@
+<div
+  class="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-10 font-sans bg-gray-50"
+>
+  <div class="w-full max-w-6xl">
+    <div class="min-h-screen max-w-7xl mx-auto px-4 py-8 pt-24">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+        <i class="bi bi-receipt-cutoff text-blue-600"></i>
+        Lịch sử Biên lai
+      </h2>
+
+      <div *ngIf="isLoading" class="text-center text-gray-500 py-12">
+        <span class="loading loading-spinner loading-lg text-blue-500"></span>
+        <p class="mt-2 text-lg">Đang tải dữ liệu...</p>
+      </div>
+
+      <div
+        *ngIf="!isLoading && receipts.length === 0"
+        class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl"
+      >
+        <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700">Bạn chưa có biên lai nào</h3>
+        <p class="text-gray-500">Tất cả biên lai sau khi sạc sẽ xuất hiện ở đây.</p>
+      </div>
+
+      <div
+        *ngIf="!isLoading && receipts.length > 0"
+        class="bg-white rounded-xl shadow-sm border border-gray-100"
+      >
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="font-semibold text-gray-700">Mã hóa đơn</th>
+                <th class="font-semibold text-gray-700">Gói dịch vụ</th>
+                <th class="font-semibold text-gray-700">Ngày tạo</th>
+                <th class="font-semibold text-gray-700">Trạng thái</th>
+                <th class="font-semibold text-gray-700">Thanh toán</th>
+                <th class="font-semibold text-gray-700">Xác nhận bởi</th>
+                <th class="font-semibold text-gray-700 text-right">Tổng chi phí</th>
+                <th class="font-semibold text-gray-700"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of receipts" class="hover:bg-gray-50">
+                <td>
+                  <div class="font-semibold text-gray-800">#{{ r.id }}</div>
+                </td>
+                <td class="text-gray-700">{{ r.pricingName }}</td>
+                <td class="text-gray-700">
+                  {{ r.createAt | date : 'HH:mm dd/MM/yyyy' }}
+                </td>
+                <td>
+                  <span
+                    class="badge badge-sm font-semibold"
+                    [ngClass]="{
+                      'badge-success badge-outline': r.status === 'Paid',
+                      'badge-error badge-outline': r.status === 'Refunded',
+                      'badge-ghost': r.status === 'Pending'
+                    }"
+                  >
+                    {{ r.status }}
+                  </span>
+                </td>
+                <td class="text-gray-700">{{ r.paymentMethod || '---' }}</td>
+                <td class="text-gray-700">
+                  {{ r.confirmedByStaffName || 'N/A' }}
+                </td>
+                <td class="font-semibold text-blue-700 text-right">{{ r.totalCost | number }} ₫</td>
+                <td class="text-right">
+                  <button
+                    class="btn btn-ghost btn-sm text-blue-600"
+                    [routerLink]="['/bien-lai', r.id]"
+                  >
+                    Xem chi tiết
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="totalPages > 1 && !isLoading" class="flex justify-center items-center mt-8 gap-4">
+        <div class="join">
+          <button class="join-item btn btn-sm" [disabled]="currentPage === 1" (click)="prevPage()">
+            «
+          </button>
+          <button class="join-item btn btn-sm">Trang {{ currentPage }} / {{ totalPages }}</button>
+          <button
+            class="join-item btn btn-sm"
+            [disabled]="currentPage === totalPages"
+            (click)="nextPage()"
+          >
+            »
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

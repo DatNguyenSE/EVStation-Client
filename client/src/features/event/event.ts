@@ -14,40 +14,54 @@ import { ReservationService } from '../../core/service/reservation-service';
 })
 export class Event implements OnInit{
   driverService = inject(DriverService);
-  reservations = signal<eventReservation[] | null> (null);
   reservationSvc = inject(ReservationService);
   cdf = inject(ChangeDetectorRef)
-
-  constructor(private route: ActivatedRoute) {}
+  reservations = signal<eventReservation[]>([]);
+  route = inject(ActivatedRoute);
   
   ngOnInit(): void {
-  this.reservationSvc.LoadEventReservation().subscribe({
-    next: res => this.reservations.set(res)
-  });
+    this.loadReservations();
+  }
+
+  loadReservations(): void {
+    this.reservationSvc.LoadEventReservation().subscribe({
+      next: res => {
+        this.reservations.set(res);
+        this.cdf.detectChanges(); // đảm bảo render lần đầu
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   tatusBadgeClasses(status: string) {
-const base = 'text-white';
-switch ((status || '').toLowerCase()) {
-case 'confirmed':
-return base + ' bg-emerald-500';
-case 'cancelled':
-case 'canceled':
-return base + ' bg-red-500';
-case 'pending':
-return base + ' bg-yellow-500';
-default:
-return base + ' bg-gray-500';
-}
-}
-
-cancelReservation(reservation : string){
-  if(!confirm('Bạn có chắc muốn hủy đặt chỗ này không?')) return;
-    this.reservationSvc.cancelReservation(reservation).subscribe({
-  next: () => {
-    this.reservationSvc.LoadEventReservation().subscribe(res => this.reservations.set(res));
+    const base = 'text-white';
+    switch ((status || '').toLowerCase()) {
+    case 'confirmed':
+    return base + ' bg-emerald-500';
+    case 'cancelled':
+    case 'canceled':
+    return base + ' bg-red-500';
+    case 'pending':
+    return base + ' bg-yellow-500';
+    default:
+    return base + ' bg-gray-500';
+    }
   }
-});
 
-}
+  cancelReservation(reservationId: string): void {
+    if (!confirm('Bạn có chắc muốn hủy đặt chỗ này không?')) return;
+
+    this.reservationSvc.cancelReservation(reservationId).subscribe({
+      next: () => {
+        // ✅ Xóa phần tử vừa hủy khỏi danh sách hiện tại
+        this.reservations.update(list => list.filter(r => r.id !== reservationId));
+        
+        // Không cần gọi lại LoadEventReservation(), vì BE đã không trả đơn bị hủy
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Không thể hủy đặt chỗ. Vui lòng thử lại.');
+      }
+    });
+  }
 }

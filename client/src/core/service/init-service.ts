@@ -18,10 +18,13 @@ export class InitService {
     const accountString = localStorage.getItem('account');
     if(!accountString) return of(null);
     const account = JSON.parse(accountString);
-    this.accountService.setCurrentUser(account);
+    this.accountService.setCurrentAccount(account);
     const currentUrl = this.router.url;
-      if (account.role === 'Admin' && !currentUrl.startsWith('/quan-tri-vien')) {
+      if (this.accountService.currentAccount()?.roles.includes('Admin')  && !currentUrl.startsWith('/quan-tri-vien')) {
         this.router.navigate(['/quan-tri-vien']);
+      }
+      if (this.accountService.currentAccount()?.roles.includes('Operator')  && !currentUrl.startsWith('/quan-tri-vien')) {
+        this.router.navigate(['/nhan-vien-tram/trang-chu']);
       }
     //signalR 
     if(this.presenceService.hubConnection?.state !== HubConnectionState.Connected) {

@@ -1,96 +1,105 @@
-<!-- Nền -->
-<div
-  class="fixed inset-0 bg-cover bg-center -z-10 w-full h-full"
-  style="
-    background-image: url('/assets/background/nen-tram-sac-xe-dien.png');
-    filter: brightness(0.45) blur(4px);
-  "
-></div>
+<div class="min-h-screen bg-gray-50 font-sans flex flex-col">
+  <div class="w-full max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Lịch sử Giao dịch</h2>
 
-<!-- Container toàn trang -->
-<div class="min-h-screen flex flex-col">
-  <!-- Nội dung chính -->
-  <main class="flex-1 flex flex-col items-center justify-start py-10 px-6">
-    <div class="w-full max-w-6xl">
-      <h2 class="text-3xl font-bold text-white text-center mb-10 drop-shadow-lg">
-        Lịch sử giao dịch
-      </h2>
-
-      <!-- Nếu có lỗi -->
-      <div
-        *ngIf="message"
-        class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-      >
-        {{ message }}
-      </div>
-
-      <!-- Danh sách giao dịch -->
-      <div
-        *ngIf="transaction?.length; else noData"
-        class="flex flex-col gap-5 w-full max-w-5xl mx-auto"
-      >
-        <div
-          *ngFor="let t of transaction"
-          class="w-full bg-white/90 backdrop-blur-sm border-l-4 shadow-sm rounded-xl p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center transition-transform hover:scale-[1.01] hover:shadow-md"
-          [ngClass]="{
-            'border-l-green-500': t.status === 'Success',
-            'border-l-yellow-400': t.status === 'Pending',
-            'border-l-red-500': t.status === 'Failed',
-            'border-l-gray-400': t.status === 'Canceled'
-          }"
-        >
-          <!-- Phần thông tin chính -->
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ t.transactionType }}</h3>
-            <p
-              class="text-lg font-semibold mb-1 transition-transform duration-200"
-              [ngClass]="{
-                'text-green-600': t.transactionType === 'Topup' || t.transactionType === 'Refund',
-                'text-red-600': t.transactionType !== 'Topup' && t.transactionType !== 'Refund'
-              }"
-            >
-              <span *ngIf="t.transactionType === 'Topup' || t.transactionType === 'Refund'">+</span>
-              <span *ngIf="t.transactionType !== 'Topup' && t.transactionType !== 'Refund'">−</span>
-              {{ t.amount | currency : 'VND' : 'symbol' : '1.0-0' }}
-            </p>
-
-            <p class="text-sm text-gray-500">
-              Số dư trước: {{ t.balanceBefore | currency : 'VND' : 'symbol' : '1.0-0' }}
-            </p>
-            <p class="text-sm text-gray-500">
-              Số dư sau: {{ t.balanceAfter | currency : 'VND' : 'symbol' : '1.0-0' }}
-            </p>
-            <p class="text-sm italic text-gray-600 mt-2">
-              {{ t.description || 'Không có mô tả' }}
-            </p>
-          </div>
-
-          <!-- Phần trạng thái và thời gian -->
-          <div class="text-right mt-3 sm:mt-0">
-            <span
-              class="inline-block px-3 py-1 rounded-full text-sm font-medium mb-2"
-              [ngClass]="{
-                'bg-green-200 text-green-800': t.status === 'Success',
-                'bg-yellow-200 text-yellow-800': t.status === 'Pending',
-                'bg-red-200 text-red-800': t.status === 'Failed',
-                'bg-gray-200 text-gray-700': t.status === 'Canceled'
-              }"
-            >
-              {{ t.status }}
-            </span>
-            <p class="text-xs text-gray-400">
-              {{ t.createdAt | date : 'dd/MM/yyyy HH:mm' }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Không có dữ liệu -->
-      <ng-template #noData>
-        <div class="text-center text-gray-200 italic py-10 text-lg">
-          Không có giao dịch nào để hiển thị.
-        </div>
-      </ng-template>
+    <div *ngIf="isLoading" class="text-center py-16 text-gray-500">
+      <span class="loading loading-spinner loading-lg text-blue-500"></span>
+      <p class="mt-2 text-lg">Đang tải...</p>
     </div>
-  </main>
+
+    <div *ngIf="!isLoading && errorMessage" class="text-center text-red-500 py-16">
+      {{ errorMessage }}
+    </div>
+
+    <div
+      *ngIf="!isLoading && transactions.length === 0"
+      class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl"
+    >
+      <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
+      <h3 class="text-xl font-semibold text-gray-700">Không có giao dịch</h3>
+      <p class="text-gray-500">Tất cả giao dịch của bạn sẽ xuất hiện ở đây.</p>
+    </div>
+
+    <div
+      *ngIf="!isLoading && transactions.length > 0"
+      class="bg-white rounded-xl shadow-sm border border-gray-100"
+    >
+      <div class="overflow-x-auto">
+        <table class="table w-full">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="font-semibold text-gray-700">Loại</th>
+              <th class="font-semibold text-gray-700 text-right">Số dư trước</th>
+              <th class="font-semibold text-gray-700 text-right">Số tiền</th>
+              <th class="font-semibold text-gray-700 text-right">Số dư sau</th>
+              <th class="font-semibold text-gray-700">Mô tả</th>
+              <th class="font-semibold text-gray-700">Ngày</th>
+              <th class="font-semibold text-gray-700">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of transactions" class="hover:bg-gray-50">
+              <td>
+                <span
+                  class="badge badge-sm font-semibold"
+                  [ngClass]="{
+                    'bg-green-200 text-green-800':
+                      t.transactionType === 'Topup' || t.transactionType === 'Refund',
+                    'bg-red-200 text-red-800':
+                      t.transactionType !== 'Topup' && t.transactionType !== 'Refund'
+                  }"
+                >
+                  {{ t.transactionType }}
+                </span>
+              </td>
+              <td class="text-right text-gray-600">{{ t.balanceBefore | number }} ₫</td>
+              <td
+                class="text-right font-semibold"
+                [ngClass]="
+                  t.transactionType === 'Topup' || t.transactionType === 'Refund'
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                "
+              >
+                {{ t.transactionType === 'Topup' || t.transactionType === 'Refund' ? '+' : '-' }}
+                {{ t.amount | number }} ₫
+              </td>
+              <td class="text-right font-bold text-gray-800">{{ t.balanceAfter | number }} ₫</td>
+              <td class="text-gray-600">{{ t.description || '---' }}</td>
+              <td class="text-gray-600">{{ t.createdAt | date : 'short' }}</td>
+              <td>
+                <span
+                  class="badge badge-sm font-semibold"
+                  [ngClass]="{
+                    'badge-success badge-outline': t.status === 'Completed',
+                    'badge-warning badge-outline': t.status === 'Pending',
+                    'badge-error badge-outline': t.status === 'Failed'
+                  }"
+                >
+                  {{ t.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="hasMultiplePages" class="w-full mt-auto">
+    <div class="max-w-6xl mx-auto flex justify-center items-center py-6 px-4">
+      <div class="join">
+        <button class="join-item btn btn-sm" [disabled]="pageNumber === 1" (click)="prevPage()">
+          «
+        </button>
+        <button class="join-item btn btn-sm">Trang {{ pageNumber }} / {{ meta.totalPages }}</button>
+        <button
+          class="join-item btn btn-sm"
+          [disabled]="pageNumber === meta.totalPages"
+          (click)="nextPage()"
+        >
+          »
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
