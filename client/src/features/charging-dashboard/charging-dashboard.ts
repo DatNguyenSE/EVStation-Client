@@ -71,7 +71,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   }
 
   // thông tin trạm 
-  getStationInfo(idStation: string) {
+  getStationInfo(idStation: number) {
     this.stationService.getStationByid(idStation).subscribe({
       next: res => this.currentStation.set(res),
       error: err => console.error('Lỗi khi lấy thông tin trạm:', err)

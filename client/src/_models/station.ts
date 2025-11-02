@@ -1,13 +1,14 @@
 
-export interface Post  {
-    id: string,
-    stationId: string;
+export type Post = {
+    id: number,
+    stationId: number;
     code: string,
     type: string,
     powerKW: string,
     connectorType: string,
     status: string,
     isWalkIn: boolean,
+  
   };
 
   export interface DtoStation {
@@ -16,7 +17,7 @@ export interface Post  {
   name: string;
   address: string;
   latitude: number;
-  longitude: number;
+  longtitude: number;
   description: string;
   openTime: string;
   closeTime: string;

@@ -21,7 +21,6 @@ import { eventResolver } from '../core/resolvers/event-resolver';
 import { driverResolver } from '../features/driver/driver-resolver';
 import { Transactions } from '../features/transactions/transactions';
 import { Admin } from '../features/admin/admin';
-import { AdminDashboard } from '../features/admin/admin-dashboard/admin-dashboard';
 import { ManagerDriver } from '../features/admin/manager-driver/manager-driver';
 import { ManagerStation } from '../features/admin/manager-station/manager-station';
 import { Report } from '../features/admin/report/report';
@@ -69,12 +68,12 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'quan-tri-vien', component: Admin,
+        path: 'quan-tri-vien',
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard] ,
         children: [
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-             {path: 'dashboard',component:AdminDashboard},
+            { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
+            { path: 'trang-chu', component: Admin },
              {path:'quan-ly-tai-xe',component:ManagerDriver},
              {path:'quan-ly-tram',component:ManagerStation},
              {path:'bao-cao',component:Report},
