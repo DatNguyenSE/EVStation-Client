@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DtoStation, Post } from '../../_models/station';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 // export interface Station {
 //   id: number;
@@ -23,13 +23,12 @@ export class StationService {
     return this.http.get<DtoStation[]>(`${this.baseUrl}/station`);
   }
 
-  getStationByid(idStaion: string) {
+  getStationByid(idStaion: number) {
     return this.http.get<DtoStation>(this.baseUrl+"/station/"+idStaion);
   }
   // getPost(id:number){
   //    return this.http.get<DtoStation[]>(this.baseUrl + "/posts/" + id);
   // }
-
   searchStations(address: string) {
     return this.http.get<DtoStation[]>(`${this.baseUrl}/station/search?address=${encodeURIComponent(address)}`);
   }
@@ -57,6 +56,32 @@ export class StationService {
 
     });
   }
+  addStation(station : Partial<DtoStation>){
+     return this.http.post<DtoStation>(`${this.baseUrl}/station`,station);
+  }
+  updateStation(id:number,station :Partial<DtoStation>){
+    return this.http.put<DtoStation>(`${this.baseUrl}/station/${id}`,station);
+  }
+  deleteStation(id:number){
+    return this.http.delete<void>(`${this.baseUrl}/station/${id}`);
+  }
+  
+updateStationStatus(id: number, status: number) {
+  return this.http.put(`${this.baseUrl}/station/${id}/status`, status); 
+}
+
+getPostsByStationId(id: number): Observable<Post[]> {
+  const noCache = new Date().getTime(); // timestamp để URL luôn khác
+  return this.http.get<DtoStation>(`${this.baseUrl}/station/${id}?_=${noCache}`).pipe(
+    map(station => station.chargingPosts || [])
+  );
+}
+
+
+
+
+
+
 
 
 

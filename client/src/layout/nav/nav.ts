@@ -32,24 +32,23 @@ export class Nav implements OnInit {
 
   /**  Lấy danh sách menu theo role hiện tại */
 
-  getMenuForRole(role: string) {
-  const menus: Record<string, { label: string; link: string}[]> = {
-    Driver: [
-      { label: 'Dịch vụ', link: '/dich-vu' },
-      { label: 'Nạp tiền', link: '/thanh-toan' },
-      { label: 'Biên lai', link: '/bien-lai' },
-    ],
-    Admin: [
-      { label: 'Bảng điều khiển', link: '/quan-tri-vien/dashboard' },
-      { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
-      { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
-      { label: 'Giao dịch', link: '/quan-tri-vien/lich-su-giao-dich' },
-      { label: 'Báo cáo', link: '/quan-tri-vien/bao-cao' },
-      { label: 'Biên lai', link: '/quan-tri-vien/bien-lai' },
-    ],
-  };
-  return menus[role] ?? [];
-}
+    getMenuForRole(role: string) {
+    const menus: Record<string, { label: string; link: string }[]> = {
+      Driver: [
+        { label: 'Dịch vụ', link: '/dich-vu' },
+        { label: 'Thanh toán', link: '/thanh-toan' },
+        { label: 'Sự kiện', link: '/su-kien' },
+      ],
+      Admin: [
+        
+        { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
+        { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
+        { label: 'Giao dịch', link: '/quan-tri-vien/lich-su-giao-dich' },
+        { label: 'Báo cáo', link: '/quan-tri-vien/bao-cao' },
+      ],
+    };
+    return menus[role] ?? [];
+  }
   constructor() {
     // lắng nghe currentAccount thay đổi (login/logout)
     effect(() => {
@@ -73,20 +72,19 @@ export class Nav implements OnInit {
     document.documentElement.setAttribute('data-theme', this.selectedTheme());
     const role = this.accountService.currentAccount()?.roles?.[0] || '';
     this.menuItems = this.getMenuForRole(role);
-    if (this.accountService.currentAccount()?.emailConfirmed && this.accountService.currentAccount()?.roles.includes('Driver')) {
-     //chỉ driver mới chạy loadWallet & upcommingReser
-      this.driverService.loadWallet();
-      this.reservationService.LoadEventReservation().subscribe({
-        next: res => this.reservationService.upcomingReservations.set(res)
-      });
-      //LoadEventReser -> return [] 
-    }
   }
+
+
+  /* Lấy danh sách menu theo role hiện tại */
+
+
+
+  
 
   onLogoClick() {
     const acc = this.accountService.currentAccount()?.roles;
     if (acc?.includes('Admin')) {
-      window.location.href = '/quan-tri-vien';
+      window.location.href = '/quan-tri-vien/trang-chu';
     } else if (acc?.includes('Staff')) {
       window.location.href = '/#';
     } else {

@@ -1,1 +1,379 @@
-<p>manager-station works!</p>
+<div class="p-6 max-w-7xl mx-auto space-y-10">
+  <!-- 🟩 BOX 1: Thêm trạm mới (kèm trụ) -->
+  <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
+    <h3 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center gap-2">
+      Thêm trạm mới (kèm trụ)
+    </h3>
+
+    <!-- Thông tin trạm -->
+    <div class="grid md:grid-cols-3 gap-4">
+      <input type="text" [(ngModel)]="newStation.name" placeholder="Tên trạm" class="input" />
+      <input type="text" [(ngModel)]="newStation.address" placeholder="Địa chỉ" class="input" />
+      <input type="number" [(ngModel)]="newStation.latitude" placeholder="Vĩ độ" class="input" />
+      <input type="number" [(ngModel)]="newStation.longtitude" placeholder="Kinh độ" class="input" />
+      <input type="time" [(ngModel)]="newStation.openTime" class="input" />
+      <input type="time" [(ngModel)]="newStation.closeTime" class="input" />
+    </div>
+
+    <textarea
+      [(ngModel)]="newStation.description"
+      placeholder="Mô tả trạm..."
+      class="w-full border border-gray-300 rounded-lg mt-4 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+    ></textarea>
+
+    <!-- 🧩 Danh sách trụ -->
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-lg font-semibold text-gray-700">Cổng sạc của trạm mới</h4>
+        <button (click)="addPostRow()" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Thêm cổng sạc
+        </button>
+      </div>
+
+      <!-- Form thêm trụ -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <select [(ngModel)]="newPost.type" class="input-small">
+          <option value="" disabled selected>Loại</option>
+          <option value="Fast">Fast</option>
+          <option value="Normal">Normal</option>
+          <option value="Scooter">Scooter</option>
+        </select>
+
+        <select [(ngModel)]="newPost.connectorType" class="input-small">
+          <option value="" disabled selected>Connector</option>
+          <option value="1">VinEScooter</option>
+          <option value="2">CSS2</option>
+          <option value="3">Type2</option>
+        </select>
+
+        <input type="number" [(ngModel)]="newPost.powerKW" placeholder="Công suất (kW)" class="input-small" />
+
+        <select [(ngModel)]="newPost.status" class="input-small">
+          <option value="Available">Available</option>
+          <option value="Occupied">Occupied</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Offline">Offline</option>
+        </select>
+
+        <label class="flex items-center gap-1">
+          <input type="checkbox" [(ngModel)]="newPost.isWalkIn" />
+          Walk-in
+        </label>
+      </div>
+
+      <!-- Bảng trụ trong UI -->
+      <table class="min-w-full text-sm text-gray-600 border border-gray-200 rounded-lg overflow-hidden">
+        <thead class="bg-blue-50">
+          <tr>
+            <th class="px-3 py-2 text-left">Loại</th>
+            <th class="px-3 py-2 text-left">Connector</th>
+            <th class="px-3 py-2 text-left">Công suất (kW)</th>
+            <th class="px-3 py-2 text-left">Trạng thái</th>
+            <th class="px-3 py-2 text-center">Walk-in</th>
+            <th class="px-3 py-2 text-center">Xóa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let post of newStation.chargingPosts; let i = index" class="border-t">
+            <td class="p-2">{{ post.type }}</td>
+            <td class="p-2">{{ post.connectorType }}</td>
+            <td class="p-2">{{ post.powerKW }}</td>
+            <td class="p-2">{{ post.status }}</td>
+            <td class="p-2 text-center"><input type="checkbox" [checked]="post.isWalkIn" disabled /></td>
+            <td class="text-center">
+              <button (click)="newStation.chargingPosts?.splice(i, 1)" class="text-red-600 hover:text-red-800">❌</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Lưu -->
+    <div class="text-right mt-6">
+      <button
+        (click)="addStation()"
+        class="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+        Lưu trạm (kèm trụ)
+      </button>
+    </div>
+  </div>
+ <!-- 🟦 BOX 2: Thêm trụ cho trạm hiện có -->
+<div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 mt-10">
+  <h3 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center gap-2">
+    Thêm trụ cho trạm hiện có
+  </h3>
+
+  <!-- Dropdown chọn trạm -->
+  <div class="grid md:grid-cols-2 gap-4 mb-5">
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Chọn trạm sạc</label>
+      <select
+        [(ngModel)]="selectedStation"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+      >
+        <option value="" selected>Chọn trạm cần thêm trụ</option>
+        <option *ngFor="let station of station" [ngValue]="station">
+          {{ station.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Form thêm trụ -->
+  <div *ngIf="selectedStation" class="grid md:grid-cols-6 gap-4 items-end">
+    <!-- Loại -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Loại</label>
+      <select
+        [(ngModel)]="newPost.type"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+      >
+        <option value="" disabled selected>Chọn loại</option>
+        <option value="Fast">Fast</option>
+        <option value="Normal">Normal</option>
+         <option value="Scooter">Scooter</option>
+      </select>
+    </div>
+
+    <!-- Connector -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Connector</label>
+      <select
+        [(ngModel)]="newPost.connectorType"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+      >
+        <option value="" disabled selected>Chọn connector</option>
+        <option value="CCS2">CCS2</option>
+        <option value="Type2">Type2</option>
+        <option value="VinEScooter">VinEScooter</option>
+      </select>
+    </div>
+
+    <!-- Công suất -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Công suất (kW)</label>
+      <input
+        [(ngModel)]="newPost.powerKW"
+        type="number"
+        placeholder="VD: 120"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+      />
+    </div>
+
+    <!-- Trạng thái -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Trạng thái</label>
+      <select
+        [(ngModel)]="newPost.status"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
+      >
+        <option value="Available">Available</option>
+        <option value="Occupied">Occupied</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Offline">Offline</option>
+      </select>
+    </div>
+
+    <!-- Walk-in -->
+    <div class="flex items-center gap-2 mt-6">
+      <input [(ngModel)]="newPost.isWalkIn" type="checkbox" id="walkIn" class="h-4 w-4 text-blue-600" />
+      <label for="walkIn" class="text-gray-700 font-medium">Walk-in</label>
+    </div>
+
+    <!-- Nút thêm -->
+    <div class="text-right mt-6">
+      <button
+        class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+        (click)="addPostToStations(selectedStation.id)"
+      >
+        Thêm trụ
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- 📋 BOX 3: Danh sách trạm hiện có -->
+  <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
+    <h3 class="text-2xl font-semibold text-blue-700 mb-4 flex items-center gap-2">Danh sách trạm hiện có</h3>
+
+    <table class="min-w-full text-sm text-gray-700 border border-gray-200 rounded-lg overflow-hidden">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-3 py-2 text-left">Mã</th>
+          <th class="px-3 py-2 text-left">Tên</th>
+          <th class="px-3 py-2 text-left">Địa chỉ</th>
+          <th class="px-3 py-2 text-center">Giờ mở</th>
+          <th class="px-3 py-2 text-center">Giờ đóng</th>
+          <th class="px-3 py-2 text-center">Trạng thái</th>
+          <th class="px-3 py-2 text-center">Số trụ</th>
+          <th class="px-3 py-2 text-center">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of station" class="border-t hover:bg-gray-50 transition">
+          <td class="px-3 py-2">{{ s.code }}</td>
+          <td class="px-3 py-2">{{ s.name }}</td>
+          <td class="px-3 py-2">{{ s.address }}</td>
+          <td class="px-3 py-2 text-center">{{ s.openTime }}</td>
+          <td class="px-3 py-2 text-center">{{ s.closeTime }}</td>
+
+          <!-- Dropdown trạng thái -->
+         <td>
+  <select
+    [(ngModel)]="s.status"
+    (change)="changeStationStatus(s)"
+    class="rounded-md px-3 py-1 font-medium text-center transition-colors duration-200 focus:outline-none"
+    [ngClass]="{
+      'bg-green-100 text-green-700 border border-green-300': s.status === 'Active',
+      'bg-red-100 text-red-700 border border-red-300': s.status === 'Inactive',
+      'bg-yellow-100 text-yellow-700 border border-yellow-300': s.status === 'Maintenance'
+    }"
+  >
+    <option value="Active">Active</option>
+    <option value="Inactive">Inactive</option>
+    <option value="Maintenance">Maintenance</option>
+  </select>
+</td>
+
+
+
+          <td class="px-3 py-2 text-center">{{ s.chargingPosts?.length || 0 }}</td>
+
+          <td class="px-3 py-2 text-center">
+            <div class="flex justify-center gap-2">
+              <button
+                (click)="viewPosts(s)"
+                class="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded-md text-xs font-medium hover:bg-blue-600 transition">
+                <i class="fa fa-search"></i> Chi tiết
+              </button>
+
+              <button
+                (click)="editStation(s)"
+                class="flex items-center gap-1 px-2 py-1 bg-yellow-400 text-white rounded-md text-xs font-medium hover:bg-yellow-500 transition">
+                <i class="fa fa-edit"></i> Sửa
+              </button>
+
+              <button
+                (click)="removeStation(s.id)"
+                class="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded-md text-xs font-medium hover:bg-red-600 transition">
+                <i class="fa fa-trash"></i> Xóa
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Edit Post -->
+<div
+  *ngIf="editingStation"
+  class="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300"
+>
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl relative animate-fade-in border border-yellow-300">
+    <div class="flex justify-between items-center mb-4 border-b pb-2">
+      <h3 class="text-2xl font-semibold text-yellow-600">✏️ Chỉnh sửa trạm</h3>
+      <button
+        (click)="editingStation = null"
+        class="text-gray-500 hover:text-red-600 text-2xl leading-none"
+        title="Đóng"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <input type="text" [(ngModel)]="editingStation.name" placeholder="Tên trạm" class="input" />
+      <input type="text" [(ngModel)]="editingStation.address" placeholder="Địa chỉ" class="input" />
+      <input type="number" [(ngModel)]="editingStation.latitude" placeholder="Vĩ độ" class="input" />
+      <input type="number" [(ngModel)]="editingStation.longtitude" placeholder="Kinh độ" class="input" />
+      <input type="time" [(ngModel)]="editingStation.openTime" class="input" />
+      <input type="time" [(ngModel)]="editingStation.closeTime" class="input" />
+    </div>
+
+    <textarea
+      [(ngModel)]="editingStation.description"
+      placeholder="Mô tả trạm..."
+      class="w-full border border-gray-300 rounded-lg mt-4 p-2"
+    ></textarea>
+
+    <div class="text-right mt-6">
+      <button
+        (click)="updateStation()"
+        class="px-5 py-2 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition"
+      >
+         Cập nhật
+      </button>
+      <button
+        (click)="editingStation = null"
+        class="px-5 py-2 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition ml-2"
+      >
+         Hủy
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+ <!-- 🔍 MODAL VIEW POSTS -->
+<div
+  *ngIf="viewingStation"
+  class="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300"
+>
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl relative animate-fade-in border border-gray-200">
+    <div class="flex justify-between items-center mb-4 border-b pb-2">
+      <h2 class="text-2xl font-semibold text-blue-700">
+         Trụ sạc của trạm: {{ viewingStation.name }}
+      </h2>
+      <button
+        (click)="viewingStation = null"
+        class="text-gray-500 hover:text-red-600 text-2xl leading-none"
+        title="Đóng"
+      >
+        ×
+      </button>
+    </div>
+
+    <table class="min-w-full text-sm text-gray-700 border border-gray-200 rounded-lg overflow-hidden">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-3 py-2 text-left">Mã trụ</th>
+          <th class="px-3 py-2 text-left">Loại</th>
+          <th class="px-3 py-2 text-left">Công suất</th>
+          <th class="px-3 py-2 text-left">Trạng thái</th>
+          <th class="px-3 py-2 text-center">Walk-in</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of viewingStation.chargingPosts" class="border-t hover:bg-gray-50">
+          <td class="px-3 py-2">{{ p.code }}</td>
+          <td class="px-3 py-2">{{ p.type }}</td>
+          <td class="px-3 py-2">{{ p.powerKW }} kW</td>
+          <td class="px-3 py-2 text-center">
+            <select
+              class="border rounded-md px-2 py-1 text-sm font-medium focus:ring-2 focus:ring-blue-400"
+              [ngClass]="{
+                'bg-green-100 text-green-700': p.status === 'Available',
+                'bg-yellow-100 text-yellow-700': p.status === 'Occupied',
+                'bg-gray-100 text-gray-700': p.status === 'Maintenance',
+                'bg-red-100 text-red-700': p.status === 'Offline'
+              }"
+              [(ngModel)]="p.status"
+              (change)="changePostStatus(p)"
+            >
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Offline">Offline</option>
+            </select>
+          </td>
+          <td class="text-center">
+            <input type="checkbox" [checked]="p.isWalkIn" disabled />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
