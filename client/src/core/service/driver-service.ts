@@ -41,7 +41,7 @@ export class DriverService {
   }
 
   loadWallet() {
-    this.http.get<{ balance: number }>(`${this.baseUrl}wallet/my`).subscribe({
+    this.http.get<{ balance: number }>(`${this.baseUrl}wallet/me`).subscribe({
       next: (res) => {
         this.walletBalance.set(res.balance);
       }
