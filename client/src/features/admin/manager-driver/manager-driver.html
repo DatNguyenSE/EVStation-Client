@@ -17,6 +17,7 @@
           <th class="px-4 py-3">Email</th>
           <th class="px-4 py-3">Ngày Sinh</th>
           <th class="px-4 py-3">Trạng Thái</th>
+          <th class="px-4 py-3">Thời Hạn Unban</th>
           <th class="px-4 py-3">Hành Động</th>
         </tr>
       </thead>
@@ -35,8 +36,9 @@
         >
           {{ d.isBanned ? 'Banned' : 'Active' }}
         </span>
-</td>
-          <button (click)="banUser(d.id,d)"
+  </td>
+        <td class="px-4 py-2">{{ d.lockoutEnd | date: 'dd/MM/yyyy HH:mm:ss' : '-'  }}</td>
+          <button (click)="banUser(d.id)"
                   class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md font-medium">
             Ban
           </button>

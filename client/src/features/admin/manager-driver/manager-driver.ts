@@ -25,6 +25,8 @@ export class ManagerDriver {
    message = '';
    isLoading = false;
 
+   
+
   ngOnInit(){
     this.loadDriver();
     this.loadPendingVehicle();
@@ -49,7 +51,7 @@ export class ManagerDriver {
     })
   }
 
-banUser(userId: string,driver:Driver) {
+banUser(userId: string) {
   Swal.fire({
       title:'Nhập Số Ngày Bạn Muốn Ban Người Này',
       input:'number',
@@ -72,11 +74,14 @@ banUser(userId: string,driver:Driver) {
       this.driverSvc.banDriver(userId,days).subscribe({
         next : (res : any) =>{
             this.toast.success(res.message);
-            this.loadDriver();
+            const driver = this.drivers.find((d:Driver) => d.id === userId);
+            if (driver) {driver.isBanned = 'true'
+              driver.lockoutEnd = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(); 
+            };
+            
+            setTimeout(() => this.loadDriver(), 500);
+            this.cdf.detectChanges();
         },
-        error : (err) =>{
-          this.toast.error(err.error?.message || 'Không thể ban người dùng.');
-        }
       }) 
     }
   })
