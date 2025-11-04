@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Vehicles, VehicleResponse, VehicleModelDetail } from '../../_models/vehicle';
+import { Vehicles, VehicleResponse, VehicleModelDetail, VehiclePending } from '../../_models/vehicle';
 import { catchError, map, Observable, throwError } from 'rxjs';
 
 @Injectable({
@@ -48,10 +48,6 @@ export class VehicleService {
     );
   }
 
-  /**
-   * Lấy thông tin chi tiết cho một mẫu xe cụ thể.
-   * @param modelName Tên của mẫu xe (ví dụ: "VF 3").
-   */
   getVehicleModelDetails(modelName: string): Observable<VehicleModelDetail> {
     const encodedModelName = encodeURIComponent(modelName);
     return this.http.get<VehicleModelDetail>(`${this.baseurl}/vehiclemodels/details?modelName=${encodedModelName}`).pipe(
@@ -61,4 +57,20 @@ export class VehicleService {
       })
     );
   }
+
+  getVehiclePending(){
+    const noCache = new Date().getTime();
+
+    return this.http.get<VehiclePending[]>(`${this.baseurl}/vehicle/pending?noCache=${noCache}`);
+  }
+
+  approveVehicle(vehicleId: number): Observable<{message: string}> {
+    return this.http.post<{message: string}>(`${this.baseurl}/vehicle/${vehicleId}/approve`, {});
+  }
+
+  rejectVehicle(vehicleId: number): Observable<{message: string}> {
+    return this.http.post<{message: string}>(`${this.baseurl}/vehicle/${vehicleId}/reject`, {});
+  }
+
+
 }
