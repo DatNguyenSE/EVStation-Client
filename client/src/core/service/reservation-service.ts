@@ -19,37 +19,9 @@ export class ReservationService {
   toast = inject(ToastService);
 
   createReservationChecked(req: ReservationRequest) {
-    const start = new Date(req.timeSlotStart);
-    const now = new Date();
-    const diffMs = start.getTime() - now.getTime();
-    const countSlot = 1;
-
-    if (diffMs < 0) {
-      return throwError(() => new Error('Thời gian bắt đầu không được ở quá khứ.'));
-    }
-    if (diffMs > 24 * 60 * 60 * 1000) {
-      return throwError(() => new Error('Chỉ được đặt chỗ trong 24h tới.'));
-    }
-
+ 
     return this.checkAvailableSlots(req.chargingPostId).pipe(
-      switchMap((availableSlotsMap) => {
-        const selectedDay = req.timeSlotStart.substring(0, 10);
-
-        // BE giờ trả về mảng object => cần map lại thành mảng string
-        const availableSlotsRaw = availableSlotsMap[selectedDay] || [];
-        const availableSlots = availableSlotsRaw.map((slotObj: any) => slotObj.startTime);
-
-
-        const startTs = new Date(req.timeSlotStart).getTime();
-        const isSlotAvailable = availableSlots.some(s => {
-          const slotTs = new Date(s).getTime();
-          return Math.abs(slotTs - startTs) < 60 * 1000;
-        });
-
-        if (!isSlotAvailable) {
-          return throwError(() => new Error('Khung giờ này đã được đặt hoặc không khả dụng.'));
-        }
-
+      switchMap(() => {
         return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation`, req);
       })
     );

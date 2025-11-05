@@ -18,6 +18,7 @@ export interface User  {
     roles: string[];
 }
 
+
 export type Driver = {
     id: string;
     username: string;
@@ -25,7 +26,9 @@ export type Driver = {
     fullName: string;
     dateOfBirth: number;
     vehicles: Vehicles[];
-}; 
+    isBanned : string,
+    lockoutEnd :string;
+};
 
 export type LoginCreds = {
     username: string;
