@@ -33,9 +33,11 @@ export class RegisterVehicle implements OnInit, OnDestroy {
   message = '';
   isError = false;
 
-  // MỚI: Thêm 2 thuộc tính để quản lý file
-  selectedFile: File | null = null;
-  @ViewChild('fileInput') fileInput?: ElementRef;
+  // --- Hai file cà vẹt ---
+  selectedFrontFile: File | null = null;
+  selectedBackFile: File | null = null;
+  @ViewChild('frontInput') frontInput?: ElementRef;
+  @ViewChild('backInput') backInput?: ElementRef;
   
   private typeChangesSub?: Subscription;
   private modelChangesSub?: Subscription;
@@ -50,8 +52,8 @@ export class RegisterVehicle implements OnInit, OnDestroy {
       connectorType: [{ value: '', disabled: true }, Validators.required],
       useDualBattery: [false],
       plate: ['', Validators.required],
-      // MỚI: Thêm form control cho file (chủ yếu để validation)
-      registrationImage: [null, Validators.required]
+      registrationFrontImage: [null, Validators.required],
+      registrationBackImage: [null, Validators.required]
     });
   }
 
@@ -61,20 +63,29 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     this.listenToDualBatteryChanges();
   }
 
-  // MỚI: Hàm để xử lý khi người dùng chọn file
-  onFileSelected(event: any): void {
+  // --- Xử lý chọn ảnh ---
+  onFrontFileSelected(event: any): void {
     const file = (event.target as HTMLInputElement).files?.[0];
-
     if (file) {
-      this.selectedFile = file;
-      // Cập nhật form control để validator biết là đã có file
-      this.registerForm.patchValue({ registrationImage: file.name });
-      this.registerForm.get('registrationImage')?.updateValueAndValidity();
+      this.selectedFrontFile = file;
+      this.registerForm.patchValue({ registrationFrontImage: file.name });
     } else {
-      this.selectedFile = null;
-      this.registerForm.patchValue({ registrationImage: null });
-      this.registerForm.get('registrationImage')?.updateValueAndValidity();
+      this.selectedFrontFile = null;
+      this.registerForm.patchValue({ registrationFrontImage: null });
     }
+    this.registerForm.get('registrationFrontImage')?.updateValueAndValidity();
+  }
+
+  onBackFileSelected(event: any): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.selectedBackFile = file;
+      this.registerForm.patchValue({ registrationBackImage: file.name });
+    } else {
+      this.selectedBackFile = null;
+      this.registerForm.patchValue({ registrationBackImage: null });
+    }
+    this.registerForm.get('registrationBackImage')?.updateValueAndValidity();
   }
 
   private listenToTypeChanges(): void {
@@ -133,12 +144,10 @@ export class RegisterVehicle implements OnInit, OnDestroy {
 
   // SỬA: Viết lại hoàn toàn hàm onSubmit
   onSubmit(): void {
-    // SỬA: Cập nhật thông báo lỗi
-    if (this.registerForm.invalid || !this.selectedFile) {
-      this.message = 'Vui lòng điền đầy đủ thông tin và tải lên ảnh cà vẹt.';
+    if (this.registerForm.invalid || !this.selectedFrontFile || !this.selectedBackFile) {
+      this.message = 'Vui lòng điền đầy đủ thông tin và tải lên cả 2 mặt cà vẹt xe.';
       this.isError = true;
-      // Đảm bảo tất cả các trường đều bị "touched" để hiển thị lỗi validation (nếu có)
-      this.registerForm.markAllAsTouched(); 
+      this.registerForm.markAllAsTouched();
       return;
     }
 
@@ -157,7 +166,8 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     
     // MỚI: Thêm file vào FormData
     // Key "registrationImage" phải khớp với tên thuộc tính IFormFile trong DTO
-    formData.append('registrationImage', this.selectedFile, this.selectedFile.name);
+    formData.append('registrationImageFront', this.selectedFrontFile, this.selectedFrontFile.name);
+    formData.append('registrationImageBack', this.selectedBackFile, this.selectedBackFile.name);
 
     // MỚI: Gọi service với formData
     // Bạn SẼ CẦN phải cập nhật 'vehicleservice.register' để chấp nhận FormData
@@ -175,12 +185,10 @@ export class RegisterVehicle implements OnInit, OnDestroy {
             this.registerForm.get('model')?.disable();
             this.vehicleModels = [];
             this.canHaveDualBattery = false;
-            this.selectedFile = null;
+            this.selectedFrontFile = this.selectedBackFile = null;
 
-            // MỚI: Reset trường input file
-            if (this.fileInput) {
-              this.fileInput.nativeElement.value = "";
-            }
+            if (this.frontInput) this.frontInput.nativeElement.value = '';
+            if (this.backInput) this.backInput.nativeElement.value = '';
             
             this.cdRef.detectChanges();
         },

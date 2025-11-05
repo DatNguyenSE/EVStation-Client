@@ -68,8 +68,15 @@ export class ReservationService {
     return this.http.get<any[]>(`${this.baseUrl}/station/${stationId}/compatible-posts/${vehicleId}`);
   }
 
-  LoadEventReservation() {
-    return this.http.get<eventReservation[]>(`${this.baseUrl}/reservation/upcoming`);
+  LoadEventReservation(ts?: number) {
+    const url = `${this.baseUrl}/reservation/upcoming?t=${ts ?? new Date().getTime()}`;
+    return this.http.get<eventReservation[]>(url, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   }
 
 
