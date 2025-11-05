@@ -1,26 +1,45 @@
-<!-- <router-outlet></router-outlet> -->
-<div class="flex flex-col w-full mb-3  mt-40">
-    <div class="flex justify-between items-center">
-        <div class="tabs tabs-border tabs-lg text-primary">
-            @for (tab of tabs; track $index) {
-                <button 
-                    class="tab"
-                    [hidden]="tab.value === 'A' 
-                        && !accountService.currentAccount()?.roles?.includes('Admin')"
-                    [class.tab-active]="activeTab === tab.value"
-                    (click)="setTab(tab.value)"
-                >
-                {{tab.label}}
-            </button>
-            }
-        </div>
+<div class="p-8 bg-gray-100 min-h-screen">
+  <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">
+     Thống kê Hệ Thống EVoltStation
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Tài xế -->
+    <div class="bg-white border-t-4 border-blue-500 rounded-xl shadow hover:shadow-lg p-6 transition-transform hover:scale-105">
+      <h3 class="text-xl font-semibold text-blue-600 mb-4 flex items-center gap-2">
+         Tài xế
+      </h3>
+      <p class="text-gray-700">Tổng số: <span class="font-bold">{{ drivers?.length }}</span></p>
+      <p class="text-green-600">Hoạt động: <span class="font-bold">{{ activeDriverCount }}</span></p>
+      <p class="text-red-600">Bị cấm: <span class="font-bold">{{ banDriverCount }}</span></p>
     </div>
+
+    <!-- Trạm -->
+    <div class="bg-white border-t-4 border-green-500 rounded-xl shadow hover:shadow-lg p-6 transition-transform hover:scale-105">
+      <h3 class="text-xl font-semibold text-green-600 mb-4 flex items-center gap-2">
+         Trạm
+      </h3>
+      <p class="text-gray-700">Tổng số: <span class="font-bold">{{ stations?.length }}</span></p>
+      <p class="text-blue-600">Hoạt động: <span class="font-bold">{{ activeStationCount }}</span></p>
+      <p class="text-gray-500">Ngưng hoạt động: <span class="font-bold">{{ inactiveStationCount }}</span></p>
+      <p class="text-yellow-600">Bảo trì: <span class="font-bold">{{ maintenanceStationCount }}</span></p>
+    </div>
+
+    <!-- Trụ -->
+    <div class="bg-white border-t-4 border-yellow-500 rounded-xl shadow hover:shadow-lg p-6 transition-transform hover:scale-105">
+      <h3 class="text-xl font-semibold text-yellow-600 mb-4 flex items-center gap-2">
+         Trụ
+      </h3>
+      <p class="text-gray-700">Tổng số: <span class="font-bold">{{ posts?.length }}</span></p>
+      <p class="text-green-600">Khả dụng: <span class="font-bold">{{ activePostCount }}</span></p>
+    </div>
+
+    <!-- Gói hàng -->
+    <div class="bg-white border-t-4 border-purple-500 rounded-xl shadow hover:shadow-lg p-6 transition-transform hover:scale-105">
+      <h3 class="text-xl font-semibold text-purple-600 mb-4 flex items-center gap-2">
+          Gói Dịch Vụ
+      </h3>
+      <p class="text-gray-700">Tổng số: <span class="font-bold">{{ packagesCount }}</span></p>
+    </div>
+  </div>
 </div>
-
-@if (activeTab === 'A') {
-    ss
-}
-
-@if (activeTab === 'B') {
-    yy
-}

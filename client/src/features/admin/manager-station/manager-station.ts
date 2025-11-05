@@ -258,8 +258,6 @@ changeStationStatus(station: DtoStation) {
 
  // update status post 
  changePostStatus(post: Post) {
-  console.log('🔎 Post object:', post);
-
   const statusToNumber: Record<string, number> = {
     Available: 0,
     Occupied: 1,

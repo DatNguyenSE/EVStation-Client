@@ -23,7 +23,8 @@ export class ManagerDriver {
   vehiclePending : VehiclePending[] =[];
   selectedImageUrl: string | null =null;
    message = '';
-   isLoading = false;
+   isLoadingDriver = false;
+   isLoadingVehicle = false;
 
    
 
@@ -39,10 +40,11 @@ export class ManagerDriver {
   }
 
   loadDriver(){
+     this.isLoadingDriver = true;
     this.driverSvc.getAllDriver().subscribe({
       next : (res) =>{
         this.drivers = res;
-        console.log('Hàm loadPendingVehicle được gọi');
+        this.isLoadingDriver = false;
         this.cdf.detectChanges();
       },
       error : (err) =>{
@@ -75,7 +77,7 @@ banUser(userId: string) {
         next : (res : any) =>{
             this.toast.success(res.message);
             const driver = this.drivers.find((d:Driver) => d.id === userId);
-            if (driver) {driver.isBanned = 'true'
+            if (driver) {driver.isBanned = true
               driver.lockoutEnd = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(); 
             };
             
@@ -89,11 +91,11 @@ banUser(userId: string) {
 
 
   loadPendingVehicle(){
-      this.isLoading = true;
+      this.isLoadingVehicle = true;
       this.vehicleSvc.getVehiclePending().subscribe({
         next :(res) =>{
           this.vehiclePending = res;
-          this.isLoading = false;
+          this.isLoadingVehicle = false;
           this.cdf.detectChanges();
         },
         error : (err) =>{
@@ -102,24 +104,24 @@ banUser(userId: string) {
       })
   }
   approveVehicle(vehicleId : number){
-     this.isLoading = true;
+     this.isLoadingVehicle = true;
      this.vehicleSvc.approveVehicle(vehicleId).subscribe({
         next : (res) =>{
           this.toast.success(res.message);
           this.vehiclePending= this.vehiclePending.filter(v => v.vehicleId !== vehicleId);
-          this.isLoading= false;
+          this.isLoadingVehicle= false;
           this.cdf.detectChanges();
         }
      })
   }
    rejectVehicle(vehicleId : number){
        if (!confirm('Bạn có chắc muốn từ chối xe này không?')) return;
-     this.isLoading = true;
+     this.isLoadingVehicle = true;
      this.vehicleSvc.rejectVehicle(vehicleId).subscribe({
         next : (res) =>{
           this.toast.success(res.message);
           this.vehiclePending = this.vehiclePending.filter(v => v.vehicleId !== vehicleId);
-          this.isLoading= false;
+          this.isLoadingVehicle= false;
           this.cdf.detectChanges();
         }
      })
