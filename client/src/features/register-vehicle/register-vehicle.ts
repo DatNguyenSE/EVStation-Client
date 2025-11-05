@@ -76,6 +76,19 @@ export class RegisterVehicle implements OnInit, OnDestroy {
       this.registerForm.patchValue({ registrationImageBack: file ? file.name : null });
       this.registerForm.get('registrationImageBack')?.updateValueAndValidity();
     }
+    this.registerForm.get('registrationFrontImage')?.updateValueAndValidity();
+  }
+
+  onBackFileSelected(event: any): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.selectedBackFile = file;
+      this.registerForm.patchValue({ registrationBackImage: file.name });
+    } else {
+      this.selectedBackFile = null;
+      this.registerForm.patchValue({ registrationBackImage: null });
+    }
+    this.registerForm.get('registrationBackImage')?.updateValueAndValidity();
   }
 
   private listenToTypeChanges(): void {

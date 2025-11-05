@@ -1,0 +1,115 @@
+<div class="min-h-screen bg-base-100 text-base-content flex flex-col items-center py-10 px-4 mt-10">
+  <div class="w-full max-w-5xl bg-white shadow-md rounded-2xl p-6">
+    <h2 class="text-2xl font-bold mb-5 flex items-center gap-2">
+      🧾 Danh sách hóa đơn chờ xác nhận
+    </h2>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-6 text-secondary text-lg">
+      <span class="loading loading-spinner loading-md me-2"></span>
+      Đang tải dữ liệu...
+    </div>
+
+    <!-- Danh sách hóa đơn -->
+    <div *ngIf="!loading && receipts.length > 0" class="overflow-x-auto">
+      <table class="table table-zebra w-full text-center">
+        <thead class="bg-base-200 text-base font-semibold">
+          <tr>
+            <th>ID</th>
+            <th>Khách hàng</th>
+            <th>Gói cước</th>
+            <th>Tổng tiền</th>
+            <th>Ngày tạo</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let r of receipts"
+            class="hover:bg-base-200 transition duration-150 ease-in-out"
+          >
+            <td class="font-semibold">#{{ r.id }}</td>
+            <td>{{ r.appUserName || '—' }}</td>
+            <td>{{ r.pricingName }}</td>
+            <td class="text-success font-medium">{{ r.totalCost | number }} ₫</td>
+            <td>{{ r.createAt | date : 'short' }}</td>
+            <td>
+              <button
+                class="btn btn-sm btn-primary"
+                (click)="viewDetails(r.id)"
+              >
+                Xem chi tiết
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Không có dữ liệu -->
+    <div *ngIf="!loading && receipts.length === 0" class="text-center py-8 text-gray-500">
+      🚫 Không có hóa đơn nào đang chờ xác nhận.
+    </div>
+
+    <!-- Chi tiết hóa đơn -->
+    <div
+      *ngIf="showDetails && selectedReceipt"
+      class="mt-8 border-t border-gray-300 pt-5"
+    >
+      <h3 class="text-xl font-semibold mb-4">
+        🧾 Chi tiết hóa đơn #{{ selectedReceipt.id }}
+      </h3>
+
+      <div class="grid md:grid-cols-2 gap-3 mb-4">
+        <div><b>Khách hàng:</b> {{ selectedReceipt.appUserName }}</div>
+        <div><b>Gói cước:</b> {{ selectedReceipt.pricingName }}</div>
+        <div><b>Tổng tiền:</b> {{ selectedReceipt.totalCost | number }} ₫</div>
+        <div><b>Ngày tạo:</b> {{ selectedReceipt.createAt | date : 'short' }}</div>
+        <div><b>Trạng thái:</b> {{ selectedReceipt.status }}</div>
+      </div>
+
+      <div class="mb-4">
+        <label for="paymentMethod" class="block font-medium mb-1"
+          >Phương thức thanh toán:</label
+        >
+        <select
+          id="paymentMethod"
+          [(ngModel)]="paymentMethod"
+          class="select select-bordered w-full max-w-xs"
+        >
+          <option *ngFor="let method of paymentMethods" [value]="method">
+            {{ method }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Alert nếu có lỗi hoặc thông báo -->
+      <div *ngIf="alertMessage" class="alert mt-3" [ngClass]="{
+          'alert-success': alertType === 'success',
+          'alert-error': alertType === 'error'
+        }">
+        {{ alertMessage }}
+      </div>
+
+      <!-- Nút hành động -->
+      <div class="mt-5 flex flex-wrap gap-3">
+        <button
+          class="btn btn-success"
+          (click)="confirmPayment()"
+          [disabled]="confirming"
+        >
+          <span *ngIf="!confirming">✅ Xác nhận thanh toán</span>
+          <span *ngIf="confirming" class="loading loading-spinner"></span>
+          <span *ngIf="confirming"> Đang xử lý...</span>
+        </button>
+
+        <button
+          class="btn btn-outline btn-secondary"
+          (click)="showDetails = false"
+        >
+          ❌ Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

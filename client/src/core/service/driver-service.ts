@@ -57,5 +57,17 @@ export class DriverService {
     return this.http.get<Driver>(
       `${this.baseUrl}users/profile-driver`)
   }
+  
 
+  getAllDriver(){
+    return this.http.get<Driver[]>(`${this.baseUrl}account/drivers`);
+  }
+
+ banDriver(userId: string, days: number) {
+   console.log('Gửi request banUser:', userId, days);
+  return this.http.post(`${this.baseUrl}account/BanUser/${userId}?days=${days}`, {});
+}
+
+
+  
 }
