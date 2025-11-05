@@ -37,7 +37,7 @@ export class Nav implements OnInit {
     const menus: Record<string, { label: string; link: string }[]> = {
       Driver: [
         { label: 'Dịch vụ', link: '/dich-vu' },
-        { label: 'Thanh toán', link: '/thanh-toan' },
+        { label: 'Nạp tiền', link: '/thanh-toan' },
         { label: 'Sự kiện', link: '/su-kien' },
         { label: 'Biên lai', link: '/bien-lai' }
       ],
