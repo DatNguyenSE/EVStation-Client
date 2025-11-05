@@ -35,6 +35,11 @@ export class DriverService {
       `${this.baseUrl}vehicle/my`);
   }
 
+  GetVehicleById(id: number) {
+    return this.http.post<Vehicles>(
+      `${this.baseUrl}vehicle/info/${id}`,{});
+  }
+
   GetVehiclesApproved() {
     return this.http.get<Vehicles[]>(
       `${this.baseUrl}vehicle/my-approved`);

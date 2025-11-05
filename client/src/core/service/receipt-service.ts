@@ -18,11 +18,6 @@ export class ReceiptService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Lấy danh sách hóa đơn (phân trang cho user hiện tại)
-   * @param pageNumber Số trang (default = 1)
-   * @param pageSize Kích thước trang (default = 5)
-   */
   getUserReceipts(pageNumber = 1, pageSize = 5): Observable<PaginatedResult<ReceiptSummaryDto>> {
     const params = new HttpParams()
       .set('pageNumber', pageNumber)

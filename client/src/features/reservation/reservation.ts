@@ -143,7 +143,12 @@ export class Reservation {
         this.cdf.detectChanges();
         clearHttpCache();
         setTimeout(() => {
-          this.toast.success(`Đặt chỗ thành công tại ${this.station?.name} mã trụ đặt là '${this.selectedPostId}'`, 5000)
+         this.toast.success(
+  `Đặt chỗ thành công tại <strong>${this.station?.name}</strong> — 
+   mã trụ đặt là <span style="color:#16a34a; font-weight:bold; background-color:#e8f5e9; padding:2px 6px; border-radius:6px;">
+     ${this.selectedPostId}
+   </span>`, 5000
+);
           this.router.navigate(['/']);
         }, 1500);
 

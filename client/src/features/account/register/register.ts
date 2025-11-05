@@ -41,10 +41,17 @@ export class Register {
   cancel() {
     this.cancelRegister.emit(false);
   }
-
+  formatDateInput() {
+    const value = this.creds.dateOfBirth;
+    const parts = value.split(/[\/\-]/);
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      this.creds.dateOfBirth = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+    }
+  }
   openTerms(event: Event) {
     event.preventDefault();
-    alert('Điều khoản sử dụng: Bạn đồng ý tuân thủ các điều kiện dịch vụ của chúng tôi.');
+    alert('Điều khoản sử dụng: Bạn đồng ý tuân thủ các điều kiện dịch vụ của chúng tôi, xem thêm.');
   }
 
   togglePassword() {

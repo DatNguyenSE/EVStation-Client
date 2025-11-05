@@ -1,9 +1,9 @@
-import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy, viewChild, ElementRef, ViewChild } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { VehicleService } from '../../core/service/vehicle-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Vehicles, VehicleModelDetail } from '../../_models/vehicle'; // Đảm bảo import VehicleModelDetail
+import { Vehicles, VehicleModelDetail } from '../../_models/vehicle';
 
 @Component({
   selector: 'app-register-vehicle',
@@ -33,9 +33,11 @@ export class RegisterVehicle implements OnInit, OnDestroy {
   message = '';
   isError = false;
 
-  // MỚI: Thêm 2 thuộc tính để quản lý file
-  selectedFile: File | null = null;
-  @ViewChild('fileInput') fileInput?: ElementRef;
+  // Thêm 2 file
+  selectedFrontFile: File | null = null;
+  selectedBackFile: File | null = null;
+  @ViewChild('frontFileInput') frontFileInput?: ElementRef;
+  @ViewChild('backFileInput') backFileInput?: ElementRef;
   
   private typeChangesSub?: Subscription;
   private modelChangesSub?: Subscription;
@@ -50,8 +52,8 @@ export class RegisterVehicle implements OnInit, OnDestroy {
       connectorType: [{ value: '', disabled: true }, Validators.required],
       useDualBattery: [false],
       plate: ['', Validators.required],
-      // MỚI: Thêm form control cho file (chủ yếu để validation)
-      registrationImage: [null, Validators.required]
+      registrationImageFront: [null, Validators.required],
+      registrationImageBack: [null, Validators.required]
     });
   }
 
@@ -61,19 +63,18 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     this.listenToDualBatteryChanges();
   }
 
-  // MỚI: Hàm để xử lý khi người dùng chọn file
-  onFileSelected(event: any): void {
+  // Hàm chọn file (2 loại)
+  onFileSelected(event: any, side: 'front' | 'back'): void {
     const file = (event.target as HTMLInputElement).files?.[0];
 
-    if (file) {
-      this.selectedFile = file;
-      // Cập nhật form control để validator biết là đã có file
-      this.registerForm.patchValue({ registrationImage: file.name });
-      this.registerForm.get('registrationImage')?.updateValueAndValidity();
+    if (side === 'front') {
+      this.selectedFrontFile = file || null;
+      this.registerForm.patchValue({ registrationImageFront: file ? file.name : null });
+      this.registerForm.get('registrationImageFront')?.updateValueAndValidity();
     } else {
-      this.selectedFile = null;
-      this.registerForm.patchValue({ registrationImage: null });
-      this.registerForm.get('registrationImage')?.updateValueAndValidity();
+      this.selectedBackFile = file || null;
+      this.registerForm.patchValue({ registrationImageBack: file ? file.name : null });
+      this.registerForm.get('registrationImageBack')?.updateValueAndValidity();
     }
   }
 
@@ -131,56 +132,46 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     });
   }
 
-  // SỬA: Viết lại hoàn toàn hàm onSubmit
+  // Cập nhật onSubmit
   onSubmit(): void {
-    // SỬA: Cập nhật thông báo lỗi
-    if (this.registerForm.invalid || !this.selectedFile) {
-      this.message = 'Vui lòng điền đầy đủ thông tin và tải lên ảnh cà vẹt.';
+    if (this.registerForm.invalid || !this.selectedFrontFile || !this.selectedBackFile) {
+      this.message = 'Vui lòng điền đầy đủ thông tin và tải lên cả hai mặt cà vẹt.';
       this.isError = true;
-      // Đảm bảo tất cả các trường đều bị "touched" để hiển thị lỗi validation (nếu có)
       this.registerForm.markAllAsTouched(); 
       return;
     }
 
-    // MỚI: Tạo FormData thay vì JSON
     const formData = new FormData();
-    const formValue = this.registerForm.getRawValue(); // Lấy tất cả giá trị, kể cả disabled
+    const formValue = this.registerForm.getRawValue();
 
-    // Thêm từng trường vào FormData
-    // Tên (key) phải khớp chính xác với tên thuộc tính trong AddVehicleRequestDto ở backend
     formData.append('model', formValue.model);
     formData.append('type', formValue.type.toString());
     formData.append('batteryCapacityKWh', formValue.batteryCapacityKWh.toString());
     formData.append('maxChargingPowerKW', formValue.maxChargingPowerKW.toString());
-    formData.append('connectorType', formValue.connectorType.toString()); // Đảm bảo backend có thể parse giá trị này (enum)
+    formData.append('connectorType', formValue.connectorType.toString());
     formData.append('plate', formValue.plate);
-    
-    // MỚI: Thêm file vào FormData
-    // Key "registrationImage" phải khớp với tên thuộc tính IFormFile trong DTO
-    formData.append('registrationImage', this.selectedFile, this.selectedFile.name);
 
-    // MỚI: Gọi service với formData
-    // Bạn SẼ CẦN phải cập nhật 'vehicleservice.register' để chấp nhận FormData
+    // Thêm 2 file
+    formData.append('registrationImageFront', this.selectedFrontFile, this.selectedFrontFile.name);
+    formData.append('registrationImageBack', this.selectedBackFile, this.selectedBackFile.name);
+
     this.vehicleservice.register(formData).subscribe({
         next: (res) => {
             this.message = "Đăng ký xe thành công! Xe của bạn đang chờ duyệt.";
             this.isError = false;
-            // Chờ 2 giây rồi redirect (cho người dùng đọc thông báo)
             setTimeout(() => {
-               window.location.href = '/'; // Chuyển đến trang quản lý xe
+               window.location.href = '/';
             }, 2000);
 
-            // Reset form
             this.registerForm.reset();
             this.registerForm.get('model')?.disable();
             this.vehicleModels = [];
             this.canHaveDualBattery = false;
-            this.selectedFile = null;
+            this.selectedFrontFile = null;
+            this.selectedBackFile = null;
 
-            // MỚI: Reset trường input file
-            if (this.fileInput) {
-              this.fileInput.nativeElement.value = "";
-            }
+            if (this.frontFileInput) this.frontFileInput.nativeElement.value = "";
+            if (this.backFileInput) this.backFileInput.nativeElement.value = "";
             
             this.cdRef.detectChanges();
         },

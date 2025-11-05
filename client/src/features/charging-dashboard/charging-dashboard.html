@@ -1,25 +1,49 @@
-@if (!errorMessage()) {
-@if (currentStation()?.status === 'Active') {
+<!-- EV CHARGING DASHBOARD -->
+<div class="min-h-screen w-full max-w-7xl mx-auto mt-20 p-8 font-inter">
 
-<div class="min-h-screen w-full max-w-6xl mx-auto mt-24 p-8">
-  <div class="flex flex-col md:flex-row gap-8">
+  <!-- HIỂN THỊ LỖI -->
+  @if (errorMessage()) {
+  <div class="flex flex-col mt-32 items-center justify-center text-center">
+    <div class="bg-white shadow-lg rounded-2xl p-10 border border-red-200 max-w-md">
+      <h2 class="text-2xl font-bold text-red-600 mb-3">Lỗi khi xác thực trạm sạc</h2>
+      <p class="text-gray-700 mb-6">{{ errorMessage() }}</p>
+      <button (click)="router.navigate(['/'])"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md transition">
+        ← Quay về trang chủ
+      </button>
+    </div>
+  </div>
+  } @else {
 
-    <!-- THÔNG TIN TRẠM -->
+  <!--  KIỂM TRA TRẠM -->
+  @if (currentStation()?.status == 'Active') {
+  <!-- <div class="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 mt-30">
+    <div class="bg-white shadow-lg rounded-2xl p-10 border border-yellow-200 max-w-md text-center">
+      <h2 class="text-2xl font-bold text-yellow-600 mb-3">Trạm hiện không hoạt động</h2>
+      <p class="text-gray-600">Vui lòng kiểm tra lại kết nối hoặc thử lại sau.</p>
+    </div>
+  </div> -->
+
+
+  <!--  NỘI DUNG CHÍNH -->
+  <div class="flex flex-col lg:flex-row gap-10">
+
+    <!--  THÔNG TIN TRẠM -->
     <div
-      class="flex-1 bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-blue-100 hover:shadow-xl transition-all duration-300">
+      class="flex-1 bg-gradient-to-b from-blue-50 to-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-blue-100 transition hover:shadow-2xl">
       <div class="flex items-center mb-6">
-        <img src="/assets/logo.png" class="w-10 h-10 mr-3" />
-        <h2 class="text-2xl font-extrabold text-blue-700 tracking-tight">Thông tin Trạm Sạc</h2>
+        <img src="/assets/logo.png" class="w-12 h-12 mr-4" />
+        <h2 class="text-3xl font-extrabold text-blue-800 tracking-tight">Trạm sạc EV</h2>
       </div>
 
-      <div class="space-y-2 text-gray-800 text-base">
-        <p><strong>Tên trạm:</strong> {{ currentStation()?.name }}</p>
-        <p><strong>Địa chỉ:</strong> {{ currentStation()?.address }}</p>
+      <div class="space-y-3 text-gray-800 text-base">
+        <p><strong class="text-blue-700">Tên trạm:</strong> {{ currentStation()?.name }}</p>
+        <p><strong class="text-blue-700">Địa chỉ:</strong> {{ currentStation()?.address }}</p>
       </div>
 
-      <div class="mt-6 border-t border-gray-200 pt-4">
-        <h3 class="text-lg font-semibold text-blue-600 mb-2 flex items-center gap-2">
-          <i class="i-ph-charging-station text-xl"></i> Thông tin trụ sạc
+      <div class="mt-6 border-t border-blue-100 pt-4">
+        <h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center gap-2">
+          <i class="i-ph-charging-station text-xl"></i> Thông tin Trụ sạc
         </h3>
         <ul class="text-gray-700 space-y-1">
           <li><strong>Mã trụ:</strong> {{ postInfo.id }}</li>
@@ -28,96 +52,123 @@
           <li><strong>Đầu nối:</strong> {{ postInfo.connectorType }}</li>
           <li>
             <strong>Trạng thái:</strong>
-            <span class="px-2 py-0.5 rounded text-sm font-medium" [ngClass]="{
-                  'bg-green-100 text-green-700': postInfo.status === 'Available',
-                  'bg-yellow-100 text-yellow-700': postInfo.status === 'Charging',
-                  'bg-red-100 text-red-700': postInfo.status === 'Offline'
-                }">
+            <span class="px-3 py-0.5 rounded-full text-sm font-medium" [ngClass]="{
+                    'bg-green-100 text-green-700': postInfo.status === 'Available',
+                    'bg-yellow-100 text-yellow-700': postInfo.status === 'Charging',
+                    'bg-red-100 text-red-700': postInfo.status === 'Offline'
+                  }">
               {{ postInfo.status }}
             </span>
           </li>
         </ul>
       </div>
+
+      <!-- THÔNG TIN XE -->
+      @if (vehicleInfo) {
+      <div class="mt-6 border-t border-blue-100 pt-4">
+        <h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center gap-2">
+          <i class="i-ph-car text-xl"></i> Thông tin Xe
+        </h3>
+        <ul class="text-gray-700 space-y-1">
+          <li><strong>Biển số:</strong> {{ vehicleInfo.plate }}</li>
+          <li><strong>Loại xe:</strong> {{ vehicleInfo.model }}</li>
+          <li><strong>Dung lượng pin:</strong> {{ vehicleInfo.batteryCapacityKWh }} kWh</li>
+          <li><strong>Pin hiện tại:</strong> {{ batteryPercent() | number:'1.0-0' }}%</li>
+        </ul>
+      </div>
+      }
+
+      <!--  THÔNG TIN ĐẶT LỊCH -->
+      <!-- @if (reservationInfo) {
+            <div class="mt-6 border-t border-blue-100 pt-4">
+              <h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center gap-2">
+                <i class="i-ph-calendar text-xl"></i> Thông tin Đặt Lịch
+              </h3>
+              <ul class="text-gray-700 space-y-1">
+                <li><strong>Mã đặt lịch:</strong> {{ reservationInfo.reservationId }}</li>
+                <li><strong>Giờ bắt đầu:</strong> {{ reservationInfo.startTime | date:'HH:mm:ss dd/MM/yyyy' }}</li>
+                <li><strong>Trạng thái:</strong> {{ reservationInfo.status }}</li>
+              </ul>
+            </div>
+          } -->
     </div>
 
-    <!-- KHU VỰC SẠC -->
+    <!--  KHU VỰC SẠC -->
     @if (postInfo.status === 'Available') {
     <div
-      class="flex-1 bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-green-100 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-extrabold text-green-700">Đang sạc...</h2>
-          <span class="text-sm bg-green-50 text-green-700 px-2 py-1 rounded-md font-medium">
-            Phiên #{{ sessionId }}
-          </span>
-        </div>
+      class="flex-1 bg-gradient-to-b from-green-50 to-white p-8 rounded-3xl shadow-xl border border-green-100 flex flex-col justify-between hover:shadow-2xl transition duration-300">
 
-        <!-- Vòng tròn pin -->
-        <div class="relative w-52 h-52 mx-auto my-8">
-          <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" stroke="#e5e7eb" stroke-width="10" fill="none" />
-            <circle cx="50" cy="50" r="45" stroke="#22c55e" stroke-width="10" fill="none" stroke-linecap="round"
-              [attr.stroke-dasharray]="282.6" [attr.stroke-dashoffset]="282.6 - (batteryPercent * 2.826)"
-              class="transition-all duration-700 ease-in-out" />
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center text-green-600">
-            <span class="text-4xl font-extrabold">{{ batteryPercent | number: '1.0-0' }}%</span>
-            <span class="text-sm text-gray-500 mt-1">Dung lượng pin</span>
-          </div>
-        </div>
+      <!-- TIÊU ĐỀ -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-3xl font-extrabold text-green-700 flex items-center gap-2">
+          <i class="i-ph-lightning-bold text-2xl"></i> Đang sạc
+        </h2>
+        <span class="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">
+          Phiên #{{ sessionId }}
+        </span>
+      </div>
 
-        <!-- Thông tin realtime -->
-        <div class="grid grid-cols-2 gap-4 text-center mt-4">
-          <div class="bg-green-50 rounded-xl py-3">
-            <p class="text-gray-500 text-sm">Đã nạp</p>
-            <p class="text-lg font-bold text-green-700">{{ chargedKwh | number:'1.2-2' }} kWh</p>
-          </div>
-          <div class="bg-green-50 rounded-xl py-3">
-            <p class="text-gray-500 text-sm">Thời gian còn lại</p>
-            <p class="text-lg font-bold text-green-700">{{ timeRemain | number:'1.0-0' }} giây</p>
-          </div>
-          <div class="col-span-2 bg-green-100/50 rounded-xl py-3 mt-1">
-            <p class="text-gray-500 text-sm">Chi phí hiện tại</p>
-            <p class="text-xl font-bold text-green-700">
-              {{ totalPrice | number }} đ
-            </p>
-          </div>
+      <!--  VÒNG PIN -->
+      <div class="relative w-60 h-60 mx-auto my-10">
+        <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" stroke="#e5e7eb" stroke-width="10" fill="none" />
+          <circle cx="50" cy="50" r="45" stroke="#22c55e" stroke-width="10" fill="none" stroke-linecap="round"
+            [attr.stroke-dasharray]="282.6" [attr.stroke-dashoffset]="282.6 - (batteryPercent() * 2.826)"
+            class="transition-all duration-700 ease-in-out" />
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-green-600">
+          <span class="text-5xl font-extrabold">{{ batteryPercent() | number:'1.0-0' }}%</span>
+          <span class="text-sm text-gray-500 mt-1">Dung lượng pin</span>
         </div>
       </div>
 
-      <div class="mt-8 text-center">
-        <button (click)="pressEndSession()" [disabled]="isStopping" class="bg-red-500 text-white py-2.5 px-8 rounded-xl font-semibold shadow-md
-           hover:bg-red-600 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed">
+      <!-- THÔNG TIN REALTIME -->
+      <div class="grid grid-cols-2 gap-4 text-center mt-4">
+        <div class="bg-green-50 rounded-2xl py-4 shadow-sm hover:shadow-md transition">
+          <p class="text-gray-500 text-sm">Đã nạp</p>
+          <p class="text-lg font-bold text-green-700">{{ chargedKwh() | number:'1.2-2' }} kWh</p>
+        </div>
+        <div class="bg-green-50 rounded-2xl py-4 shadow-sm hover:shadow-md transition">
+          <p class="text-gray-500 text-sm">Thời gian còn lại</p>
+          <p class="text-lg font-bold text-green-700">{{ timeRemain() | number:'1.0-0' }} giây</p>
+        </div>
+        <div class="col-span-2 bg-green-100/50 rounded-2xl py-4 shadow-sm hover:shadow-md transition">
+          <p class="text-gray-500 text-sm">Chi phí hiện tại</p>
+          <p class="text-2xl font-extrabold text-green-700">
+            {{ totalPrice() | number }} đ
+          </p>
+        </div>
+      </div>
+
+      <!--  NÚT DỪNG -->
+      <div class="mt-10 text-center">
+        <button (click)="pressStopSession()" [disabled]="isStopping" [ngClass]="{
+      'bg-red-600 hover:bg-red-700': !isPaused,
+      'bg-green-600 hover:bg-green-700': isPaused
+    }" class="text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
           @if (isStopping) {
-          <span class="animate-pulse">Đang dừng...</span>
+          <span class="animate-pulse">Đang xử lý...</span>
           } @else {
-          Dừng sạc
+          @if (isPaused) {
+          <i class="i-ph-play text-lg mr-1"></i> Tiếp tục sạc
+          } @else {
+          <i class="i-ph-power text-lg mr-1"></i> Dừng sạc
           }
+          }
+        </button>
+      </div>
+
+      <div class="mt-10 text-center">
+        <button (click)="pressEndSession()" [disabled]="!this.confirmed()"
+          class="bg-red-500 hover:bg-red-600 text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+          <span class="i-ph-power text-lg mr-1"></span> Hoàn tất
+
         </button>
       </div>
     </div>
     }
   </div>
+  }
+  }
 </div>
-
-} @else {
-<!-- TRẠM KHÔNG HOẠT ĐỘNG -->
-<div class="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 mt-30">
-  <img src="/assets/offline.svg" alt="Offline" class="w-56 mb-6 opacity-80" />
-  <h2 class="text-2xl font-bold text-red-600 mb-3">Trạm hiện không hoạt động</h2>
-  <p class="text-gray-600">Vui lòng kiểm tra lại kết nối hoặc thử lại sau.</p>
-</div>
-}
-} @else {
-<!-- GIAO DIỆN LỖI -->
-<div class="flex flex-col mt-30 mb-30 items-center justify-center min-h-[70vh] text-center">
-  <h2 class="text-2xl font-bold text-red-600 mb-3">Lỗi khi xác thực trạm sạc</h2>
-  <p class="text-gray-700 mb-6 max-w-md">
-    {{ errorMessage() }}
-  </p>
-  <button (click)="this.router.navigate(['/'])"
-    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md">
-    ← Quay về trang chủ
-  </button>
-</div>
-}

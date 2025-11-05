@@ -37,7 +37,6 @@ export class Nav implements OnInit {
       Driver: [
         { label: 'Dịch vụ', link: '/dich-vu' },
         { label: 'Thanh toán', link: '/thanh-toan' },
-        { label: 'Sự kiện', link: '/su-kien' },
       ],
       Admin: [
         

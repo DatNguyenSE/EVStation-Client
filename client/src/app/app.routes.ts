@@ -59,12 +59,11 @@ export const routes: Routes = [
             },
             { path: 'map', component: GgMap },
             { path: 'dangki-xe', component: RegisterVehicle },
-            { path: 'thongtinsac/:idPost', component: ChargingDashboard },
             {path:'datcho',component:Reservation},
             {path:'lichsugiaodich',component:Transactions},
             {path:'bien-lai',component:Receipt},
             {path:'bien-lai/:id',component:ReceiptDetail},
-            { path:'quet-ma',component: QrCodeComponent}
+            
         ]
     },
     {
@@ -98,8 +97,9 @@ export const routes: Routes = [
     { path: 'lien-he', component: Contact },
     { path: 'huong-dan', component: Instruction },
     { path: 'tin-tuc', component: News },
-    { path: 'confirm-email', component: ConfirmEmail }
-
+    { path: 'confirm-email', component: ConfirmEmail },
+    { path:'quet-ma',component: QrCodeComponent},
+    { path: 'thongtinsac/:idPost', component: ChargingDashboard },
     // { path :'errors', component: TestErrors},
     // { path :'server-error', component: ServerErrorComponent},
     // { path: '**', component: NotFoundComponent},
