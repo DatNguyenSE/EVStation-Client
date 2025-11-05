@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PresenceService } from '../../core/service/presence-service';
 
 interface ChargingUser {
   name: string;
@@ -25,7 +26,8 @@ interface ChargingSlot {
   templateUrl: './operator.html',
   styleUrl: './operator.css'
 })
-export class Operator {
+export class Operator implements OnInit {
+  private presenceService = inject(PresenceService);
   station = {
     name: 'Trạm Sạc EV - Nguyễn Văn Cừ',
     address: '123 Nguyễn Văn Cừ, Quận 5, TP.HCM',

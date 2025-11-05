@@ -8,7 +8,6 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
-import { Operator } from '../../features/operator/operator';
 
 
 @Component({
@@ -38,7 +37,6 @@ export class Nav implements OnInit {
       Driver: [
         { label: 'Dịch vụ', link: '/dich-vu' },
         { label: 'Nạp tiền', link: '/thanh-toan' },
-        { label: 'Sự kiện', link: '/su-kien' },
         { label: 'Biên lai', link: '/bien-lai' }
       ],
       Admin: [

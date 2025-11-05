@@ -11,6 +11,9 @@ import { ToastService } from '../../core/service/toast-service';
 import { ValidateScanResponse } from '../../_models/charging';
 import { Vehicles } from '../../_models/vehicle';
 import { DriverService } from '../../core/service/driver-service';
+import { PresenceService } from '../../core/service/presence-service';
+import { ReservationService } from '../../core/service/reservation-service';
+import { HubConnectionState } from '@microsoft/signalr';
 
 @Component({
   selector: 'app-charging-dashboard',
@@ -18,7 +21,7 @@ import { DriverService } from '../../core/service/driver-service';
   imports: [CommonModule, DecimalPipe],
   templateUrl: './charging-dashboard.html',
   styleUrl: './charging-dashboard.css',
-    changeDetection: ChangeDetectionStrategy.OnPush  // ✅ thêm dòng này
+    changeDetection: ChangeDetectionStrategy.OnPush  //  thêm dòng này xóa lỗi Change Detection
 })
 export class ChargingDashboard implements OnInit, OnDestroy {
   // === Inject services ===
@@ -32,6 +35,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   protected isPaused = false;
   protected confirmed = signal(false);
   private toast = inject(ToastService);
+  private presenceService = inject(PresenceService);
 
   // === Trạng thái ===
   idPost!: string;
@@ -55,6 +59,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.idPost = this.route.snapshot.paramMap.get('idPost')!;
+    this.presenceService.createHubConnection();
     this.getPostInfo();
   }
 
@@ -134,9 +139,14 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     }).subscribe({
       next: session => {
         console.log(' Phiên sạc bắt đầu:', session);
+        // ====kết nối SignalR-ConnectCharging
+
+
+         this.presenceService.sendConnectCharging(this.idPost);
+      
         this.sessionId = session.id;
         this.cdr.detectChanges();
-        //  Kết nối SignalR
+        // ====kết nối SignalR-ChargingHub
         this.hubService.startConnection();
         setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
 
@@ -172,7 +182,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   }
 
 // --- Dừng phiên sạc ---
-  pressStopSession() {
+  async pressStopSession() {
   if (!this.sessionId || this.isStopping) return;
 
   const actionText = this.isPaused ? 'tiếp tục' : 'dừng';
@@ -184,6 +194,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   if (this.isPaused) {
     // Tiếp tục sạc
+    await this.presenceService.sendConnectCharging(this.idPost);
     this.startSession(); // Gọi lại hàm có sẵn của bạn
     this.isPaused = false;
     this.isStopping = false;
@@ -192,13 +203,16 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   } else {
     this.chargingService.stopSession(this.sessionId).subscribe({
-      next: () => {
+      next: async () => {
+        await this.presenceService.sendDisconnectCharging(this.idPost);
         this.isPaused = true;
         this.isStopping = false;
         this.cdr.detectChanges();
         this.confirmed.set(true);
         console.log(this.sessionId + ' paused successfully');
         this.toast.success('Tạm dừng sạc thành công');
+        
+
       },
       error: () => {
         this.isStopping = false;
@@ -217,7 +231,9 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   if (!confirmed) return;
 
   this.chargingService.completeSession(this.sessionId).subscribe({
-    next: () => {
+    next: async () => {
+      await this.presenceService.sendDisconnectCharging(this.idPost);
+      this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
       console.log(`${this.sessionId} EndSession successfully`);
       this.toast.success('Đã kết thúc phiên sạc thành công');
       this.toast.success('Hóa đơn đã được gửi đến email của bạn');
@@ -237,5 +253,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.realtimeSub?.unsubscribe();
     this.stopSub?.unsubscribe();
     this.fullSub?.unsubscribe();
+    this.hubService.stopConnection();
+    this.presenceService.stopHubConnection();
   }
 }
