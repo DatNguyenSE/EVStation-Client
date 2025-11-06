@@ -1,17 +1,15 @@
 <div class="min-h-screen bg-base-100 text-base-content flex flex-col items-center py-10 px-4 mt-10">
-  <div class="w-full max-w-5xl bg-white shadow-md rounded-2xl p-6">
-    <h2 class="text-2xl font-bold mb-5 flex items-center gap-2">
-      🧾 Danh sách hóa đơn chờ xác nhận
+  <div class="w-full max-w-6xl bg-white shadow-xl rounded-2xl p-8 transition-all duration-300">
+    <h2 class="text-3xl font-bold mb-6 flex items-center gap-2 text-base-content">
+      Danh sách hóa đơn chờ xác nhận
     </h2>
 
-    <!-- Loading -->
-    <div *ngIf="loading" class="text-center py-6 text-secondary text-lg">
-      <span class="loading loading-spinner loading-md me-2"></span>
+    <div *ngIf="loading" class="text-center py-10 text-secondary text-lg flex justify-center items-center gap-3">
+      <span class="loading loading-spinner loading-lg"></span>
       Đang tải dữ liệu...
     </div>
 
-    <!-- Danh sách hóa đơn -->
-    <div *ngIf="!loading && receipts.length > 0" class="overflow-x-auto">
+    <div *ngIf="!loading && receipts.length > 0" class="overflow-x-auto rounded-xl border border-base-300 shadow-sm">
       <table class="table table-zebra w-full text-center">
         <thead class="bg-base-200 text-base font-semibold">
           <tr>
@@ -26,17 +24,18 @@
         <tbody>
           <tr
             *ngFor="let r of receipts"
-            class="hover:bg-base-200 transition duration-150 ease-in-out"
+            class="hover:bg-primary/10 transition-all duration-200 ease-in-out cursor-pointer"
+            (click)="viewDetails(r.id)"
           >
             <td class="font-semibold">#{{ r.id }}</td>
             <td>{{ r.appUserName || '—' }}</td>
             <td>{{ r.pricingName }}</td>
-            <td class="text-success font-medium">{{ r.totalCost | number }} ₫</td>
+            <td class="text-success font-semibold">{{ r.totalCost | number }} ₫</td>
             <td>{{ r.createAt | date : 'short' }}</td>
             <td>
               <button
-                class="btn btn-sm btn-primary"
-                (click)="viewDetails(r.id)"
+                class="btn btn-sm btn-primary hover:scale-105 transition-transform"
+                (click)="viewDetails(r.id); $event.stopPropagation()"
               >
                 Xem chi tiết
               </button>
@@ -46,70 +45,184 @@
       </table>
     </div>
 
-    <!-- Không có dữ liệu -->
-    <div *ngIf="!loading && receipts.length === 0" class="text-center py-8 text-gray-500">
+    <div *ngIf="!loading && receipts.length === 0" class="text-center py-10 text-gray-500 text-lg">
       🚫 Không có hóa đơn nào đang chờ xác nhận.
     </div>
+  </div>
+</div>
 
-    <!-- Chi tiết hóa đơn -->
-    <div
-      *ngIf="showDetails && selectedReceipt"
-      class="mt-8 border-t border-gray-300 pt-5"
-    >
-      <h3 class="text-xl font-semibold mb-4">
-        🧾 Chi tiết hóa đơn #{{ selectedReceipt.id }}
-      </h3>
+<div
+  *ngIf="showDetails"
+  (click)="closeDetails()"
+  class="fixed inset-0 bg-black bg-opacity-40 z-40 transition-opacity duration-300 ease-in-out"
+></div>
 
-      <div class="grid md:grid-cols-2 gap-3 mb-4">
-        <div><b>Khách hàng:</b> {{ selectedReceipt.appUserName }}</div>
-        <div><b>Gói cước:</b> {{ selectedReceipt.pricingName }}</div>
-        <div><b>Tổng tiền:</b> {{ selectedReceipt.totalCost | number }} ₫</div>
-        <div><b>Ngày tạo:</b> {{ selectedReceipt.createAt | date : 'short' }}</div>
-        <div><b>Trạng thái:</b> {{ selectedReceipt.status }}</div>
+<div
+  class="fixed top-0 right-0 h-full w-full max-w-lg bg-base-100 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col"
+  [ngClass]="{ 'translate-x-0': showDetails, 'translate-x-full': !showDetails }"
+>
+  <ng-container *ngIf="selectedReceipt">
+    
+    <div class="p-6 bg-white border-b border-base-200 flex flex-col gap-2 relative">
+      <button
+        (click)="closeDetails()"
+        class="absolute top-4 right-4 btn btn-sm btn-circle btn-ghost hover:bg-base-200"
+      >
+        ✕
+      </button>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Hóa đơn</h3>
+      <div class="flex items-baseline justify-between">
+        <span class="text-2xl font-bold text-gray-800">#{{ selectedReceipt.id }}</span>
+        <span
+          class="badge text-sm px-3 py-2"
+          [ngClass]="{
+            'badge-warning': selectedReceipt.status === 'Pending',
+            'badge-success': selectedReceipt.status === 'Paid',
+            'badge-error': selectedReceipt.status === 'Cancelled'
+          }"
+        >
+          {{ selectedReceipt.status }}
+        </span>
       </div>
-
-      <div class="mb-4">
-        <label for="paymentMethod" class="block font-medium mb-1"
-          >Phương thức thanh toán:</label
-        >
-        <select
-          id="paymentMethod"
-          [(ngModel)]="paymentMethod"
-          class="select select-bordered w-full max-w-xs"
-        >
-          <option *ngFor="let method of paymentMethods" [value]="method">
-            {{ method }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Alert nếu có lỗi hoặc thông báo -->
-      <div *ngIf="alertMessage" class="alert mt-3" [ngClass]="{
-          'alert-success': alertType === 'success',
-          'alert-error': alertType === 'error'
-        }">
-        {{ alertMessage }}
-      </div>
-
-      <!-- Nút hành động -->
-      <div class="mt-5 flex flex-wrap gap-3">
-        <button
-          class="btn btn-success"
-          (click)="confirmPayment()"
-          [disabled]="confirming"
-        >
-          <span *ngIf="!confirming">✅ Xác nhận thanh toán</span>
-          <span *ngIf="confirming" class="loading loading-spinner"></span>
-          <span *ngIf="confirming"> Đang xử lý...</span>
-        </button>
-
-        <button
-          class="btn btn-outline btn-secondary"
-          (click)="showDetails = false"
-        >
-          ❌ Đóng
-        </button>
+      <div class="text-3xl font-extrabold text-primary mt-3">
+        {{ selectedReceipt.totalCost | number }} ₫
       </div>
     </div>
-  </div>
+
+    <div class="flex-grow overflow-y-auto p-6 space-y-6 bg-base-50 text-sm">
+      
+      <section class="bg-white rounded-lg p-5 shadow-sm border border-base-200">
+        <h4 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fa-regular fa-user text-primary text-lg"></i> Thông tin khách hàng
+        </h4>
+        <div class="space-y-3 text-gray-700">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">Tên khách hàng:</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.appUserName || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">ID khách hàng:</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.appUserId || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">Gói cước:</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.pricingName || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">Tên gói dịch vụ:</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.packageName || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">Ngày tạo hóa đơn:</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.createAt | date : 'medium' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-lg p-5 shadow-sm border border-base-200">
+        <h4 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-list-ol text-primary text-lg"></i> Các phiên sạc
+        </h4>
+        
+        <div *ngIf="selectedReceipt.chargingSessions && selectedReceipt.chargingSessions.length > 0; else noSessions" class="space-y-4">
+          <div *ngFor="let session of selectedReceipt.chargingSessions" class="pb-3 border-b border-base-200 last:pb-0 last:border-b-0">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-semibold text-gray-800">Trụ: {{ session.chargingPostCode }}</span>
+              <span class="font-bold text-primary">{{ session.energyUsed | number: '1.2-2' }} kWh</span>
+            </div>
+            <div class="text-xs text-gray-500 flex items-center gap-2">
+              <i class="fa-regular fa-clock"></i>
+              <span>
+                {{ session.startTime | date: 'shortTime' }} - {{ session.endTime | date: 'shortTime' }}
+                <span class="italic">({{ session.startTime | date: 'dd/MM' }})</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noSessions>
+          <p class="text-gray-500 text-xs italic">Không có dữ liệu phiên sạc cho hóa đơn này.</p>
+        </ng-template>
+      </section>
+
+      <section class="bg-white rounded-lg p-5 shadow-sm border border-base-200">
+        <h4 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-primary text-lg"></i> Chi tiết các khoản phí
+        </h4>
+        <div class="space-y-3 text-gray-700">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">Năng lượng tiêu thụ (tổng):</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.energyConsumed | number : '1.2-2' }} kWh</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500">Đơn giá điện (thời điểm sạc):</span>
+            <span class="font-medium text-gray-800">{{ selectedReceipt.pricePerKwhSnapshot | number }} ₫/kWh</span>
+          </div>
+          <div class="my-3 border-b border-dashed border-base-300"></div> 
+          <div class="flex justify-between items-center font-semibold text-gray-800 text-base">
+            <span>Tiền điện:</span>
+            <span>+ {{ selectedReceipt.energyCost | number }} ₫</span>
+          </div>
+
+          <ng-container *ngIf="selectedReceipt.idleFee > 0">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Phí chờ (Idle):</span>
+              <span class="font-medium text-gray-800">+ {{ selectedReceipt.idleFee | number }} ₫</span>
+            </div>
+            <p class="text-xs text-gray-500 pl-4">
+              (Thời gian chờ: {{ selectedReceipt.idleStartTime | date: 'HH:mm' }} - {{ selectedReceipt.idleEndTime | date: 'HH:mm' }})
+            </p>
+          </ng-container>
+          
+          <div *ngIf="selectedReceipt.overstayFee > 0" class="flex justify-between items-center">
+            <span class="text-gray-500">Phí quá giờ (Overstay):</span>
+            <span class="font-medium text-gray-800">+ {{ selectedReceipt.overstayFee | number }} ₫</span>
+          </div>
+          
+          <div *ngIf="selectedReceipt.discountAmount > 0" class="flex justify-between items-center text-warning font-semibold">
+            <span>Giảm giá:</span>
+            <span>- {{ selectedReceipt.discountAmount | number }} ₫</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-lg p-5 shadow-sm border border-base-200">
+        <h4 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fa-regular fa-credit-card text-primary text-lg"></i> Chọn phương thức thanh toán
+        </h4>
+        <div class="mb-4">
+          <select
+            id="paymentMethod"
+            [(ngModel)]="paymentMethod"
+            class="select select-bordered w-full max-w-xs focus:ring-primary focus:border-primary text-sm"
+          >
+            <option *ngFor="let method of paymentMethods" [value]="method">
+              {{ method }}
+            </option>
+          </select>
+        </div>
+
+      </section>
+    </div>
+
+    <div class="sticky bottom-0 p-5 border-t border-base-200 bg-white flex justify-end gap-3 shadow-t-lg">
+      <button
+        class="btn btn-ghost hover:bg-base-200"
+        (click)="closeDetails()"
+        [disabled]="confirming"
+      >
+        Đóng
+      </button>
+      <button
+        class="btn btn-primary shadow-md hover:shadow-lg transition-all"
+        (click)="confirmPayment()"
+        [disabled]="confirming" 
+      >
+        <ng-container *ngIf="!confirming">Xác nhận thanh toán</ng-container>
+        <ng-container *ngIf="confirming">
+          <span class="loading loading-spinner"></span> Đang xử lý...
+        </ng-container>
+      </button>
+    </div>
+  </ng-container>
 </div>

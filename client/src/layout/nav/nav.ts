@@ -38,13 +38,11 @@ export class Nav implements OnInit {
       Driver: [
         { label: 'Dịch vụ', link: '/dich-vu' },
         { label: 'Nạp tiền', link: '/thanh-toan' },
-        { label: 'Sự kiện', link: '/su-kien' },
         { label: 'Biên lai', link: '/bien-lai' }
       ],
       Admin: [
         { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
         { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
-        { label: 'Biên Lai', link: '/quan-tri-vien/bien-lai' },
         { label: 'Báo cáo', link: '/quan-tri-vien/bao-cao' },
         { label: 'Biên lai', link: '/quan-tri-vien/bien-lai' }
       ],
