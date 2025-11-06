@@ -25,12 +25,11 @@ export class InitService {
       }
       if (this.accountService.currentAccount()?.roles.includes('Operator')  && !currentUrl.startsWith('/quan-tri-vien')) {
         this.router.navigate(['/nhan-vien-tram/trang-chu']);
+        this.presenceService.createHubConnection();
       }
     //signalR 
-    if(this.presenceService.hubConnection?.state !== HubConnectionState.Connected) {
-            this.presenceService.createHubConnection(account);
-            this.reservationService.createHubConnection(account);
-          }
+        this.reservationService.createHubConnection(account);
+
     return of(null)
   }
 }

@@ -8,7 +8,6 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
-import { Operator } from '../../features/operator/operator';
 
 
 @Component({
