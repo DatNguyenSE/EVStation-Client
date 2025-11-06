@@ -8,9 +8,11 @@ import { PackagesService } from '../../core/service/packages-service';
 import { StationService } from '../../core/service/station-service';
 import { Driver } from '../../_models/user';
 import { ToastService } from '../../core/service/toast-service';
-import { DtoStation, Post } from '../../_models/station';
+import { DtoStation, Post, Pricing } from '../../_models/station';
 import { Package } from '../../_models/package';
 import { PostService } from '../../core/service/post-service';
+import { Vehicle } from '../vehicle/vehicle';
+import { PriceService } from '../../core/service/price-service';
 
 @Component({
   selector: 'app-admin',
@@ -24,6 +26,7 @@ export class Admin {
   private packageSvc = inject(PackagesService);
   private postSvc = inject(PostService);
   private stationSvc = inject(StationService);
+  private priceSvc = inject(PriceService);
   private toast = inject(ToastService);
   private cdf = inject(ChangeDetectorRef);
 
@@ -41,22 +44,57 @@ export class Admin {
   // dành cho post
   posts : Post[] =[];
   activePostCount : number =0;
+  offlinePostCount : number =0;
+  maintenancePostCount : number =0;
 
 
   // dành cho package
   packages : Package[]=[];
   packagesCount : number = 0;
 
-  //
+  // dành cho vehicle 
+  vehicle : Vehicle[] =[];
+  vehiclePending:number =0;
+  vehicleApprove:number=0;
+  vehicleReject:number=0;
+  
+  //load bang gia
+  price : Pricing[] =[];
+  editPrice : Pricing | null = null
+
+
   isRootAdminPage = true;
 
   ngOnInit(){
-    this.loadDriver();
+  this.loadDriver();
   this.loadStation();
   this.loadPost();
   this.getPackages();
   }
+   
+  loadPrice(){
+    this.priceSvc.getPricing().subscribe({
+      next :(res) =>{
+        this.price = res;
+        this.cdf.detectChanges();
+      },
+      error :(err) =>{
+        this.toast.error(`Lỗi Tải Bảng Giá`)
+      }
+    })
+  }
 
+  // updatePrice
+  updatePrice(id:number){
+    if(!this.editPrice) return;
+    this.priceSvc.updatePricing(this.editPrice.id,this.editPrice).subscribe({
+      next : (res) =>{
+        this.price = res;
+        this.cdf.detectChanges();
+
+      }
+    })
+  }
 
   loadDriver(){
     this.driverSvc.getAllDriver().subscribe({
@@ -76,7 +114,6 @@ export class Admin {
    loadStation() {
   this.stationSvc.getStations().subscribe({
     next: (res) => {
-      console.log('Dữ liệu từ API:', res);
        this.stations = res;
        this.activeStationCount = this.stations.filter((d:DtoStation) => d.status === 'Active').length;
        this.inactiveStationCount = this.stations.filter((d:DtoStation) => d.status === 'Inactive').length;
@@ -93,9 +130,10 @@ export class Admin {
 loadPost(){
   this.postSvc.getAllPost().subscribe({
     next : (res) =>{
-      console.log('Dữ liệu từ API:', res);
       this.posts = res;
       this.activePostCount = this.posts.filter((d:Post) => d.status === 'Available').length;
+      this.offlinePostCount = this.posts.filter((d:Post) => d.status === 'Offline').length;
+      this.maintenancePostCount = this.posts.filter((d:Post) => d.status === 'Maintenance').length;
       this.cdf.detectChanges();
     },
     error: (err) => {
@@ -107,7 +145,6 @@ loadPost(){
    getPackages(){
       this.packageSvc.getPackages().subscribe({
         next : (data) =>{
-          console.log('Dữ liệu từ API:', data);
           this.packages=data;
           this.packagesCount = this.packages.length;
           this.cdf.detectChanges();

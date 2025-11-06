@@ -33,6 +33,7 @@ export class ManagerDriver {
     this.loadPendingVehicle();
   }
   OpenImage(url : string){
+     console.log('URL ảnh được click:', url);
     this.selectedImageUrl=url;
   }
   CloseImage(){
@@ -78,7 +79,7 @@ banUser(userId: string) {
             this.toast.success(res.message);
             const driver = this.drivers.find((d:Driver) => d.id === userId);
             if (driver) {driver.isBanned = true
-              driver.lockoutEnd = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(); 
+              driver.lockoutEnd = res.lockoutEnd; 
             };
             
             setTimeout(() => this.loadDriver(), 500);
@@ -88,6 +89,28 @@ banUser(userId: string) {
     }
   })
 }
+ unBanDriver(userId : string){
+  Swal.fire({
+    title:'Bạn Có Chắc Unban Tài Xế Này Không',
+    icon:'warning',
+    showCancelButton:true,
+    confirmButtonText:'Xác Nhận',
+  }).then((result) =>{
+    if(result.isConfirmed){
+      this.driverSvc.unBanDriver(userId).subscribe({
+        next : (res : any) =>{
+          this.toast.success(res.message);
+          const driver = this.drivers.find((d:Driver) => d.id === userId);
+          if(driver) {driver.isBanned = false
+            driver.lockoutEnd = null;
+          }
+          setTimeout(() => this.loadDriver(), 500);
+            this.cdf.detectChanges();
+        }
+      })
+    }
+  })
+ }
 
 
   loadPendingVehicle(){
@@ -115,8 +138,14 @@ banUser(userId: string) {
      })
   }
    rejectVehicle(vehicleId : number){
-       if (!confirm('Bạn có chắc muốn từ chối xe này không?')) return;
-     this.isLoadingVehicle = true;
+       Swal.fire({
+        title:'Bạn Có Chắc Không Duyệt Xe Này Không',
+        icon:'warning',
+        showCancelButton:true,
+        confirmButtonText:'Xác Nhận',
+       }).then((result) =>{
+        if(result.isConfirmed){
+             this.isLoadingVehicle = true;
      this.vehicleSvc.rejectVehicle(vehicleId).subscribe({
         next : (res) =>{
           this.toast.success(res.message);
@@ -124,7 +153,9 @@ banUser(userId: string) {
           this.isLoadingVehicle= false;
           this.cdf.detectChanges();
         }
-     })
+       })
+        }
+       })
   }
 
 

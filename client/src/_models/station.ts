@@ -26,4 +26,12 @@ export type Post = {
   chargingPosts: Post[];
 }
 
+export interface Pricing{
+  id:number;
+  name:string;
+  priceType:string;
+  pricePerKwh:number;
+  isActive:string;
+}
+
 

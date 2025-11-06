@@ -69,6 +69,10 @@ export class DriverService {
   return this.http.post(`${this.baseUrl}account/BanUser/${userId}?days=${days}`, {});
 }
 
+unBanDriver(userId : string){
+  return this.http.post(`${this.baseUrl}account/UnbanUser/${userId}`,{});
+}
+
 
   
 }

@@ -29,7 +29,7 @@
       </thead>
       <tbody class="divide-y divide-gray-100">
         <tr *ngFor="let d of drivers" class="hover:bg-gray-50">
-          <td class="px-4 py-2">{{ d.id }}</td>
+          <td class="px-4 py-2">{{ d.id}}</td>
           <td class="px-4 py-2">{{ d.fullName }}</td>
           <td class="px-4 py-2">{{ d.email }}</td>
           <td class="px-4 py-2">{{ d.dateOfBirth | date:'dd/MM/yyyy' }}</td>
@@ -44,10 +44,14 @@
           <td class="px-4 py-2">
             {{ d.lockoutEnd ? (d.lockoutEnd | date:'dd/MM/yyyy HH:mm:ss') : '-' }}
           </td>
-          <td class="px-4 py-2 text-center">
+          <td class="px-4 py-2 flex gap-2 justify-center ">
             <button (click)="banUser(d.id)"
                     class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md font-medium">
               Ban
+            </button>
+            <button (click)="unBanDriver(d.id)"
+                    class="bg-yellow-500 hover:bg-yellow-500 text-white text-xs px-3 py-1 rounded-md font-medium">
+              UnBan
             </button>
           </td>
         </tr>
@@ -96,12 +100,33 @@
           <td class="px-4 py-2">{{ v.vehicleType }}</td>
           <td class="px-4 py-2">{{ v.ownerName }}</td>
           <td class="px-4 py-2">{{ v.ownerEmail }}</td>
-          <td class="px-4 py-2">
-            <img [src]="v.registrationImageUrl"
-                 alt="Ảnh đăng ký xe"
-                 class="w-20 h-20 object-cover rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:scale-105 transition-transform"
-                 (click)="selectedImageUrl = v.registrationImageUrl" />
-          </td>
+            <td class="px-4 py-2">
+  <div class="flex gap-3">
+    <!-- Ảnh mặt trước -->
+    <div class="text-center">
+      <img
+        [src]="v.registrationImageFrontUrl"
+        alt="Mặt trước đăng ký xe"
+        class="w-20 h-20 object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+        (click)="selectedImageUrl = v.registrationImageFrontUrl"
+      />
+      <p class="text-xs mt-1 text-gray-600">Mặt trước</p>
+    </div>
+
+    <!-- Ảnh mặt sau -->
+    <div class="text-center">
+      <img
+        [src]="v.registrationImageBackUrl"
+        alt="Mặt sau đăng ký xe"
+        class="w-20 h-20 object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+        (click)="selectedImageUrl = v.registrationImageBackUrl"
+      />
+      <p class="text-xs mt-1 text-gray-600">Mặt sau</p>
+    </div>
+  </div>
+</td>
+
+
           <td class="px-4 py-2 flex gap-2 justify-center">
             <button (click)="approveVehicle(v.vehicleId)"
                     class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-md font-medium">
@@ -123,17 +148,22 @@
   </div>
 
   <!-- ✅ Modal xem ảnh -->
-  <div *ngIf="selectedImageUrl"
-       class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50"
-       (click)="selectedImageUrl = null">
-    <div class="relative">
-      <img [src]="selectedImageUrl"
-           alt="Xem ảnh"
-           class="max-w-3xl max-h-[90vh] rounded-lg shadow-lg" />
-      <button (click)="selectedImageUrl = null; $event.stopPropagation()"
-              class="absolute top-2 right-2 bg-white text-gray-800 px-3 py-1 rounded-md text-sm font-semibold hover:bg-gray-100">
-        ✕
-      </button>
-    </div>
+  <div
+  *ngIf="selectedImageUrl"
+  class="fixed inset-0 bg-white/10 backdrop-blur-sm flex justify-center items-center z-50"
+  (click)="selectedImageUrl = null"
+>
+  <div class="relative" (click)="$event.stopPropagation()">
+    <img
+      [src]="selectedImageUrl"
+      alt="Xem ảnh đăng ký xe"
+      class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg object-contain"
+    />
+    <button
+      (click)="selectedImageUrl = null"
+      class="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-800 px-2.5 py-1 rounded-full text-sm font-bold shadow-md"
+    >
+      ✕
+    </button>
   </div>
 </div>

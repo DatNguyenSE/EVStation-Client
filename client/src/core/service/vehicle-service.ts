@@ -18,6 +18,7 @@ export class VehicleService {
   register(formData: FormData): Observable<VehicleResponse> {
     return this.http.post<VehicleResponse>(`${this.baseurl}/vehicle/add`, formData).pipe(
       map(response => {
+        console.log("API",response);
         // Tinh chỉnh: Đổi tên biến `vehicle` thành `response` để tránh nhầm lẫn
         // với tham số `vehicle` đầu vào của hàm.
         if (response) {
