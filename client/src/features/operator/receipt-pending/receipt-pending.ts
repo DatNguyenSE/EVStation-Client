@@ -24,7 +24,7 @@ export class ReceiptPending implements OnInit {
 
   // Payment
   paymentMethod: string = 'Cash';
-  paymentMethods = ['Cash', 'CreditCard', 'BankTransfer', 'EWallet'];
+  paymentMethods = ['Cash', 'CreditCard', 'BankTransfer'];
 
   // Alert
   alertMessage: string | null = null;

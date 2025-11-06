@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
+import { ChargingSessionDetailDto, ChargingSessionHistory } from '../../_models/session';
 
 export interface CreateChargingSessionDto {
   postId: number;
@@ -54,4 +55,11 @@ export class ChargingSessionService {
     return this.http.post(`${this.baseUrl}charging/validate-scan?postId=${postID}`,{});
   }
 
+  getHistory(): Observable<ChargingSessionHistory[]> {
+    return this.http.get<ChargingSessionHistory[]>(`${this.baseUrl}charging-sessions/history`);
+  }
+
+  getSessionDetail(sessionId: number) {
+    return this.http.get<ChargingSessionDetailDto>(`${this.baseUrl}charging-sessions/${sessionId}/detail`);
+  }
 }

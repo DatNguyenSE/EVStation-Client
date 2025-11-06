@@ -7,6 +7,7 @@ export type Package = {
     durationDays : number;
 }
 export type MyPackage ={
+    id:number;
     packageName:string;
     description:string;
     startDate:Date;

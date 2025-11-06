@@ -1,0 +1,50 @@
+<div class="flex items-center justify-center min-h-screen px-4 py-10 from-green-50 to-emerald-100 font-sans text-base text-gray-800">
+  <section
+    *ngIf="!isLoading && session"
+    class="w-full max-w-3xl bg-white shadow-xl rounded-2xl p-8 border border-gray-200"
+  >
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-emerald-700 flex items-center gap-2">
+        Phiên sạc #{{ session.id }}
+      </h2>
+
+      <span
+        class="px-3 py-1 rounded-full text-sm font-semibold"
+        [ngClass]="{
+          'bg-green-100 text-green-700': session.status === 'Completed',
+          'bg-yellow-100 text-yellow-700': session.status === 'Charging',
+          'bg-red-100 text-red-700': session.status === 'Cancelled'
+        }"
+      >
+        {{ session.status }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm leading-relaxed">
+      <div><b class="text-gray-600">Trạm sạc:</b> {{ session.stationName }} ({{ session.chargingPostCode }})</div>
+      <div><b class="text-gray-600">Phương tiện:</b> {{ session.vehiclePlate }}</div>
+      <div><b class="text-gray-600">Bắt đầu:</b> {{ session.startTime | date : 'dd/MM/yyyy HH:mm' }}</div>
+      <div><b class="text-gray-600">Kết thúc:</b> {{ session.endTime | date : 'dd/MM/yyyy HH:mm' }}</div>
+      <div><b class="text-gray-600">Năng lượng tiêu thụ:</b> {{ session.energyConsumed | number : '1.1-2' }} kWh</div>
+      <div><b class="text-gray-600">Chi phí sạc:</b> {{ session.chargingCost | number }} ₫</div>
+      <div><b class="text-gray-600">Phí chờ:</b> {{ session.idleFee || 0 | number }} ₫</div>
+      <div><b class="text-gray-600">Phí quá giờ:</b> {{ session.overstayFee || 0 | number }} ₫</div>
+      <div class="md:col-span-2 mt-2 text-lg font-semibold text-emerald-700 border-t pt-3">
+        Tổng cộng: <span class="font-bold">{{ session.totalCost | number }} ₫</span>
+      </div>
+    </div>
+
+    <div class="mt-8 flex justify-center">
+      <button
+        class="btn btn-ghost border border-emerald-400 hover:bg-emerald-500 hover:text-white transition-all px-5 py-2 rounded-lg font-medium"
+        (click)="goBack()"
+      >
+        ← Quay lại
+      </button>
+    </div>
+  </section>
+
+  <div *ngIf="isLoading" class="text-center py-16">
+    <span class="loading loading-spinner loading-lg text-emerald-600"></span>
+  </div>
+</div>
