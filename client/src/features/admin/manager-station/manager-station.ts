@@ -45,6 +45,8 @@ export class ManagerStation {
   editingStation: DtoStation | null = null;
   selectedStation: DtoStation | null = null;
   viewingStation: DtoStation | null = null;
+
+  
   
 
   ngOnInit(){    
@@ -75,10 +77,10 @@ viewPosts(station: DtoStation) {
  loadStation() {
   this.stationSvc.getStations().subscribe({
     next: (res) => {
-      console.log('Raw stations:', res);
+     
       this.station = res.map((s) => ({
         ...s,
-        chargingPosts: (s.chargingPosts || []).map((p) => ({
+        chargingPosts: (s.chargingPosts).map((p) => ({
           ...p,
           id: p.id,
         })),

@@ -35,6 +35,11 @@ export class DriverService {
       `${this.baseUrl}vehicle/my`);
   }
 
+  GetVehicleById(id: number) {
+    return this.http.post<Vehicles>(
+      `${this.baseUrl}vehicle/info/${id}`,{});
+  }
+
   GetVehiclesApproved() {
     return this.http.get<Vehicles[]>(
       `${this.baseUrl}vehicle/my-approved`);
@@ -52,5 +57,17 @@ export class DriverService {
     return this.http.get<Driver>(
       `${this.baseUrl}users/profile-driver`)
   }
+  
 
+  getAllDriver(){
+    return this.http.get<Driver[]>(`${this.baseUrl}account/drivers`);
+  }
+
+ banDriver(userId: string, days: number) {
+   console.log('Gửi request banUser:', userId, days);
+  return this.http.post(`${this.baseUrl}account/BanUser/${userId}?days=${days}`, {});
+}
+
+
+  
 }

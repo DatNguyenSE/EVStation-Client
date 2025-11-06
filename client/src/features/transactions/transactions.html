@@ -11,19 +11,13 @@
       {{ errorMessage }}
     </div>
 
-    <div
-      *ngIf="!isLoading && transactions.length === 0"
-      class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl"
-    >
+    <div *ngIf="!isLoading && transactions.length === 0" class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl">
       <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
       <h3 class="text-xl font-semibold text-gray-700">Không có giao dịch</h3>
       <p class="text-gray-500">Tất cả giao dịch của bạn sẽ xuất hiện ở đây.</p>
     </div>
 
-    <div
-      *ngIf="!isLoading && transactions.length > 0"
-      class="bg-white rounded-xl shadow-sm border border-gray-100"
-    >
+    <div *ngIf="!isLoading && transactions.length > 0" class="bg-white rounded-xl shadow-sm border border-gray-100">
       <div class="overflow-x-auto">
         <table class="table w-full">
           <thead>
@@ -40,27 +34,21 @@
           <tbody>
             <tr *ngFor="let t of transactions" class="hover:bg-gray-50">
               <td>
-                <span
-                  class="badge badge-sm font-semibold"
-                  [ngClass]="{
+                <span class="badge badge-sm font-semibold" [ngClass]="{
                     'bg-green-200 text-green-800':
                       t.transactionType === 'Topup' || t.transactionType === 'Refund',
                     'bg-red-200 text-red-800':
                       t.transactionType !== 'Topup' && t.transactionType !== 'Refund'
-                  }"
-                >
+                  }">
                   {{ t.transactionType }}
                 </span>
               </td>
               <td class="text-right text-gray-600">{{ t.balanceBefore | number }} ₫</td>
-              <td
-                class="text-right font-semibold"
-                [ngClass]="
+              <td class="text-right font-semibold" [ngClass]="
                   t.transactionType === 'Topup' || t.transactionType === 'Refund'
                     ? 'text-green-600'
                     : 'text-red-600'
-                "
-              >
+                ">
                 {{ t.transactionType === 'Topup' || t.transactionType === 'Refund' ? '+' : '-' }}
                 {{ t.amount | number }} ₫
               </td>
@@ -68,14 +56,11 @@
               <td class="text-gray-600">{{ t.description || '---' }}</td>
               <td class="text-gray-600">{{ t.createdAt | date : 'short' }}</td>
               <td>
-                <span
-                  class="badge badge-sm font-semibold"
-                  [ngClass]="{
-                    'badge-success badge-outline': t.status === 'Completed',
-                    'badge-warning badge-outline': t.status === 'Pending',
-                    'badge-error badge-outline': t.status === 'Failed'
-                  }"
-                >
+                <span class="badge badge-sm font-semibold border" [ngClass]="{
+    'bg-green-50 text-green-700 border-green-400': t.status === 'Completed',
+    'bg-yellow-50 text-yellow-700 border-yellow-400': t.status === 'Pending',
+    'bg-red-50 text-red-700 border-red-400': t.status === 'Failed'
+  }">
                   {{ t.status }}
                 </span>
               </td>
@@ -92,11 +77,7 @@
           «
         </button>
         <button class="join-item btn btn-sm">Trang {{ pageNumber }} / {{ meta.totalPages }}</button>
-        <button
-          class="join-item btn btn-sm"
-          [disabled]="pageNumber === meta.totalPages"
-          (click)="nextPage()"
-        >
+        <button class="join-item btn btn-sm" [disabled]="pageNumber === meta.totalPages" (click)="nextPage()">
           »
         </button>
       </div>

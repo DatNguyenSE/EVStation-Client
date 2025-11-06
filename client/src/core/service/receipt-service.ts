@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   CancelRequestDto,
+  ConfirmPaymentRequestDto,
   PaginatedResult,
   ReceiptDetailsDto,
   ReceiptFilterParams,
@@ -18,11 +19,6 @@ export class ReceiptService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Lấy danh sách hóa đơn (phân trang cho user hiện tại)
-   * @param pageNumber Số trang (default = 1)
-   * @param pageSize Kích thước trang (default = 5)
-   */
   getUserReceipts(pageNumber = 1, pageSize = 5): Observable<PaginatedResult<ReceiptSummaryDto>> {
     const params = new HttpParams()
       .set('pageNumber', pageNumber)
@@ -82,5 +78,14 @@ export class ReceiptService {
   // Hoàn tiền (admin-only)
   issueRefund(refundRequest: RefundRequestDto) {
     return this.http.post(`${this.baseUrl}/refund`, refundRequest, { responseType: 'text' });
+  }
+
+  getPendingReceipt() {
+    return this.http.get<ReceiptSummaryDto[]>(`${this.baseUrl}/operator`);
+  }
+
+  confirmPaymentByStaff(id: number, paymentMethod: string): Observable<void> {
+    const body: ConfirmPaymentRequestDto = { paymentMethod };
+    return this.http.post<void>(`${this.baseUrl}/${id}/confirm-payment-by-staff`, body);
   }
 }

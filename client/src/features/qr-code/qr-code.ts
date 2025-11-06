@@ -3,9 +3,9 @@ import { Component, inject, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Result } from '@zxing/library';
-import { Dashboard } from "../../layout/dashboard/dashboard";
-import { ChargingDashboard } from "../charging-dashboard/charging-dashboard";
 import { Router } from '@angular/router';
+import { DriverService } from '../../core/service/driver-service';
+import { Vehicles } from '../../_models/vehicle';
 
 @Component({
   selector: 'app-qr-code',
@@ -23,8 +23,17 @@ export class QrCodeComponent implements OnInit, OnDestroy {
   isScanning = false;
   errorMessage: string | null = null;
   controls: IScannerControls | null = null;
-  router = inject(Router)
-  ngOnInit() { }
+  router = inject(Router);
+  dirverService = inject(DriverService);
+
+
+  ngOnInit() {
+    
+   }
+
+  getVehicle(){
+
+  }
 
   async startScan() {
     try {

@@ -5,9 +5,9 @@ import { HttpClient } from '@angular/common/http';
 
 export interface CreateChargingSessionDto {
   postId: number;
-  vehicleId: number,
+  vehicleId?: number,
   vehiclePlate?: string;
-  reservationId: number;
+  reservationId?: number;
 }
 
 export interface ChargingSessionDto {
@@ -36,16 +36,22 @@ export class ChargingSessionService {
   startSession(dto: CreateChargingSessionDto): Observable<ChargingSessionDto> {
     return this.http.post<ChargingSessionDto>(`${this.baseUrl}charging-sessions/start`, dto);
   }
+  
   stopSession(sessionId: number): Observable<any> {
   return this.http.post(`${this.baseUrl}charging-sessions/${sessionId}/stop`, {});
 }
-  
+ 
+
   completeSession(sessionId: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${sessionId}charging-sessions/complete`, {});
+    return this.http.post(`${this.baseUrl}charging-sessions/${sessionId}/complete`, {});
   }
 
   updatePlate(sessionId: number, plate: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${sessionId}charging-sessions/update-plate`, { plate });
+    return this.http.post(`${this.baseUrl}${sessionId}/charging-sessions/update-plate`, { plate });
+  }
+
+  validateScan(postID :number): Observable<any>{
+    return this.http.post(`${this.baseUrl}charging/validate-scan?postId=${postID}`,{});
   }
 
 }

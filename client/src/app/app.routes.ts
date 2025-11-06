@@ -32,6 +32,7 @@ import { ReceiptAdmin } from '../features/admin/receipt/receipt';
 import { ReceiptDetailAdmin } from '../features/admin/receipt/receipt-detail/receipt-detail';
 import QRCode from '@zxing/library/esm/core/qrcode/encoder/QRCode';
 import { QrCodeComponent } from '../features/qr-code/qr-code';
+import { ReceiptPending } from '../features/operator/receipt-pending/receipt-pending';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -59,12 +60,11 @@ export const routes: Routes = [
             },
             { path: 'map', component: GgMap },
             { path: 'dangki-xe', component: RegisterVehicle },
-            { path: 'thongtinsac/:idPost', component: ChargingDashboard },
             {path:'datcho',component:Reservation},
             {path:'lichsugiaodich',component:Transactions},
             {path:'bien-lai',component:Receipt},
             {path:'bien-lai/:id',component:ReceiptDetail},
-            { path:'quet-ma',component: QrCodeComponent}
+            
         ]
     },
     {
@@ -83,11 +83,13 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'nhan-vien-tram/trang-chu', component: Operator,
+        path: 'nhan-vien-tram',
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard] ,
         children: [
-              
+            { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
+            { path: 'trang-chu', component: Operator },
+            { path:'bien-lai', component: ReceiptPending }
         ]
     },
 
@@ -98,8 +100,9 @@ export const routes: Routes = [
     { path: 'lien-he', component: Contact },
     { path: 'huong-dan', component: Instruction },
     { path: 'tin-tuc', component: News },
-    { path: 'confirm-email', component: ConfirmEmail }
-
+    { path: 'confirm-email', component: ConfirmEmail },
+    { path:'quet-ma',component: QrCodeComponent},
+    { path: 'thongtinsac/:idPost', component: ChargingDashboard },
     // { path :'errors', component: TestErrors},
     // { path :'server-error', component: ServerErrorComponent},
     // { path: '**', component: NotFoundComponent},

@@ -24,7 +24,8 @@ export class Event implements OnInit{
   }
 
   loadReservations(): void {
-    this.reservationSvc.LoadEventReservation().subscribe({
+    const ts = new Date().getTime(); 
+    this.reservationSvc.LoadEventReservation(ts).subscribe({
       next: res => {
         this.reservations.set(res);
         this.cdf.detectChanges(); // đảm bảo render lần đầu
