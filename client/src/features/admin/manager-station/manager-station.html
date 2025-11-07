@@ -371,6 +371,13 @@
           <td class="text-center">
             <input type="checkbox" [checked]="p.isWalkIn" disabled />
           </td>
+          <td class="text-center">
+             <button 
+              class="btn btn-danger btn-sm"
+              (click)="removePost(p.id)">
+              <i class="fa fa-trash"></i> Xóa
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

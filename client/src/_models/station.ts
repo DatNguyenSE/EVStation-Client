@@ -31,7 +31,8 @@ export interface Pricing{
   name:string;
   priceType:string;
   pricePerKwh:number;
-  isActive:string;
+  pricePerMinute:number;
+  isActive:boolean;
 }
 
 

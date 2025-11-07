@@ -13,10 +13,12 @@ import { Package } from '../../_models/package';
 import { PostService } from '../../core/service/post-service';
 import { Vehicle } from '../vehicle/vehicle';
 import { PriceService } from '../../core/service/price-service';
+import { FormsModule } from '@angular/forms';
+import { Revenue } from './revenue/revenue';
 
 @Component({
   selector: 'app-admin',
-  imports: [],
+  imports: [CommonModule,FormsModule,Revenue],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
@@ -26,7 +28,6 @@ export class Admin {
   private packageSvc = inject(PackagesService);
   private postSvc = inject(PostService);
   private stationSvc = inject(StationService);
-  private priceSvc = inject(PriceService);
   private toast = inject(ToastService);
   private cdf = inject(ChangeDetectorRef);
 
@@ -51,16 +52,19 @@ export class Admin {
   // dành cho package
   packages : Package[]=[];
   packagesCount : number = 0;
+  activePackagesCount : number =0;
+  inactivePackageCount : number = 0;
 
   // dành cho vehicle 
   vehicle : Vehicle[] =[];
   vehiclePending:number =0;
   vehicleApprove:number=0;
   vehicleReject:number=0;
+
+  // load doang thu
+   
   
-  //load bang gia
-  price : Pricing[] =[];
-  editPrice : Pricing | null = null
+
 
 
   isRootAdminPage = true;
@@ -72,29 +76,7 @@ export class Admin {
   this.getPackages();
   }
    
-  loadPrice(){
-    this.priceSvc.getPricing().subscribe({
-      next :(res) =>{
-        this.price = res;
-        this.cdf.detectChanges();
-      },
-      error :(err) =>{
-        this.toast.error(`Lỗi Tải Bảng Giá`)
-      }
-    })
-  }
-
-  // updatePrice
-  updatePrice(id:number){
-    if(!this.editPrice) return;
-    this.priceSvc.updatePricing(this.editPrice.id,this.editPrice).subscribe({
-      next : (res) =>{
-        this.price = res;
-        this.cdf.detectChanges();
-
-      }
-    })
-  }
+ 
 
   loadDriver(){
     this.driverSvc.getAllDriver().subscribe({
@@ -147,10 +129,15 @@ loadPost(){
         next : (data) =>{
           this.packages=data;
           this.packagesCount = this.packages.length;
+          this.activePackagesCount = this.packages.filter((d:Package) => d.isActive === true).length;
+          this.inactivePackageCount = this.packages.filter((d:Package) => d.isActive === false).length;
           this.cdf.detectChanges();
         }
       })
     }
+
+ // load-tong-doanh-thu
+ 
   
 }
 

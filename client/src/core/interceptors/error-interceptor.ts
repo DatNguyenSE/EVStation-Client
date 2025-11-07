@@ -42,7 +42,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           case 400:
             console.log(' Full error object:', error);
             console.log(' Error detail:', error.error);
-
+            
             if (Array.isArray(error.error) && error.error.length > 0) {
               // ASP.NET Identity errors
               error.error.forEach((e: any) => {

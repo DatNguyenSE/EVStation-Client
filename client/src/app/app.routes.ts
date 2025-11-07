@@ -35,6 +35,7 @@ import { QrCodeComponent } from '../features/qr-code/qr-code';
 import { ReceiptPending } from '../features/operator/receipt-pending/receipt-pending';
 import { chargingGuard } from '../core/_guards/charging.guard';
 import { SessionDetail } from '../features/session-detail/session-detail';
+import { PricingConfig } from '../features/admin/pricing-config/pricing-config';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -80,6 +81,7 @@ export const routes: Routes = [
              {path:'quan-ly-tram',component:ManagerStation},
              {path:'bao-cao',component:Report},
              {path:'lich-su-giao-dich',component:Transaction},
+             {path:'quan-ly-gia-tien-va-goi',component:PricingConfig},
              {path:'bien-lai',component:ReceiptAdmin},
              {path:'bien-lai/:id',component:ReceiptDetailAdmin}
         ]
