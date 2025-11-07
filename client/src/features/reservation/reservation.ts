@@ -142,6 +142,13 @@ export class Reservation {
         this.message = `Đặt chỗ thành công tại ${this.station?.name} mã trụ đặt là '${this.selectedPostId}'`;
         this.cdf.detectChanges();
         clearHttpCache();
+
+        // THÊM ĐOẠN NÀY – TẢI LẠI UPCOMING ĐỂ ĐẢM BẢO 100%
+        this.reservationSvc.LoadEventReservation().subscribe(res => {
+          const confirmed = res.filter(r => r.status === 'Confirmed');
+          this.reservationSvc.upcomingReservations.set(confirmed);
+        });
+
         setTimeout(() => {
          this.toast.success(
   `Đặt chỗ thành công tại <strong>${this.station?.name}</strong> — 

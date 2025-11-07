@@ -5,10 +5,15 @@ import { eventReservation } from '../../_models/reservation';
 
 import { ActivatedRoute } from '@angular/router';
 import { ReservationService } from '../../core/service/reservation-service';
+import { HttpClient } from '@angular/common/http';
+import { ReservationDetailModal } from '../reservation-detail/reservation-detail-modal';
+import { ReservationDetail } from '../../_models/reservation-detail';
+import { ToastService } from '../../core/service/toast-service';
 
 @Component({
   selector: 'app-event',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, ReservationDetailModal],
   templateUrl: './event.html',
   styleUrl: './event.css'
 })
@@ -18,6 +23,36 @@ export class Event implements OnInit{
   cdf = inject(ChangeDetectorRef)
   reservations = signal<eventReservation[]>([]);
   route = inject(ActivatedRoute);
+  http = inject(HttpClient);
+  toast = inject(ToastService);
+
+  // Modal state
+  showDetailModal = signal(false);
+  selectedReservationDetail = signal<ReservationDetail | null>(null);
+  loadingDetail = signal(false);
+
+  openDetail(reservationId: number) {
+    this.loadingDetail.set(true);
+    this.showDetailModal.set(true);
+
+    this.reservationSvc.getReservationDetail(reservationId).subscribe({
+      next: (data) => {
+        console.log('Chi tiết đặt chỗ:', data);
+        this.selectedReservationDetail.set(data);
+        this.loadingDetail.set(false);
+      },
+      error: (err) => {
+        console.error('Lỗi API:', err);
+        this.toast.error('Không thể tải chi tiết đặt chỗ');
+        this.closeDetailModal();
+      }
+    });
+  }
+
+  closeDetailModal() {
+    this.showDetailModal.set(false);
+    this.selectedReservationDetail.set(null);
+  }
   
   ngOnInit(): void {
     this.loadReservations();
@@ -54,10 +89,12 @@ export class Event implements OnInit{
 
     this.reservationSvc.cancelReservation(reservationId).subscribe({
       next: () => {
-        // ✅ Xóa phần tử vừa hủy khỏi danh sách hiện tại
-        this.reservations.update(list => list.filter(r => r.id !== reservationId));
-        
-        // Không cần gọi lại LoadEventReservation(), vì BE đã không trả đơn bị hủy
+        // CÁCH ĐÚNG: Cập nhật status, KHÔNG xóa
+        this.reservations.update(list =>
+          list.map(r => r.id === reservationId ? { ...r, status: 'Cancelled' } : r)
+        );
+
+        this.toast.success('Đã hủy đặt chỗ thành công');
       },
       error: (err) => {
         console.error(err);

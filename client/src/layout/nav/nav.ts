@@ -60,7 +60,11 @@ export class Nav implements OnInit {
         console.log('User roles:', this.accountService.currentAccount()?.roles);
         this.driverService.loadWallet();
         this.reservationService.LoadEventReservation().subscribe({
-          next: res => this.reservationService.upcomingReservations.set(res)
+          next: res => {
+            // Chỉ giữ lại những đơn có status là 'Confirmed'
+            const confirmedReservations = res.filter(r => r.status === 'Confirmed');
+            this.reservationService.upcomingReservations.set(confirmedReservations);
+          }
         });
       } else {
         // logout -> clear reservationCount

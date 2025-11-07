@@ -1,80 +1,146 @@
-<div class="max-w-5xl mx-auto px-4 py-8 min-h-screen text-base-content pt-24">
-  <!-- Header -->
-  <h2 class="text-2xl font-bold text-base-700 mb-6 flex items-center gap-2">
-    <i class="bi bi-calendar-check text-blue-600"></i>
-    Lịch đặt chỗ của bạn
-  </h2>
+<div class="bg-base-200/60 min-h-screen py-8 pt-24">
+  <div class="max-w-5xl mx-auto px-4">
 
-  <!-- Empty state -->
-  <div *ngIf="!reservations()?.length" class="flex flex-col items-center justify-center py-20 text-center">
-    <i class="bi bi-inbox text-4xl text-gray-400 mb-3"></i>
-    <p class="text-base-content/60 text-lg">Hiện không có lịch đặt nào.</p>
-  </div>
+    <!-- Tiêu đề -->
+    <h2 class="text-3xl font-bold text-base-content mb-8 flex items-center gap-3">
+      <i class="bi bi-calendar-check text-primary text-4xl"></i>
+      Lịch đặt chỗ của bạn
+    </h2>
 
-  <!-- Reservation list -->
-  <ul class="space-y-5" *ngIf="reservations()?.length">
-    <li
-      *ngFor="let r of reservations()"
-      class="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 p-5 relative"
-    >
-      <!-- Header -->
-      <div class="flex justify-between items-start flex-wrap gap-2 mb-3">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-800">Mã đặt chỗ #{{ r.id }}</h3>
-          <p class="text-sm text-gray-500 mt-1">
-            Xe: <span class="font-medium text-gray-700">{{ r.vehicleId }}</span> ·
-            Trụ sạc: <span class="font-medium text-gray-700">{{ r.chargingPostId }}</span>
-          </p>
+    <!-- Không có lịch đặt -->
+    <div *ngIf="!reservations()?.length"
+         class="flex flex-col items-center justify-center py-24 text-center bg-base-100 rounded-2xl shadow-inner border border-base-300/30">
+      <div class="bg-base-200/50 p-6 rounded-full mb-5">
+        <i class="bi bi-inbox text-6xl text-base-content/30"></i>
+      </div>
+      <p class="text-lg font-medium text-base-content/70">Hiện không có lịch đặt nào.</p>
+      <p class="text-sm text-base-content/50 mt-1">Hãy đặt trạm sạc ngay hôm nay!</p>
+    </div>
+
+    <!-- Danh sách đặt chỗ -->
+    <div class="space-y-5" *ngIf="reservations()?.length">
+      <div *ngFor="let r of reservations()"
+           class="bg-base-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300
+                  border border-base-300/40 overflow-hidden group cursor-pointer"
+            (click)="openDetail(+r.id)">
+
+        <!-- Thanh trạng thái bên trái -->
+        <div class="absolute left-0 top-0 h-full w-2.5"
+             [ngClass]="{
+               'bg-gradient-to-b from-emerald-500 to-emerald-700': r.status === 'Confirmed',
+               'bg-gradient-to-b from-amber-500 to-amber-700': r.status === 'Pending',
+               'bg-gradient-to-b from-red-500 to-red-700': r.status === 'Cancelled',
+               'bg-gradient-to-b from-slate-500 to-slate-700': r.status === 'Completed',
+               'bg-gradient-to-b from-purple-500 to-purple-700': r.status === 'Expired'
+             }"></div>
+
+        <!-- Nội dung card -->
+        <div class="pl-7 pr-5 py-5 space-y-4">
+
+          <!-- Header: Trạng thái + Hành động -->
+          <div class="flex justify-between items-center">
+            <!-- Trạng thái -->
+            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase"
+                  [ngClass]="{
+                    'bg-emerald-100 text-emerald-900 ring-2 ring-emerald-400': r.status === 'Confirmed',
+                    'bg-amber-100 text-amber-900 ring-2 ring-amber-400': r.status === 'Pending',
+                    'bg-red-100 text-red-900 ring-2 ring-red-400': r.status === 'Cancelled',
+                    'bg-slate-200 text-slate-800 ring-2 ring-slate-400': r.status === 'Completed',
+                    'bg-purple-100 text-purple-900 ring-2 ring-purple-400': r.status === 'Expired'
+                  }">
+              <i class="bi text-sm mr-1"
+                 [ngClass]="{
+                   'bi-check-circle-fill': r.status === 'Confirmed',
+                   'bi-hourglass-split': r.status === 'Pending',
+                   'bi-x-circle-fill': r.status === 'Cancelled',
+                   'bi-check-all': r.status === 'Completed',
+                   'bi-exclamation-triangle-fill': r.status === 'Expired'
+                 }"></i>
+              {{ r.status }}
+            </span>
+
+            <!-- Nút Hủy / Thông báo -->
+            <div class="flex items-center gap-2">
+              <!-- Nút Hủy (chỉ khi cần, căn giữa đẹp) -->
+              <button 
+                  *ngIf="r.status === 'Confirmed'"
+                  class="btn btn-sm rounded-full bg-red-100 hover:bg-red-200 text-red-700 border-0 shadow-sm 
+                        px-3.5 min-h-8 transition-colors duration-200
+                        active:scale-95
+                        font-medium text-sm"  
+                  (click)="cancelReservation(r.id); $event.stopPropagation()">
+                  Hủy
+              </button>
+
+              <!-- Đã hủy -->
+              <span *ngIf="r.status === 'Cancelled'"
+                    class="text-xs font-medium text-error flex items-center gap-1 min-h-8">
+                <i class="bi bi-x-circle-fill"></i> Đã hủy
+              </span>
+
+              <!-- Hết hạn -->
+              <span *ngIf="r.status === 'Expired'"
+                    class="text-xs font-medium text-purple-700 flex items-center gap-1 min-h-8">
+                <i class="bi bi-exclamation-triangle-fill"></i> Hết hạn
+              </span>
+            </div>
+          </div>
+
+          <!-- Thời gian chính -->
+          <div class="flex items-center gap-4">
+            <div class="bg-primary/15 text-primary p-3 rounded-xl">
+              <i class="bi bi-clock-history text-xl"></i>
+            </div>
+            <div>
+              <p class="text-lg font-bold text-base-content leading-tight">
+                {{ r.timeSlotStart | date: 'HH:mm, EEE, dd/MM/yyyy' }}
+              </p>
+              <p class="text-sm text-base-content/60 flex items-center gap-1">
+                <i class="bi bi-arrow-right-short"></i>
+                Kết thúc: {{ r.timeSlotEnd | date: 'HH:mm' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Thông tin: Trụ sạc + Xe -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <!-- Trụ sạc -->
+            <div class="flex items-center gap-3 bg-emerald-50/70 px-4 py-2.5 rounded-xl border border-emerald-200/50">
+              <i class="bi bi-ev-station-fill text-xl text-emerald-600"></i>
+              <div>
+                <p class="text-xs text-emerald-700 font-medium">Trụ sạc</p>
+                <p class="font-bold text-base-content">{{ r.chargingPostId }}</p>
+              </div>
+            </div>
+
+            <!-- Phương tiện -->
+            <div class="flex items-center gap-3 bg-sky-50/70 px-4 py-2.5 rounded-xl border border-sky-200/50">
+              <i class="bi bi-car-front-fill text-xl text-sky-600"></i>
+              <div>
+                <p class="text-xs text-sky-700 font-medium">Phương tiện</p>
+                <p class="font-bold text-base-content">{{ r.vehicleId }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer: Mã + Giờ ngắn -->
+          <div class="flex items-center justify-between pt-2 border-t border-base-300/30 text-sm">
+            <div class="flex items-center gap-2">
+              <i class="bi bi-tag-fill text-primary"></i>
+              <span class="text-xs text-base-content/60">Mã đặt chỗ</span>
+              <span class="font-mono font-bold text-primary">#{{ r.id }}</span>
+            </div>
+            <div class="text-xs text-base-content/40">
+              {{ r.timeSlotStart | date: 'shortTime' }} – {{ r.timeSlotEnd | date: 'shortTime' }}
+            </div>
+          </div>
         </div>
-
-        <span
-          class="px-3 py-1 rounded-full text-sm font-semibold"
-          [ngClass]="{
-            'bg-green-100 text-green-700': r.status === 'Confirmed',
-            'bg-yellow-100 text-yellow-700': r.status === 'Pending',
-            'bg-red-100 text-red-700': r.status === 'Cancelled'
-          }"
-        >
-          {{ r.status }}
-        </span>
       </div>
-
-      <!-- Time info -->
-      <div class="grid sm:grid-cols-2 gap-3 text-sm text-gray-600">
-        <p>
-          <span class="font-medium">Bắt đầu: </span>
-          <span class="text-gray-800">{{ r.timeSlotStart | date: 'HH:mm:ss dd/MM/yyyy' }}</span>
-        </p>
-        <p>
-          <span class="font-medium">Kết thúc: </span>
-          <span class="text-gray-800">{{ r.timeSlotEnd | date: 'HH:mm:ss dd/MM/yyyy' }}</span>
-        </p>
-      </div>
-
-      <!-- Divider -->
-      <div class="border-t border-gray-200 my-4"></div>
-
-      <!-- Footer -->
-      <div class="flex justify-end gap-3 flex-wrap">
-        <button class="btn btn-outline btn-sm">Xem chi tiết</button>
-        <button
-          class="btn btn-sm bg-red-600 hover:bg-red-700 text-white"
-          (click)="cancelReservation(r.id)"
-          [disabled]="r.status === 'Cancelled'"
-        >
-          {{ r.status === 'Cancelled' ? 'Đã hủy' : 'Hủy' }}
-        </button>
-      </div>
-
-      <!-- Accent border -->
-      <div
-        class="absolute left-0 top-0 h-full w-1 rounded-l-2xl"
-        [ngClass]="{
-          'bg-green-500': r.status === 'Confirmed',
-          'bg-yellow-500': r.status === 'Pending',
-          'bg-red-500': r.status === 'Cancelled'
-        }"
-      ></div>
-    </li>
-  </ul>
+    </div>
+    <app-reservation-detail-modal
+      *ngIf="showDetailModal()"
+      [detail]="selectedReservationDetail()"
+      (close)="closeDetailModal()">
+    </app-reservation-detail-modal>
+  </div>
 </div>

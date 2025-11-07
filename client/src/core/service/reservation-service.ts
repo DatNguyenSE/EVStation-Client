@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { HubConnection } from '@microsoft/signalr';
@@ -8,6 +8,7 @@ import { Account } from '../../_models/user';
 import * as signalR from '@microsoft/signalr';
 import { ToastService } from './toast-service';
 import { ReservationRequest, ReservationResponse } from '../../_models/reservation';
+import { ReservationDetail } from '../../_models/reservation-detail';
 
 
 @Injectable({
@@ -41,7 +42,7 @@ export class ReservationService {
   }
 
   LoadEventReservation(ts?: number) {
-    const url = `${this.baseUrl}/reservation/upcoming?t=${ts ?? new Date().getTime()}`;
+    const url = `${this.baseUrl}/reservation/history?t=${ts ?? new Date().getTime()}`;
     return this.http.get<eventReservation[]>(url, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -75,7 +76,8 @@ export class ReservationService {
 
     this.hubConnection.on('UpdateUpcomingReservations', (reservations: eventReservation[]) => {
       console.log('Realtime update:', reservations);
-      this.upcomingReservations.set(reservations);
+      const confirmedReservations = reservations.filter(r => r.status === 'Confirmed');
+      this.upcomingReservations.set(confirmedReservations);
     });
     // this.hubConnection.on('ReservationCancelled', (reservationId: string) => {
     //     const current = this.upcomingReservations();
@@ -89,6 +91,10 @@ export class ReservationService {
     } catch (error) {
       console.error(' Error connecting to ReservationHub:', error);
     }
+  }
+
+  getReservationDetail(reservationId: number): Observable<ReservationDetail> {
+    return this.http.get<ReservationDetail>(`${this.baseUrl}/reservation/${reservationId}`);
   }
 
   stopHubConnection() {

@@ -6,12 +6,14 @@ import { Router } from '@angular/router';
 import { clearHttpCache } from '../interceptors/loading-interceptor';
 import {jwtDecode} from 'jwt-decode';
 import { environment } from '../../environments/environment.development';
+import { ReservationService } from '../../core/service/reservation-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   private http = inject(HttpClient);
+  private reservationService = inject(ReservationService);
   protected router = inject(Router);
   baseUrl = environment.apiUrl;
   currentAccount = signal<Account | null>(null);
@@ -30,8 +32,12 @@ export class AccountService {
         if(account) {
           localStorage.setItem("account", JSON.stringify(account)); 
                      // đổi về dạng object -> txtjson sau đó muốn lấy thì JSON.parse(localStorage.getItem("user")) 
-          this.setCurrentAccount(account);      
+          this.setCurrentAccount(account);     
+          
+          // KẾT NỐI SIGNALR REALTIME
+        this.reservationService.createHubConnection(account);
         }
+        return account;
       })
     )
   }
@@ -43,6 +49,7 @@ export class AccountService {
   logout() {
     localStorage.removeItem('account');
     this.currentAccount.set(null);
+    this.reservationService.stopHubConnection();
     clearHttpCache();
     window.location.href = '/';
   }
