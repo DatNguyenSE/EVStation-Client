@@ -24,7 +24,7 @@ export class QrCodeComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   controls: IScannerControls | null = null;
   router = inject(Router);
-  dirverService = inject(DriverService);
+  driverService = inject(DriverService);
 
 
   ngOnInit() {
@@ -60,11 +60,13 @@ export class QrCodeComponent implements OnInit, OnDestroy {
           console.log("Thong tin: " + this.resultUrl)
           this.stopScan();
 
-          const cleanPath  = this.resultUrl.replace("http://localhost:4200/thongtinsac/", "");;
-        console.log(cleanPath ); // "1"
+          const cleanPath  = this.resultUrl.replace("http://localhost:4200/thongtinsac/", "");
+          console.log(cleanPath ); // "1"
 
-        this.router.navigate(['/thongtinsac',cleanPath]);
-          
+          this.router.navigate(
+            ['/thongtinsac', cleanPath],
+            { state: { allowAccess: true } } 
+          );
         }
       });
 
@@ -99,7 +101,10 @@ export class QrCodeComponent implements OnInit, OnDestroy {
         const cleanPath  = this.resultUrl.replace("http://localhost:4200/thongtinsac/", "");
         console.log(cleanPath ); // "1"
 
-        this.router.navigate(['/thongtinsac',cleanPath]);
+        this.router.navigate(
+          ['/thongtinsac', cleanPath],
+          { state: { allowAccess: true } } 
+        );
 
 
       } catch (err) {
@@ -110,7 +115,10 @@ export class QrCodeComponent implements OnInit, OnDestroy {
 
   submitStationId() {
     if (!this.idPost.trim()) return;
-    this.router.navigate(['/thongtinsac', this.idPost]);
+    this.router.navigate(
+      ['/thongtinsac', this.idPost],
+      { state: { allowAccess: true } } 
+    );
   }
 
   ngOnDestroy() {

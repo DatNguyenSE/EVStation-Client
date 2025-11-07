@@ -63,16 +63,17 @@
       <!-- ẢNH MẶT TRƯỚC -->
       <div>
         <label class="block font-semibold mb-2 text-gray-700">Ảnh chụp Cà vẹt (mặt trước)</label>
-        <input type="file" accept="image/png, image/jpeg" (change)="onFileSelected($event, 'front')" #frontInput class="w-full text-sm text-gray-700
-           file:mr-4 file:py-2 file:px-4
-           file:rounded-xl file:border-0
-           file:text-sm file:font-semibold
-           file:bg-blue-50 file:text-blue-700
-           hover:file:bg-blue-100
-           border border-gray-300 rounded-xl p-0 cursor-pointer" />
+        <input
+          type="file"
+          accept="image/png, image/jpeg"
+          (change)="onFileSelected($event, 'front')"
+          #frontFileInput
+          class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-xl p-0 cursor-pointer"
+        />
         <div
           *ngIf="registerForm.get('registrationImageFront')?.invalid && registerForm.get('registrationImageFront')?.touched"
-          class="text-red-600 text-sm mt-1">
+          class="text-red-600 text-sm mt-1"
+        >
           Vui lòng tải lên ảnh trước cà vẹt.
         </div>
       </div>
@@ -80,20 +81,20 @@
       <!-- ẢNH MẶT SAU -->
       <div>
         <label class="block font-semibold mb-2 text-gray-700">Ảnh chụp Cà vẹt (mặt sau)</label>
-        <input type="file" accept="image/png, image/jpeg" (change)="onFileSelected($event, 'back')" #backInput class="w-full text-sm text-gray-700
-           file:mr-4 file:py-2 file:px-4
-           file:rounded-xl file:border-0
-           file:text-sm file:font-semibold
-           file:bg-blue-50 file:text-blue-700
-           hover:file:bg-blue-100
-           border border-gray-300 rounded-xl p-0 cursor-pointer" />
+        <input
+          type="file"
+          accept="image/png, image/jpeg"
+          (change)="onFileSelected($event, 'back')"
+          #backFileInput
+          class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-xl p-0 cursor-pointer"
+        />
         <div
           *ngIf="registerForm.get('registrationImageBack')?.invalid && registerForm.get('registrationImageBack')?.touched"
-          class="text-red-600 text-sm mt-1">
+          class="text-red-600 text-sm mt-1"
+        >
           Vui lòng tải lên ảnh sau cà vẹt.
         </div>
       </div>
-
 
       <button type="submit" [disabled]="registerForm.invalid"
         class="w-full py-3 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition disabled:opacity-50">

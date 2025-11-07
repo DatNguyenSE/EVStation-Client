@@ -33,6 +33,8 @@ import { ReceiptDetailAdmin } from '../features/admin/receipt/receipt-detail/rec
 import QRCode from '@zxing/library/esm/core/qrcode/encoder/QRCode';
 import { QrCodeComponent } from '../features/qr-code/qr-code';
 import { ReceiptPending } from '../features/operator/receipt-pending/receipt-pending';
+import { chargingGuard } from '../core/_guards/charging.guard';
+import { SessionDetail } from '../features/session-detail/session-detail';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -64,7 +66,7 @@ export const routes: Routes = [
             {path:'lichsugiaodich',component:Transactions},
             {path:'bien-lai',component:Receipt},
             {path:'bien-lai/:id',component:ReceiptDetail},
-            
+            {path:'phien-sac/:id',component:SessionDetail},
         ]
     },
     {
@@ -102,7 +104,11 @@ export const routes: Routes = [
     { path: 'tin-tuc', component: News },
     { path: 'confirm-email', component: ConfirmEmail },
     { path:'quet-ma',component: QrCodeComponent},
-    { path: 'thongtinsac/:idPost', component: ChargingDashboard },
+    { 
+        path: 'thongtinsac/:idPost',
+        component: ChargingDashboard,
+        canActivate: [chargingGuard]
+    },
     // { path :'errors', component: TestErrors},
     // { path :'server-error', component: ServerErrorComponent},
     // { path: '**', component: NotFoundComponent},
