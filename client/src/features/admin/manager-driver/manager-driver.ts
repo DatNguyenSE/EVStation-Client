@@ -33,7 +33,6 @@ export class ManagerDriver {
     this.loadPendingVehicle();
   }
   OpenImage(url : string){
-     console.log('URL ảnh được click:', url);
     this.selectedImageUrl=url;
   }
   CloseImage(){

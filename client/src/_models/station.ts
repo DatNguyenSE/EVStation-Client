@@ -17,7 +17,7 @@ export type Post = {
   name: string;
   address: string;
   latitude: number;
-  longtitude: number;
+  longitude: number;
   description: string;
   openTime: string;
   closeTime: string;

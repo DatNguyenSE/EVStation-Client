@@ -30,7 +30,7 @@ export class ManagerStation {
     closeTime: '',
     status: 'Active',
     latitude: 0,
-    longtitude: 0,
+    longitude: 0,
     description: '',
     chargingPosts:[],
   };
@@ -78,8 +78,10 @@ viewPosts(station: DtoStation) {
  loadStation() {
   this.stationSvc.getStations().subscribe({
     next: (res) => {
-     
+      console.log("API",res);
+      //  const stations = Array.isArray(res) ? res : [res];
       this.station = res.map((s) => ({
+        
         ...s,
         chargingPosts: (s.chargingPosts).map((p) => ({
           ...p,
@@ -96,6 +98,8 @@ viewPosts(station: DtoStation) {
 
 
 
+
+
   // thêm trụ
   addStation(){
     const payload ={
@@ -103,7 +107,7 @@ viewPosts(station: DtoStation) {
       address : this.newStation.address,
       description : this.newStation.description,
       latitude: this.newStation.latitude,
-      longtitude:this.newStation.longtitude,
+      longitude:this.newStation.longitude,
       openTime : this.newStation.openTime,
       closeTime : this.newStation.closeTime,
       posts : this.newStation.chargingPosts?.map((p : Post) => ({
@@ -120,19 +124,21 @@ viewPosts(station: DtoStation) {
       next : (res) =>{
       const stationName = res.name ?? '(không rõ tên)';
         this.toast.success(`Bạn Đã Thêm Trạm Thành Công tại: ${stationName}`);
+        this.station = [...this.station, res];
         this.station.push(res);
         this.newStation = {
           name: '',
           address: '',
           description: '',
           latitude: 0,
-          longtitude: 0,
+          longitude: 0,
           openTime: '',
           closeTime: '',
           chargingPosts: [],
         };
-        this.cdf.detectChanges();
         this.loadStation();
+        this.cdf.detectChanges();
+        
       },
       error :(err) =>{
           this.message = err.error?.message;
@@ -219,7 +225,7 @@ removePost(id: number) {
         };
       }
 
-      this.toast.success(`✅ Cập nhật trạm "${res.name}" thành công`);
+      this.toast.success(`Cập nhật trạm "${res.name}" thành công`);
       this.editingStation = null;
     },
     error: (err) => {
@@ -356,18 +362,29 @@ changeStationStatus(station: DtoStation) {
 
   // Xóa Trạm 
   removeStation(id:number){
-     if(confirm('Bạn Có Chắc Xóa Trạm này đi không ?')){
-      this.stationSvc.deleteStation(id).subscribe({
+     Swal.fire({
+      title:'Bạn Có Chắc Xóa Trạm Không',
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy'
+     }).then((result) =>{
+       if(result.isConfirmed){
+              this.stationSvc.deleteStation(id).subscribe({
         next : () => {
           this.toast.success(`Bạn Đã Xóa Trạm Thành Công`);
+          this.station = this.station.filter((d:DtoStation) => d.id !== id);
            this.cdf.detectChanges();
-          this.loadStation();
+          
         },
         error : (err) =>{
           this.message = err.message
         }
       })
-     }
+       }
+     }) 
   }
 
   

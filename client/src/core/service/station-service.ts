@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { DtoStation, Post } from '../../_models/station';
 import { map, Observable } from 'rxjs';
 
@@ -20,7 +20,9 @@ export class StationService {
   private baseUrl = 'https://localhost:5001/api';
 
   getStations() {
-    return this.http.get<DtoStation[]>(`${this.baseUrl}/station`);
+    return this.http.get<DtoStation[]>(`${this.baseUrl}/station`,{
+    params: { noCache: Date.now().toString() }  // ép gọi mới mỗi lần
+  });
   }
 
   getStationByid(idStaion: number) {
