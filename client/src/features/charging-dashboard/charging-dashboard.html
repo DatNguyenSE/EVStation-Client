@@ -54,7 +54,7 @@
             <strong>Trạng thái:</strong>
             <span class="px-3 py-0.5 rounded-full text-sm font-medium" [ngClass]="{
                     'bg-green-100 text-green-700': postInfo.status === 'Available',
-                    'bg-yellow-100 text-yellow-700': postInfo.status === 'Charging',
+                    'bg-yellow-100 text-yellow-700': postInfo.status === 'Occupied',
                     'bg-red-100 text-red-700': postInfo.status === 'Offline'
                   }">
               {{ postInfo.status }}
@@ -130,7 +130,7 @@
         </div>
         <div class="bg-green-50 rounded-2xl py-4 shadow-sm hover:shadow-md transition">
           <p class="text-gray-500 text-sm">Thời gian còn lại</p>
-          <p class="text-lg font-bold text-green-700">{{ timeRemain() | number:'1.0-0' }} giây</p>
+          <p class="text-lg font-bold text-green-700">{{ formatTimeRemain() }}</p>
         </div>
         <div class="col-span-2 bg-green-100/50 rounded-2xl py-4 shadow-sm hover:shadow-md transition">
           <p class="text-gray-500 text-sm">Chi phí hiện tại</p>

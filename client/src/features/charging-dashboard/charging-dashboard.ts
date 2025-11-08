@@ -56,6 +56,21 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   private realtimeSub?: Subscription;
   private stopSub?: Subscription;
   private fullSub?: Subscription;
+  private countdownInterval?: any;
+
+  // Bắt đầu đếm ngược
+  private startCountdown() {
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
+
+    this.countdownInterval = setInterval(() => {
+      const current = this.timeRemain();
+      if (current > 0) {
+        this.timeRemain.set(current - 1);
+      } else {
+        clearInterval(this.countdownInterval);
+      }
+    }, 1000);
+  }
 
   ngOnInit() {
     this.idPost = this.route.snapshot.paramMap.get('idPost')!;
@@ -126,7 +141,28 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       });
   }
 
+  // Format giây → hh:mm:ss
+  protected formatTimeRemain(): string {
+    const totalSeconds = this.timeRemain();
+    if (totalSeconds <= 0) return '00:00';
 
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    // < 1 phút → chỉ hiện giây
+    if (hours === 0 && minutes === 0) {
+      return `${seconds} giây`;
+    }
+
+    // < 1 giờ → mm:ss
+    if (hours === 0) {
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // >= 1 giờ → hh:mm:ss
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
 
   // --- Bắt đầu phiên sạc ---
 
@@ -145,7 +181,14 @@ export class ChargingDashboard implements OnInit, OnDestroy {
          this.presenceService.sendConnectCharging(this.idPost);
       
         this.sessionId = session.id;
-        this.cdr.detectChanges();
+
+        this.stationService.getPostById(this.idPost).subscribe({
+          next: updatedPost => {
+            this.postInfo = updatedPost;
+            console.log('Trụ đã cập nhật trạng thái:', updatedPost.status); // → Occupied
+          }
+        });
+
         // ====kết nối SignalR-ChargingHub
         this.hubService.startConnection();
         setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
@@ -160,7 +203,9 @@ export class ChargingDashboard implements OnInit, OnDestroy {
               this.batteryPercent.set(data.batteryPercentage ?? this.batteryPercent());
               this.chargedKwh.set(data.energyConsumed ?? this.chargedKwh());
               this.totalPrice.set(data.cost ?? this.totalPrice());
-              this.timeRemain.set(data.timeRemain ?? this.timeRemain());
+              this.timeRemain.set(data.timeRemainTotalSeconds ?? this.timeRemain());
+
+              this.startCountdown();
             });
           });
 
@@ -190,7 +235,6 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   if (!confirmed) return;
 
   this.isStopping = true;
-  this.cdr.detectChanges();
 
   if (this.isPaused) {
     // Tiếp tục sạc
@@ -200,14 +244,12 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.isStopping = false;
     this.confirmed.set(false);
     this.toast.success('Đã tiếp tục sạc');
-    this.cdr.detectChanges();
   } else {
     this.chargingService.stopSession(this.sessionId).subscribe({
       next: async () => {
         await this.presenceService.sendDisconnectCharging(this.idPost);
         this.isPaused = true;
         this.isStopping = false;
-        this.cdr.detectChanges();
         this.confirmed.set(true);
         console.log(this.sessionId + ' paused successfully');
         this.toast.success('Tạm dừng sạc thành công');
@@ -216,7 +258,6 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       },
       error: () => {
         this.isStopping = false;
-        this.cdr.detectChanges();
         this.toast.error('Dừng sạc thất bại');
       }
     });
@@ -249,6 +290,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
     if (this.sessionId) this.hubService.leaveSession(this.sessionId);
     this.realtimeSub?.unsubscribe();
     this.stopSub?.unsubscribe();
