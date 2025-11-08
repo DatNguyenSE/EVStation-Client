@@ -2,9 +2,10 @@ export type Package = {
     id:number;
     name:string;
     description:string;
-    vehicleType : number;
+    vehicleType : string;
     price : number;
     durationDays : number;
+    isActive : boolean;
 }
 export type MyPackage ={
     id:number;

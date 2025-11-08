@@ -60,12 +60,17 @@ export class DriverService {
   
 
   getAllDriver(){
-    return this.http.get<Driver[]>(`${this.baseUrl}account/drivers`);
+    const noCache = new Date().getTime();
+    return this.http.get<Driver[]>(`${this.baseUrl}account/drivers?noCache=${noCache}`);
   }
 
  banDriver(userId: string, days: number) {
    console.log('Gửi request banUser:', userId, days);
   return this.http.post(`${this.baseUrl}account/BanUser/${userId}?days=${days}`, {});
+}
+
+unBanDriver(userId : string){
+  return this.http.post(`${this.baseUrl}account/UnbanUser/${userId}`,{});
 }
 
 

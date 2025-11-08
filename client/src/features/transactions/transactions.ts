@@ -34,15 +34,17 @@ export class Transactions implements OnInit {
 
   loadTransactions(page: number = this.pageNumber): void {
     this.isLoading = true;
+
     this.transactionService.getTransactions(page, this.pageSize).subscribe({
       next: (res: PagedResult<TransactionDto>) => {
         // Cập nhật state bên trong setTimeout để tránh ExpressionChangedAfterItHasBeenCheckedError
         setTimeout(() => {
-          this.transactions = res.items || [];
+          this.transactions =res.items || []
           if (res.pagination) {
             this.meta = res.pagination;
             this.pageNumber = res.pagination.currentPage;
           }
+          
           this.isLoading = false;
           this.cdr.detectChanges(); // đảm bảo view update ngay
         });

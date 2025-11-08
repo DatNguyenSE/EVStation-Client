@@ -1,0 +1,222 @@
+<!-- BOX 2: BẢNG GIÁ DỊCH VỤ -->
+<div class="bg-white rounded-xl shadow-lg border-t-8 border-yellow-600 p-6 mt-15 w-full">
+  <!-- BOX 2: BẢNG GIÁ DỊCH VỤ -->
+<div class="bg-white rounded-2xl shadow-lg border-t-8 border-yellow-500 p-6 mt-10 w-full">
+  <h3 class="text-2xl font-bold text-yellow-700 mb-6 text-center flex items-center justify-center gap-3">
+    <i class="fas fa-coins text-yellow-500 text-3xl"></i>
+    Bảng Giá Dịch Vụ
+  </h3>
+
+  <!-- BẢNG GIÁ -->
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+    <table class="min-w-full bg-white text-sm text-gray-700">
+      <thead class="bg-yellow-100 text-gray-800 uppercase tracking-wide">
+        <tr class="text-center">
+          <th class="py-3 px-4 border">#</th>
+          <th class="py-3 px-4 border">Tên Gói</th>
+          <th class="py-3 px-4 border">Loại Giá</th>
+          <th class="py-3 px-4 border">Giá / kWh hoặc / phút (VNĐ)</th>
+          <th class="py-3 px-4 border">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of price; let i = index"
+            class="hover:bg-yellow-50 transition-colors duration-200 text-center">
+          <td class="py-2 px-4 border font-medium text-gray-500">{{ i + 1 }}</td>
+          <td class="py-2 px-4 border font-semibold text-gray-800">{{ p.name }}</td>
+          <td class="py-2 px-4 border capitalize">{{ p.priceType }}</td>
+          <td class="py-2 px-4 border text-green-700 font-semibold">
+            <ng-container *ngIf="p.priceType === 'OccupancyFee' || p.priceType === 'OverstayFee'; else kwhPrice">
+              {{ p.pricePerMinute | number:'1.0-0' }}
+            </ng-container>
+            <ng-template #kwhPrice>
+              {{ p.pricePerKwh | number:'1.0-0' }}
+            </ng-template>
+          </td>
+          <td class="py-2 px-4 border">
+            <button
+              (click)="editPrices(p)"
+              class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 shadow-sm">
+              <i class="fas fa-edit"></i>
+              Sửa
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="price.length === 0" class="text-center text-gray-500">
+          <td colspan="5" class="py-4">Không có dữ liệu bảng giá</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- POPUP SỬA GIÁ -->
+<div *ngIf="editPrice as e"
+     class="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 animate-fade-in">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border-t-4 border-yellow-500">
+    <h3 class="text-xl font-semibold text-yellow-700 mb-4 flex items-center gap-2">
+      <i class="fas fa-pen text-yellow-500"></i> Cập Nhật Bảng Giá
+    </h3>
+
+    <div class="grid grid-cols-1 gap-4">
+      <input type="text" [(ngModel)]="e.name"
+             class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
+             placeholder="Tên gói" />
+      <input type="text" [(ngModel)]="e.priceType"
+             class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
+             placeholder="Loại giá" />
+      <input type="number" [(ngModel)]="e.pricePerKwh"
+             class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
+             placeholder="Giá / kWh" />
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button (click)="cancelEdit()"
+              class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200">
+        Hủy
+      </button>
+      <button (click)="updatePrice()"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+        Lưu thay đổi
+      </button>
+    </div>
+  </div>
+</div>
+  <!-- BOX 3: QUẢN LÝ GÓI DỊCH VỤ -->
+<div class="bg-white rounded-xl shadow-lg border-t-8 border-green-600 p-6 mt-12 w-full">
+  <h3 class="text-2xl font-semibold text-green-700 mb-6 text-center flex items-center justify-center gap-2">
+    <i class="fas fa-box text-green-500"></i> Quản Lý Gói Dịch Vụ
+  </h3>
+  <div class="flex justify-between mb-4">
+    <button (click)="createPackage()" 
+            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+      <i class="fas fa-plus"></i> Tạo gói mới
+    </button>
+      <button (click)="getPackages()"
+              class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg">
+        Tải lại
+      </button>
+  </div>
+
+  <!-- FORM TẠO GÓI MỚI -->
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+  <!-- Tên gói -->
+  <input type="text"
+         [(ngModel)]="newPackage.name"
+         placeholder="Tên gói"
+         class="border rounded-lg p-2 focus:ring-2 focus:ring-green-400 outline-none" />
+
+  <!-- Mô tả -->
+  <input type="text"
+         [(ngModel)]="newPackage.description"
+         placeholder="Mô tả"
+         class="border rounded-lg p-2 focus:ring-2 focus:ring-green-400 outline-none" />
+
+  <!-- Loại xe -->
+  <select [(ngModel)]="newPackage.vehicleType"
+          class="border rounded-lg p-2 focus:ring-2 focus:ring-green-400 outline-none bg-white">
+    <option value="" disabled selected>-- Chọn loại xe --</option>
+    <option value="Motorbike">Xe máy Điện</option>
+    <option value="Car">Ô tô</option>
+  </select>
+
+  <!-- Giá -->
+  <input type="number"
+         [(ngModel)]="newPackage.price"
+         placeholder="Giá (VNĐ)"
+         class="border rounded-lg p-2 focus:ring-2 focus:ring-green-400 outline-none" />
+
+  <!-- Thời hạn -->
+  <input type="number"
+         [(ngModel)]="newPackage.durationDays"
+         placeholder="Thời hạn (ngày)"
+         class="border rounded-lg p-2 focus:ring-2 focus:ring-green-400 outline-none" />
+</div>
+
+
+  <!-- DANH SÁCH GÓI -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
+      <thead class="bg-green-100 text-gray-700">
+        <tr class="text-center">
+          <th class="py-2 px-4 border">#</th>
+          <th class="py-2 px-4 border">Tên Gói</th>
+          <th class="py-2 px-4 border">Loại Xe</th>
+          <th class="py-2 px-4 border">Giá</th>
+          <th class="py-2 px-4 border">Thời Hạn (ngày)</th>
+          <th class="py-2 px-4 border">Trạng Thái</th>
+          <th class="py-2 px-4 border">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pack of packages; let i = index" class="hover:bg-green-50 text-center transition">
+          <td class="py-2 px-4 border">{{ i + 1 }}</td>
+          <td class="py-2 px-4 border font-medium text-gray-800">{{ pack.name }}</td>
+          <td class="py-2 px-4 border">{{ pack.vehicleType }}</td>
+          <td class="py-2 px-4 border text-green-700 font-semibold">{{ pack.price | number }}</td>
+          <td class="py-2 px-4 border">{{ pack.durationDays }}</td>
+          <td class="py-2 px-4 border">
+            <span [ngClass]="pack.isActive ? 'text-green-600 font-semibold' : 'text-red-500 font-semibold'">
+              {{ pack.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+            </span>
+          </td>
+          <td class="py-2 px-4 border space-x-2">
+            <button (click)="editPackages(pack)" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+              <i class="fas fa-edit"></i> Sửa
+            </button>
+            <button (click)="deletePackages(pack.id!)" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+              <i class="fas fa-trash"></i> Xóa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- POPUP SỬA GÓI -->
+<div *ngIf="editPackage as e"
+     class="fixed inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm bg-opacity-50 z-50">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 animate-fade-in">
+    <h3 class="text-xl font-semibold text-green-700 mb-4 flex items-center gap-2">
+      <i class="fas fa-pen text-green-500"></i> Cập Nhật Gói Dịch Vụ
+    </h3>
+
+    <div class="grid grid-cols-1 gap-4">
+      <input type="text" [(ngModel)]="e.name"
+             class="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-400 outline-none"
+             placeholder="Tên gói" />
+      <input type="text" [(ngModel)]="e.description"
+             class="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-400 outline-none"
+             placeholder="Mô tả" />
+      <input type="text" [(ngModel)]="e.vehicleType"
+             class="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-400 outline-none"
+             placeholder="Loại xe" />
+      <input type="number" [(ngModel)]="e.price"
+             class="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-400 outline-none"
+             placeholder="Giá" />
+      <input type="number" [(ngModel)]="e.durationDays"
+             class="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-400 outline-none"
+             placeholder="Thời hạn (ngày)" />
+      <label class="flex items-center gap-2 text-gray-700">
+        <input type="checkbox" [(ngModel)]="e.isActive" class="w-4 h-4 text-green-500" />
+        Kích hoạt gói
+      </label>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button (click)="cancelEditPackages()"
+              class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition">
+        Hủy
+      </button>
+      <button (click)="updatePackages()"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+        Lưu thay đổi
+      </button>
+    </div>
+  </div>
+</div>
+
+</div>
+

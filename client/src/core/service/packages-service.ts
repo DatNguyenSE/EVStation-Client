@@ -2,19 +2,19 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MyPackage, Package } from '../../_models/package';
-import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PackagesService {
 
-  private http = inject(HttpClient); // Dùng inject() thay vì constructor
+  private http = inject(HttpClient);
   private baseUrl = 'https://localhost:5001/api';
 
   // Lấy danh sách package
   getPackages(): Observable<Package[]> {
-    return this.http.get<Package[]>(`${this.baseUrl}/charging-package/available`)
+    const noCache = new Date().getTime();
+    return this.http.get<Package[]>(`${this.baseUrl}/charging-package/available?noCache=${noCache}`);
       
   }
 
@@ -28,5 +28,17 @@ export class PackagesService {
 
   cancelPackage(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/userpackage/${id}`);
+  }
+
+  updatePackage(id:number, pack : Partial<Package>){
+      return this.http.put<Package>(`${this.baseUrl}/charging-package/${id}`,pack);
+  }
+
+  deletePackage(id:number){
+      return this.http.delete<void>(`${this.baseUrl}/charging-package/${id}`);
+  }
+
+  createPackage(packages : Partial<Package>){
+    return this.http.post<Package>(`${this.baseUrl}/charging-package`,packages);
   }
 }

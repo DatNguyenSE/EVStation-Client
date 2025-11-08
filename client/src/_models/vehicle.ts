@@ -16,7 +16,9 @@ export interface Vehicles  {
   connectorType: string;
   plate: string;
   registrationStatus: string;
-  registrationImageUrl: string;
+
+  
+
 };
 export interface VehiclePending {
   vehicleId: number;
@@ -25,7 +27,8 @@ export interface VehiclePending {
   vehicleType: string;
   ownerName: string;
   ownerEmail: string;
-  registrationImageUrl: string;
+  registrationImageBackUrl:string;
+  registrationImageFrontUrl:string;
   registrationStatus: string;
 }
 

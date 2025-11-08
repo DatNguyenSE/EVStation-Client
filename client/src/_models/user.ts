@@ -26,8 +26,8 @@ export type Driver = {
     fullName: string;
     dateOfBirth: number;
     vehicles: Vehicles[];
-    isBanned : string,
-    lockoutEnd :string;
+    isBanned : boolean,
+    lockoutEnd :string | null;
 };
 
 export type LoginCreds = {

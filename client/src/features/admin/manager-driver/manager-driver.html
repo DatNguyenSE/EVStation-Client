@@ -1,62 +1,74 @@
-<div class="p-6 bg-gray-50 min-h-screen flex flex-col gap-6 mt-15">
+<div class="p-6 bg-gray-50 min-h-screen flex flex-col gap-8 mt-15">
 
-  <!-- 🔹 Box 1: Danh sách tài xế -->
+  <!-- 🔹 BOX 1: Danh sách tài xế -->
   <div class="bg-white rounded-2xl shadow-md p-5">
-    <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
-       Danh sách Tài Xế
-    </h2>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-700 flex items-center gap-2">
+        Danh sách Tài Xế
+      </h2>
+      <button (click)="loadDriver()"
+              class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg">
+        Tải lại
+      </button>
+    </div>
 
-    <div *ngIf="isLoading" class="text-gray-500 italic">Đang tải dữ liệu...</div>
+    <div *ngIf="isLoadingDriver" class="text-gray-500 italic text-center">Đang tải dữ liệu...</div>
 
-    <table *ngIf="!isLoading && drivers.length > 0"
+    <table *ngIf="!isLoadingDriver && drivers.length > 0"
            class="w-full text-sm text-left border border-gray-200 rounded-lg overflow-hidden">
       <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
         <tr>
           <th class="px-4 py-3">ID</th>
           <th class="px-4 py-3">Tên tài xế</th>
           <th class="px-4 py-3">Email</th>
-          <th class="px-4 py-3">Ngày Sinh</th>
-          <th class="px-4 py-3">Trạng Thái</th>
-          <th class="px-4 py-3">Thời Hạn Unban</th>
-          <th class="px-4 py-3">Hành Động</th>
+          <th class="px-4 py-3">Ngày sinh</th>
+          <th class="px-4 py-3">Trạng thái</th>
+          <th class="px-4 py-3">Thời hạn Unban</th>
+          <th class="px-4 py-3 text-center">Hành động</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100">
         <tr *ngFor="let d of drivers" class="hover:bg-gray-50">
-          <td class="px-4 py-2">{{ d.id }}</td>
+          <td class="px-4 py-2">{{ d.id}}</td>
           <td class="px-4 py-2">{{ d.fullName }}</td>
           <td class="px-4 py-2">{{ d.email }}</td>
-          <td class="px-4 py-2">{{ d.dateOfBirth | date: 'dd/MM/yyyy' }}</td>
-         <td class="px-4 py-2">
-             <span
-          [ngClass]="{
+          <td class="px-4 py-2">{{ d.dateOfBirth | date:'dd/MM/yyyy' }}</td>
+          <td class="px-4 py-2">
+            <span [ngClass]="{
               'bg-green-100 text-green-800 px-2 py-1 rounded text-xs': !d.isBanned,
-             'bg-red-100 text-red-800 px-2 py-1 rounded text-xs': d.isBanned
-             }"
-        >
-          {{ d.isBanned ? 'Banned' : 'Active' }}
-        </span>
-  </td>
-        <td class="px-4 py-2">{{ d.lockoutEnd | date: 'dd/MM/yyyy HH:mm:ss' : '-'  }}</td>
-          <button (click)="banUser(d.id)"
-                  class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md font-medium">
-            Ban
-          </button>
+              'bg-red-100 text-red-800 px-2 py-1 rounded text-xs': d.isBanned
+            }">
+              {{ d.isBanned ? 'Banned' : 'Active' }}
+            </span>
+          </td>
+          <td class="px-4 py-2">
+            {{ d.lockoutEnd ? (d.lockoutEnd | date:'dd/MM/yyyy HH:mm:ss') : '-' }}
+          </td>
+          <td class="px-4 py-2 flex gap-2 justify-center ">
+            <button (click)="banUser(d.id)"
+                    class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md font-medium">
+              Ban
+            </button>
+            <button (click)="unBanDriver(d.id)"
+                    class="bg-yellow-500 hover:bg-yellow-500 text-white text-xs px-3 py-1 rounded-md font-medium">
+              UnBan
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <div *ngIf="!isLoading && drivers.length === 0"
+    <div *ngIf="!isLoadingDriver && drivers.length === 0"
          class="text-gray-500 italic mt-4 text-center">
       Không có tài xế nào trong hệ thống.
     </div>
   </div>
 
-  <!-- 🔹 Box 2: Xe đang chờ duyệt -->
+  <!-- 🔹 BOX 2: Xe đang chờ duyệt -->
   <div class="bg-white rounded-2xl shadow-md p-5">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold text-gray-700 flex items-center gap-2">
-        Xe đang chờ duyệt
+         Xe đang chờ duyệt
       </h2>
       <button (click)="loadPendingVehicle()"
               class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg">
@@ -64,9 +76,9 @@
       </button>
     </div>
 
-    <div *ngIf="isLoading" class="text-gray-500 italic">Đang tải danh sách xe...</div>
+    <div *ngIf="isLoadingVehicle" class="text-gray-500 italic text-center">Đang tải danh sách xe...</div>
 
-    <table *ngIf="!isLoading && vehiclePending.length > 0"
+    <table *ngIf="!isLoadingVehicle && vehiclePending.length > 0"
            class="w-full text-sm text-left border border-gray-200 rounded-lg overflow-hidden">
       <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
         <tr>
@@ -74,8 +86,8 @@
           <th class="px-4 py-3">Model</th>
           <th class="px-4 py-3">Biển số</th>
           <th class="px-4 py-3">Loại</th>
-          <th class="px-4 py-3">Tên Chủ Xe</th>
-          <th class="px-4 py-3">Email Chủ Xe</th>
+          <th class="px-4 py-3">Tên chủ xe</th>
+          <th class="px-4 py-3">Email chủ xe</th>
           <th class="px-4 py-3">Ảnh đăng ký</th>
           <th class="px-4 py-3 text-center">Hành động</th>
         </tr>
@@ -87,16 +99,34 @@
           <td class="px-4 py-2">{{ v.plate }}</td>
           <td class="px-4 py-2">{{ v.vehicleType }}</td>
           <td class="px-4 py-2">{{ v.ownerName }}</td>
-          <td class="px-4 py-2">{{ v.ownerName }}</td>
+          <td class="px-4 py-2">{{ v.ownerEmail }}</td>
+            <td class="px-4 py-2">
+  <div class="flex gap-3">
+    <!-- Ảnh mặt trước -->
+    <div class="text-center">
+      <img
+        [src]="v.registrationImageFrontUrl"
+        alt="Mặt trước đăng ký xe"
+        class="w-20 h-20 object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+        (click)="selectedImageUrl = v.registrationImageFrontUrl"
+      />
+      <p class="text-xs mt-1 text-gray-600">Mặt trước</p>
+    </div>
 
-          <td class="px-4 py-2">
-            <img [src]="v.registrationImageUrl"
-                 alt="Ảnh đăng ký xe"
-                 class="w-20 h-20 object-cover rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:scale-105 transition-transform"
-                 (click)="selectedImageUrl = v.registrationImageUrl" />
-          </td>
+    <!-- Ảnh mặt sau -->
+    <div class="text-center">
+      <img
+        [src]="v.registrationImageBackUrl"
+        alt="Mặt sau đăng ký xe"
+        class="w-20 h-20 object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+        (click)="selectedImageUrl = v.registrationImageBackUrl"
+      />
+      <p class="text-xs mt-1 text-gray-600">Mặt sau</p>
+    </div>
+  </div>
+</td>
 
-          <!-- ✅ Nút hành động -->
+
           <td class="px-4 py-2 flex gap-2 justify-center">
             <button (click)="approveVehicle(v.vehicleId)"
                     class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-md font-medium">
@@ -111,25 +141,29 @@
       </tbody>
     </table>
 
-    <div *ngIf="!isLoading && vehiclePending.length === 0"
+    <div *ngIf="!isLoadingVehicle && vehiclePending.length === 0"
          class="text-gray-500 italic mt-4 text-center">
       Hiện chưa có xe nào đang chờ duyệt.
     </div>
   </div>
 
   <!-- ✅ Modal xem ảnh -->
-  <div *ngIf="selectedImageUrl"
-       class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50"
-       (click)="selectedImageUrl = null">
-    <div class="relative">
-      <img [src]="selectedImageUrl"
-           alt="Xem ảnh"
-           class="max-w-3xl max-h-[90vh] rounded-lg shadow-lg" />
-      <button (click)="selectedImageUrl = null; $event.stopPropagation()"
-              class="absolute top-2 right-2 bg-white text-gray-800 px-3 py-1 rounded-md text-sm font-semibold hover:bg-gray-100">
-        ✕
-      </button>
-    </div>
+  <div
+  *ngIf="selectedImageUrl"
+  class="fixed inset-0 bg-white/10 backdrop-blur-sm flex justify-center items-center z-50"
+  (click)="selectedImageUrl = null"
+>
+  <div class="relative" (click)="$event.stopPropagation()">
+    <img
+      [src]="selectedImageUrl"
+      alt="Xem ảnh đăng ký xe"
+      class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg object-contain"
+    />
+    <button
+      (click)="selectedImageUrl = null"
+      class="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-800 px-2.5 py-1 rounded-full text-sm font-bold shadow-md"
+    >
+      ✕
+    </button>
   </div>
-
 </div>

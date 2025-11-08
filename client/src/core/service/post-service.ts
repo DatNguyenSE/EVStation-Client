@@ -10,6 +10,9 @@ export class PostService {
   private http = inject(HttpClient);
   private baseUrl = 'https://localhost:5001/api';
 
+  getAllPost(){
+      return this.http.get<Post[]>(`${this.baseUrl}/posts`);
+  }
   addPostToStation(stationId : number,post:Partial<Post>){
     return this.http.post<Post>(`${this.baseUrl}/posts/${stationId}/post`,post);
   }

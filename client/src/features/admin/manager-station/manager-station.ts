@@ -5,6 +5,7 @@ import { DtoStation, Post } from '../../../_models/station';
 import { ToastService } from '../../../core/service/toast-service';
 import { FormsModule } from '@angular/forms';
 import { PostService } from '../../../core/service/post-service';
+ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-manager-station',
@@ -139,25 +140,40 @@ viewPosts(station: DtoStation) {
     })
   }
 
-  // Xóa Trụ
-   removePost(id: number) {
-     this.postSvc.deletePost(id).subscribe({
-         next : (res) =>{
+  // Xóa Tu
+removePost(id: number) {
+  Swal.fire({
+    title: 'Bạn có chắc muốn xóa trụ này?',
+    text: "Hành động này không thể hoàn tác!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Xóa',
+    cancelButtonText: 'Hủy'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.postSvc.deletePost(id).subscribe({
+        next: (res) => {
           this.toast.success(`Đã Xóa Trụ Thành Công`);
-          this.station.forEach(st => {
-        st.chargingPosts = st.chargingPosts.filter(p => p.id !== id);
-      });
-      if (this.viewingStation) {
-        this.viewingStation.chargingPosts = this.viewingStation.chargingPosts.filter(p => p.id !== id);
-      }
-          this.loadStation();
+          if (this.viewingStation) {
+            this.viewingStation.chargingPosts = this.viewingStation.chargingPosts.filter(p => p.id !== id);
+             
+            const idx = this.station.findIndex(s => s.id === this.viewingStation!.id);
+            if (idx !== -1) {
+              this.station[idx].chargingPosts = this.viewingStation.chargingPosts;
+            }
+          }
           this.cdf.detectChanges();
-         },
-         error : (err) =>{
+        },
+        error: (err) => {
           this.toast.error(err.message);
-         }
-     })
-  }
+        }
+      });
+    }
+  });
+}
+
 
   // thêm trụ vào trạm sạc hiện có 
   addPostToStations(stationId : number){
@@ -258,8 +274,6 @@ changeStationStatus(station: DtoStation) {
 
  // update status post 
  changePostStatus(post: Post) {
-  console.log('🔎 Post object:', post);
-
   const statusToNumber: Record<string, number> = {
     Available: 0,
     Occupied: 1,

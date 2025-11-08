@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-session-detail',
+  standalone:true,
   imports: [CommonModule],
   templateUrl: './session-detail.html',
   styleUrl: './session-detail.css',

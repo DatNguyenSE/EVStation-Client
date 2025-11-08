@@ -98,25 +98,7 @@
       <div *ngIf="activeTab==='history'">
         <h2 class="text-xl font-semibold text-white mb-5 border-b pb-2 ">Hoạt động sạc gần đây</h2>
         <div class="space-y-4">
-          <div *ngFor="let item of history"
-            class="bg-white rounded-lg p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200">
-            <div class="flex justify-between items-center mb-1">
-              <p class="font-bold text-lg text-blue-900">{{ item.date }}</p>
-              <p class="text-sm font-medium text-gray-500">{{ item.time }}</p>
-            </div>
-            <p class="text-gray-600 mb-3 text-sm">
-              <span class="font-medium text-blue-700">Trụ sạc:</span> {{ item.station }}
-            </p>
-            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-              <p class="text-base font-bold flex items-center">
-                <span class="mr-1 text-blue-700 text-l">Kw Tiêu Thụ:</span>
-                <span class="text-gray-600">{{ item.kwh }} kW</span>
-              </p>
-              <p class="text-xl font-extrabold text-gray-800">
-                {{ item.price }}₫
-              </p>
-            </div>
-          </div>
+        
         </div>
       </div>
 
