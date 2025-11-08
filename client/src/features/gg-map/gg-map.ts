@@ -274,15 +274,15 @@ reserveStation(station: any) {
 
  private findNearest(lat: number, lon: number): void {
   this.stationSvc.getNearby({ lat, lon }).subscribe({
-    next: (station) => {
-      if (!station) {
+    next: (stations) => {
+      if (!stations) {
         alert('Không tìm thấy trạm sạc gần nhất');
         return;
       }
 
-      this.nearest = station;
-      this.nearestDistance = station?.distance ?? 0;
-      this.stations = [station];
+      this.nearest = stations[0];
+      this.nearestDistance = stations[0]?.distance ?? 0;
+      this.stations = [stations[0]];
         this.clearRoute();
         this.clearStationMarkers();
         this.addStationMarkers();

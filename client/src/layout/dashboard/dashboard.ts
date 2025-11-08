@@ -54,6 +54,7 @@ export class Dashboard implements OnInit {
         this.updatePaginatedHistory(); 
 
         this.isLoadingHistory = false;
+        this.cdf.detectChanges();
         console.log('Lịch sử sạc:', this.fullChargeHistory);
       },
       error: (err) => {

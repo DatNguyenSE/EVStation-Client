@@ -42,8 +42,8 @@ export class StationService {
       observe: 'response'
     });
   }
-  getNearby(location: { lat: number; lon: number }) {
-    return this.http.get<DtoStation>(`${this.baseUrl}/station/nearest?lat=${location.lat}&lon=${location.lon}`);
+  getNearby(location: { lat: number; lon: number}, count: number = 5) {
+    return this.http.get<DtoStation[]>(`${this.baseUrl}/station/nearest?lat=${location.lat}&lon=${location.lon}&count=${count}`);
   }
   getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     return this.http.get<{ distance: number }>(`${this.baseUrl}/station/distance`, {

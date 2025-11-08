@@ -26,7 +26,7 @@
           <td class="py-2 px-4 border font-semibold text-gray-800">{{ p.name }}</td>
           <td class="py-2 px-4 border capitalize">{{ p.priceType }}</td>
           <td class="py-2 px-4 border text-green-700 font-semibold">
-            <ng-container *ngIf="p.priceType === 'OccupancyFee'; else kwhPrice">
+            <ng-container *ngIf="p.priceType === 'OccupancyFee' || p.priceType === 'OverstayFee'; else kwhPrice">
               {{ p.pricePerMinute | number:'1.0-0' }}
             </ng-container>
             <ng-template #kwhPrice>
