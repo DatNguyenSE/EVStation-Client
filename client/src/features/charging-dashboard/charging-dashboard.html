@@ -46,18 +46,18 @@
           <i class="i-ph-charging-station text-xl"></i> Thông tin Trụ sạc
         </h3>
         <ul class="text-gray-700 space-y-1">
-          <li><strong>Mã trụ:</strong> {{ postInfo.id }}</li>
-          <li><strong>Loại:</strong> {{ postInfo.type }}</li>
-          <li><strong>Công suất:</strong> {{ postInfo.powerKW }} kW</li>
-          <li><strong>Đầu nối:</strong> {{ postInfo.connectorType }}</li>
+          <li><strong>Mã trụ:</strong> {{ postInfo()?.id }}</li>
+          <li><strong>Loại:</strong> {{ postInfo()?.type }}</li>
+          <li><strong>Công suất:</strong> {{ postInfo()?.powerKW }} kW</li>
+          <li><strong>Đầu nối:</strong> {{ postInfo()?.connectorType }}</li>
           <li>
             <strong>Trạng thái:</strong>
             <span class="px-3 py-0.5 rounded-full text-sm font-medium" [ngClass]="{
-                    'bg-green-100 text-green-700': postInfo.status === 'Available',
-                    'bg-yellow-100 text-yellow-700': postInfo.status === 'Occupied',
-                    'bg-red-100 text-red-700': postInfo.status === 'Offline'
+                    'bg-green-100 text-green-700': postInfo()?.status === 'Available',
+                    'bg-yellow-100 text-yellow-700': postInfo()?.status === 'Occupied',
+                    'bg-red-100 text-red-700': postInfo()?.status === 'Offline'
                   }">
-              {{ postInfo.status }}
+              {{ postInfo()?.status }}
             </span>
           </li>
         </ul>
@@ -94,7 +94,7 @@
     </div>
 
     <!--  KHU VỰC SẠC -->
-    @if (postInfo.status === 'Available') {
+    @if (postInfo()?.status === 'Available' || postInfo()?.status === 'Occupied' || sessionId) {
     <div
       class="flex-1 bg-gradient-to-b from-green-50 to-white p-8 rounded-3xl shadow-xl border border-green-100 flex flex-col justify-between hover:shadow-2xl transition duration-300">
 
