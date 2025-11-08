@@ -1,6 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, inject, OnDestroy} from '@angular/core';
 import { StationService } from '../../core/service/station-service';
-import {  NgFor, NgIf } from '@angular/common';
+import {  CommonModule, NgFor, NgIf } from '@angular/common';
 import * as L from 'leaflet'
 import 'leaflet-routing-machine';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +27,7 @@ const userIcon = L.icon({
 @Component({
   selector: 'app-gg-map',
   standalone: true,
-  imports: [NgIf, NgFor,FormsModule],
+  imports: [NgIf, NgFor,FormsModule,CommonModule],
   templateUrl: './gg-map.html',
   styleUrls: ['./gg-map.css'],
 })
@@ -46,11 +46,13 @@ export class GgMap implements AfterViewInit, OnDestroy {
   searchResults: any[] = [];
   searchTimeout?: any;
 
+  count: number = 5;
+
    private cdRef = inject(ChangeDetectorRef);
 
 
   constructor(private stationSvc: StationService, private router :Router) {}
-  private clearRoute(): void {
+private clearRoute(): void {
   if (this.routing) {
     try {
       if ((this.routing as any)._map) {
@@ -63,16 +65,29 @@ export class GgMap implements AfterViewInit, OnDestroy {
     } catch {}
     this.routing = null;
   }
-    this.map.eachLayer((layer: any) => {
+
+  if (this.routeControl) {
+    try {
+      if ((this.routeControl as any)._map) {
+        this.map.removeControl(this.routeControl);
+      }
+    } catch {}
+    this.routeControl = null;
+  }
+
+  // Xóa hết các polyline route còn sót
+  this.map.eachLayer((layer: any) => {
     if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
       this.map.removeLayer(layer);
     }
   });
 }
 
+
   ngAfterViewInit(): void {
   setTimeout(() => {
     this.initMap();
+    this.count = this.count || 5;
   }, 100);
 }
 
@@ -272,25 +287,35 @@ reserveStation(station: any) {
     });
   }
 
- private findNearest(lat: number, lon: number): void {
+private findNearest(lat: number, lon: number): void {
   this.stationSvc.getNearby({ lat, lon }).subscribe({
     next: (stations) => {
-      if (!stations) {
-        alert('Không tìm thấy trạm sạc gần nhất');
-        return;
-      }
+      // Lọc trạm hợp lệ
+      const validStations = stations.filter((s: DtoStation) => !!s.latitude && !!s.longitude);
+      // ✅ Chọn trạm gần nhất (có dữ liệu)
+      const nearest = validStations.reduce((min, s) =>
+        s.distance < min.distance ? s : min
+      );
 
-      this.nearest = stations[0];
-      this.nearestDistance = stations[0]?.distance ?? 0;
-      this.stations = [stations[0]];
+      // ✅ Bọc trong setTimeout để tránh lỗi ExpressionChanged
+     
+        this.stations = validStations;
+        this.nearest = nearest;
+        this.nearestDistance = this.nearest?.distance ?? 0;
+        // Xóa route cũ và vẽ lại marker
         this.clearRoute();
         this.clearStationMarkers();
         this.addStationMarkers();
+
         this.cdRef.detectChanges();
     },
-    error: (err) => console.error('Lỗi tải trạm gần nhất', err),
+    error: (err) => {
+      console.error('Lỗi tải trạm gần nhất', err);
+    },
   });
 }
+
+
    private clearStationMarkers(){
     this.stationLayer.clearLayers();
    }

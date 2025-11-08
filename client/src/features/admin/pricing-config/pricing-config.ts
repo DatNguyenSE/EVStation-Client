@@ -98,6 +98,17 @@ export class PricingConfig {
 
     createPackage(){
 
+      if (
+    !this.newPackage.name ||
+    !this.newPackage.description ||
+    !this.newPackage.vehicleType ||
+    (this.newPackage.price ?? 0) <= 0 ||
+    (this.newPackage.durationDays ?? 0) <= 0
+  ) {
+    this.toast.warning('Vui lòng điền đầy đủ thông tin trước khi tạo gói!');
+    return; // Dừng không gọi API
+  }
+
        const payLoad = {
           name : this.newPackage.name,
           description : this.newPackage.description,
@@ -116,7 +127,6 @@ export class PricingConfig {
          },
           error: (err) => {
             this.toast.error('Vui lòng nhập đầy đủ thông tin');
-            console.warn('Lỗi BE (ẩn trên UI):', err); // chỉ log nội bộ
           }
        })
     }
@@ -128,7 +138,7 @@ export class PricingConfig {
     updatePackages(){
       if(!this.editPackage) return;
       this.packageSvc.updatePackage(this.editPackage.id,this.editPackage).subscribe({
-         next : (res) =>{
+         next : (res)  =>{
           const index = this.packages.findIndex(d => d.id === this.editPackage!.id);
           if(index !== -1){
             this.packages[index] = {

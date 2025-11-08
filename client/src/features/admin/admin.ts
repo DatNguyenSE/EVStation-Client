@@ -81,7 +81,6 @@ export class Admin {
   loadDriver(){
     this.driverSvc.getAllDriver().subscribe({
       next : (res) =>{
-        console.log('Dữ liệu từ API:', res);
         this.drivers = res;
         this.activeDriverCount = this.drivers.filter((d : Driver) => d.isBanned === false).length
         this.banDriverCount = this.drivers.filter((d : Driver) => d.isBanned === true).length

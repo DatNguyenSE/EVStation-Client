@@ -21,11 +21,12 @@ export class Revenue {
 
   revenues: Revenues[] = [];
   totalRevenueSum = 0;
+   totalPackageRevenue = 0;
   startDate = '';
   endDate = '';
   granularity = 'Month';
   chart: any;
-
+  pieChart: any;
   ngOnInit() {
     const today = new Date();
 
@@ -37,8 +38,11 @@ export class Revenue {
     const pad = (n: number) => n.toString().padStart(2, '0');
     this.startDate = `${firstDay.getFullYear()}/${pad(firstDay.getMonth() + 1)}/${pad(firstDay.getDate())}`;
     this.endDate = `${lastDay.getFullYear()}/${pad(lastDay.getMonth() + 1)}/${pad(lastDay.getDate())}`;
-
+  }
+    ngAfterViewInit() {
+    // Chờ DOM sẵn sàng rồi mới vẽ biểu đồ
     this.loadDoanhThu();
+    this.loadDoanhThuGoi();
   }
 
   loadDoanhThu() {
@@ -58,6 +62,15 @@ export class Revenue {
         this.toast.error('Lỗi khi tải doanh thu');
         console.error(err);
       }
+    });
+  }
+  loadDoanhThuGoi(){
+    this.revenueSvc.loadPackageRevenue(this.startDate, this.endDate).subscribe({
+      next: (pkgRevenue) => {
+        this.totalPackageRevenue = pkgRevenue;
+        this.renderPieChart(); // cập nhật pie chart khi có dữ liệu
+      },
+      error: () => this.toast.error('Lỗi tải doanh thu gói dịch vụ'),
     });
   }
 
@@ -97,6 +110,39 @@ export class Revenue {
           x: { title: { display: true, text: 'Trạm sạc' } }
         }
       }
+    });
+  }
+  renderPieChart() {
+    const ctxPie = document.getElementById('revenuePie') as HTMLCanvasElement;
+    if (!ctxPie) return;
+    if (this.pieChart) this.pieChart.destroy();
+
+    this.pieChart = new Chart(ctxPie, {
+      type: 'pie',
+      data: {
+        labels: ['Tiền sạc', 'Tiền gói dịch vụ'],
+        datasets: [
+          {
+            data: [this.totalRevenueSum, this.totalPackageRevenue],
+            backgroundColor: ['rgba(59,130,246,0.6)', 'rgba(168,85,247,0.6)'],
+            borderColor: ['rgba(37,99,235,1)', 'rgba(126,34,206,1)'],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            color: '#1e3a8a',
+            font: { size: 16, weight: 'bold' },
+          },
+          legend: {
+            position: 'bottom',
+            labels: { color: '#374151', font: { size: 13 } },
+          },
+        },
+      },
     });
   }
 }
