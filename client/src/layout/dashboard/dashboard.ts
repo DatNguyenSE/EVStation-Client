@@ -40,17 +40,36 @@ export class Dashboard implements OnInit {
     this.loadChargeHistory(1); 
   }
 
-  loadChargeHistory(page: number) {
+  // loadChargeHistory(page: number) {
+  //   this.isLoadingHistory = true;
+  //   this.chargingService.getHistory(page, this.pagination().pageSize).subscribe({
+  //     next: (res) => {
+  //       this.paginatedHistory = res.sessions;
+  //       this.pagination.set(res.pagination);
+  //       this.isLoadingHistory = false;
+  //       this.cdf.detectChanges();
+  //     },
+  //     error: (err) => {
+  //       console.error("Lỗi tải lịch sử sạc:", err);
+  //       this.isLoadingHistory = false;
+  //       this.cdf.detectChanges();
+  //     }
+  //   });
+  // }
+    loadChargeHistory(page: number) {
     this.isLoadingHistory = true;
     this.chargingService.getHistory(page, this.pagination().pageSize).subscribe({
       next: (res) => {
-        this.paginatedHistory = res.sessions;
-        this.pagination.set(res.pagination);
+        this.paginatedHistory = res?.sessions ?? []; // ✅ đảm bảo không undefined
+        this.pagination.set(res?.pagination ?? {
+          currentPage: 1, pageSize: 5, totalPages: 1, totalCount: 0
+        });
         this.isLoadingHistory = false;
         this.cdf.detectChanges();
       },
       error: (err) => {
         console.error("Lỗi tải lịch sử sạc:", err);
+        this.paginatedHistory = []; // ✅ fallback
         this.isLoadingHistory = false;
         this.cdf.detectChanges();
       }
@@ -68,12 +87,14 @@ export class Dashboard implements OnInit {
   loadDriverPackage(){
     this.packageSvc.getMyPackage().subscribe({
       next : (res) =>{
-         this.driverPackage = res;
+        //  this.driverPackage = res;
+        this.driverPackage = Array.isArray(res) ? res : []; 
          console.log('Gói cước của tài xế:', this.driverPackage);
          this.cdf.detectChanges();
       },
       error :(err) =>{
         console.log("Lỗi Load Package",err);
+        this.driverPackage = [];
       }
     })
   }

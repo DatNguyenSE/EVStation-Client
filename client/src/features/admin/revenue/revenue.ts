@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { RevenueService } from '../../../core/service/revenue-service';
 import { ToastService } from '../../../core/service/toast-service';
 import { Chart, registerables } from 'chart.js';
-import { Revenues } from '../../../_models/revenue';
+import { Revenues, RevenuesPack } from '../../../_models/revenue';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -20,8 +20,10 @@ export class Revenue {
   private cdf = inject(ChangeDetectorRef);
 
   revenues: Revenues[] = [];
+    pkgRevenue!: RevenuesPack;
+
   totalRevenueSum = 0;
-   totalPackageRevenue = 0;
+  totalPackageRevenue = 0;
   startDate = '';
   endDate = '';
   granularity = 'Month';
@@ -66,8 +68,9 @@ export class Revenue {
   }
   loadDoanhThuGoi(){
     this.revenueSvc.loadPackageRevenue(this.startDate, this.endDate).subscribe({
-      next: (pkgRevenue) => {
-        this.totalPackageRevenue = pkgRevenue;
+      next: (res) => {
+        this.pkgRevenue = res;
+        this.totalPackageRevenue = res.totalPackageRevenue;
         this.renderPieChart(); // cập nhật pie chart khi có dữ liệu
       },
       error: () => this.toast.error('Lỗi tải doanh thu gói dịch vụ'),

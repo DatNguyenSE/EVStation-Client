@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Revenues } from '../../_models/revenue';
+import { Revenues, RevenuesPack } from '../../_models/revenue';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +13,11 @@ export class RevenueService {
    loadRevenue(startDate:string,endDate:string,granularity:string = 'Month') : Observable<Revenues[]>{
     return this.http.get<Revenues[]>(`${this.baseUrl}/revenue?startDate=${startDate}&endDate=${endDate}&granularity=${granularity}`);
    }
-    loadPackageRevenue(startDate: string, endDate: string): Observable<number> {
+    loadPackageRevenue(startDate: string, endDate: string): Observable<RevenuesPack> {
     let params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
 
-    return this.http.get<number>(`${this.baseUrl}/revenue/packages`, { params });
+    return this.http.get<RevenuesPack>(`${this.baseUrl}/revenue/packages`, { params });
   }
 }
