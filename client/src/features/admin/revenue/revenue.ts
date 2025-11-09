@@ -50,7 +50,6 @@ export class Revenue {
   loadDoanhThu() {
     this.revenueSvc.loadRevenue(this.startDate, this.endDate, this.granularity).subscribe({
       next: (res: any) => {
-        // ép kiểu về Revenues[]
         this.revenues = (res as Revenues[]).map(r => ({
           ...r,
           period: this.formatDateFromBE(r.period)
@@ -71,7 +70,7 @@ export class Revenue {
       next: (res) => {
         this.pkgRevenue = res;
         this.totalPackageRevenue = res.totalPackageRevenue;
-        this.renderPieChart(); // cập nhật pie chart khi có dữ liệu
+        this.renderPieChart(); 
       },
       error: () => this.toast.error('Lỗi tải doanh thu gói dịch vụ'),
     });
