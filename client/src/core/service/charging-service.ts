@@ -38,10 +38,14 @@ export class ChargingSessionService {
   startSession(dto: CreateChargingSessionDto): Observable<ChargingSessionDto> {
     return this.http.post<ChargingSessionDto>(`${this.baseUrl}charging-sessions/start`, dto);
   }
+
+  reconnectSession(sessionId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}charging-sessions/${sessionId}/reconnect`);
+  }
   
   stopSession(sessionId: number): Observable<any> {
-  return this.http.post(`${this.baseUrl}charging-sessions/${sessionId}/stop`, {});
-}
+    return this.http.post(`${this.baseUrl}charging-sessions/${sessionId}/stop`, {});
+  }
  
 
   completeSession(sessionId: number): Observable<any> {

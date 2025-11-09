@@ -39,11 +39,11 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   // === Trạng thái ===
   idPost!: string;
-  postInfo!: Post;
+  postInfo = signal<Post | null>(null);
   sessionId!: number;
   currentStation = signal<DtoStation | null>(null);
   errorMessage = signal<string | null>(null);
-  private cdr = inject(ChangeDetectorRef);
+  // private cdr = inject(ChangeDetectorRef);
   protected validateInfo!: ValidateScanResponse;
   protected vehicleInfo: Vehicles | undefined;
   // === Dữ liệu realtime ===
@@ -74,19 +74,137 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.idPost = this.route.snapshot.paramMap.get('idPost')!;
-    this.presenceService.createHubConnection();
-    this.getPostInfo();
+    // ✨ KIỂM TRA RECONNECT TRƯỚC
+    const savedSessionId = this.checkForExistingSession();
+    
+    if (savedSessionId) {
+      console.log('🔄 Phát hiện session cũ, đang reconnect...');
+      this.reconnectToSession(savedSessionId);
+    } else {
+      console.log('🆕 Bắt đầu session mới...');
+      this.presenceService.createHubConnection();
+      this.getPostInfo();
+    }
+  }
+
+  // ✨ HÀM MỚI: Kiểm tra localStorage
+  private checkForExistingSession(): number | null {
+    try {
+      const savedData = localStorage.getItem(`charging_session_${this.idPost}`);
+      if (!savedData) return null;
+      
+      const data = JSON.parse(savedData);
+      const savedTime = new Date(data.timestamp);
+      const now = new Date();
+      
+      // Chỉ cho phép reconnect trong vòng 24h
+      const hoursDiff = (now.getTime() - savedTime.getTime()) / (1000 * 60 * 60);
+      if (hoursDiff > 24) {
+        localStorage.removeItem(`charging_session_${this.idPost}`);
+        return null;
+      }
+      
+      return data.sessionId;
+    } catch (error) {
+      console.error('Lỗi khi đọc localStorage:', error);
+      return null;
+    }
+  }
+
+  // ✨ HÀM MỚI: Reconnect session
+  private reconnectToSession(sessionId: number) {
+    this.chargingService.reconnectSession(sessionId).subscribe({
+      next: (response) => {
+        console.log('✅ Reconnect thành công:', response);
+        
+        // Khôi phục state
+        this.sessionId = response.sessionId;
+        this.postInfo.set({
+          id: response.postInfo.id,
+          code: response.postInfo.code, // Thêm code nếu có
+          type: response.postInfo.type,
+          powerKW: response.postInfo.powerKW,
+          connectorType: response.postInfo.connectorType,
+          status: response.postInfo.status,
+          stationId: response.stationId,
+          isWalkIn: false // BE không trả về, tạm set false
+        } as Post);
+        
+        this.currentStation.set({
+          id: response.stationId,
+          name: response.stationName,
+          address: response.stationAddress,
+          status: 'Active' // BE không trả về, tạm set Active
+        } as DtoStation);
+        
+        if (response.vehicleInfo) {
+          this.vehicleInfo = {
+            vehicleId: 0, // BE không trả về vehicleId, có thể thêm sau
+            plate: response.vehicleInfo.plate,
+            model: response.vehicleInfo.model,
+            batteryCapacityKWh: response.vehicleInfo.batteryCapacityKWh,
+            type: '', // BE không trả về
+            maxChargingPowerKW: 0, // BE không trả về
+            connectorType: '', // BE không trả về
+            registrationStatus: '' // BE không trả về
+          } as Vehicles; // Cast để bypass TypeScript
+        }
+        
+        // Khôi phục state realtime
+        this.batteryPercent.set(response.currentState.batteryPercent);
+        this.chargedKwh.set(response.currentState.chargedKwh);
+        this.totalPrice.set(response.currentState.totalPrice);
+        
+        // Reconnect SignalR
+        this.presenceService.createHubConnection();
+        this.hubService.startConnection();
+        setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
+        
+        // Đăng ký lắng nghe realtime updates
+        this.subscribeToRealtimeUpdates();
+        
+        this.toast.success('Đã khôi phục phiên sạc');
+      },
+      error: (err) => {
+        console.error('❌ Reconnect thất bại:', err);
+        localStorage.removeItem(`charging_session_${this.idPost}`);
+        this.toast.error('Không thể khôi phục phiên sạc. Vui lòng bắt đầu mới.');
+        this.errorMessage.set('Phiên sạc đã kết thúc hoặc không tồn tại.');
+      }
+    });
+  }
+
+  // ✨ REFACTOR: Tách logic subscribe ra hàm riêng
+  private subscribeToRealtimeUpdates() {
+    this.realtimeSub = this.hubService.chargingUpdate$.subscribe(data => {
+      if (!data) return;
+      queueMicrotask(() => {
+        this.batteryPercent.set(data.batteryPercentage ?? this.batteryPercent());
+        this.chargedKwh.set(data.energyConsumed ?? this.chargedKwh());
+        this.totalPrice.set(data.cost ?? this.totalPrice());
+        this.timeRemain.set(data.timeRemainTotalSeconds ?? this.timeRemain());
+        this.startCountdown();
+      });
+    });
+
+    this.stopSub = this.hubService.sessionStopped$.subscribe(id => {
+      console.warn(`Phiên sạc ${id} đã dừng.`);
+    });
+
+    this.fullSub = this.hubService.sessionCompleted$.subscribe(id => {
+      console.log(`Phiên sạc ${id} đã đầy pin.`);
+    });
   }
 
   // --- Lấy thông tin trụ, trạm , reservationID, VehicleID---
   getPostInfo() {
     this.stationService.getPostById(this.idPost).subscribe({
       next: res => {
-        this.postInfo = res;
-        this.getStationInfo(this.postInfo.stationId);
+        this.postInfo.set(res);
+        this.getStationInfo(res.stationId);
 
         // Chỉ tiếp tục nếu trụ đang sẵn sàng
-        if (this.postInfo.status === 'Available') {
+        if (this.postInfo()?.status === 'Available') {
           // Gọi validateScan → lấy reservation & vehicle → sau đó startSession
           this.getReservationAndVehicleInfo();
         } else {
@@ -115,7 +233,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
           console.log('Reservation info:', res);
 
           // Nếu là walk-in thì bỏ qua bước lấy vehicle
-          if (this.postInfo.isWalkIn) {
+          if (this.postInfo()?.isWalkIn) {
             return of(null); // trả về Observable rỗng để không bị lỗi switchMap
           } else {
             return this.driverService.GetVehicleById(res.vehicleId);
@@ -181,49 +299,48 @@ export class ChargingDashboard implements OnInit, OnDestroy {
          this.presenceService.sendConnectCharging(this.idPost);
       
         this.sessionId = session.id;
+        this.saveSessionToLocalStorage(session.id);
 
-        this.stationService.getPostById(this.idPost).subscribe({
-          next: updatedPost => {
-            this.postInfo = updatedPost;
-            console.log('Trụ đã cập nhật trạng thái:', updatedPost.status); // → Occupied
-          }
-        });
+        const currentPost = this.postInfo(); // Lấy thông tin trụ hiện tại
+        if (currentPost) {
+          this.postInfo.set({
+            ...currentPost, // Giữ tất cả thông tin cũ (id, type, powerKW...)
+            status: 'Occupied' // Chỉ ghi đè trạng thái
+          });
+        } else {
+          // Phòng hờ nếu currentPost là null, thì mới gọi lại API
+          this.stationService.getPostById(this.idPost).subscribe({
+            next: updatedPost => this.postInfo.set(updatedPost)
+          });
+        }
 
         // ====kết nối SignalR-ChargingHub
         this.hubService.startConnection();
         setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
 
-        //  Lắng nghe dữ liệu realtime (hoãn 1 tick để tránh NG0100)
-        this.realtimeSub = this.hubService.chargingUpdate$
-          .subscribe(data => {
-            if (!data) return;
-
-            //  Cập nhật signal — an toàn
-            queueMicrotask(() => {
-              this.batteryPercent.set(data.batteryPercentage ?? this.batteryPercent());
-              this.chargedKwh.set(data.energyConsumed ?? this.chargedKwh());
-              this.totalPrice.set(data.cost ?? this.totalPrice());
-              this.timeRemain.set(data.timeRemainTotalSeconds ?? this.timeRemain());
-
-              this.startCountdown();
-            });
-          });
-
-        //  Khi phiên bị dừng
-        this.stopSub = this.hubService.sessionStopped$.subscribe(id => {
-          console.warn(`Phiên sạc ${id} đã dừng.`);
-        });
-
-        //  Khi sạc đầy
-        this.fullSub = this.hubService.sessionCompleted$.subscribe(id => {
-          console.log(`Phiên sạc ${id} đã đầy pin.`);
-        });
+        // Subscribe to updates
+        this.subscribeToRealtimeUpdates();
       },
       error: err => {
         console.error('Start session failed:', err);
         this.errorMessage.set('Không thể bắt đầu phiên sạc.');
       }
     });
+  }
+
+  // ✨ HÀM MỚI: Lưu session vào localStorage
+  private saveSessionToLocalStorage(sessionId: number) {
+    try {
+      const data = {
+        sessionId: sessionId,
+        postId: this.idPost,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem(`charging_session_${this.idPost}`, JSON.stringify(data));
+      console.log('💾 Đã lưu sessionId vào localStorage');
+    } catch (error) {
+      console.error('Lỗi khi lưu localStorage:', error);
+    }
   }
 
 // --- Dừng phiên sạc ---
@@ -275,10 +392,14 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     next: async () => {
       await this.presenceService.sendDisconnectCharging(this.idPost);
       this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
+
+      // 🗑️ XÓA LOCALSTORAGE
+      localStorage.removeItem(`charging_session_${this.idPost}`);
+
       console.log(`${this.sessionId} EndSession successfully`);
       this.toast.success('Đã kết thúc phiên sạc thành công');
       this.toast.success('Hóa đơn đã được gửi đến email của bạn');
-       setTimeout(() => {window.location.href = '/lichsugiaodich';}, 3000);
+      setTimeout(() => {window.location.href = '/lichsugiaodich';}, 3000);
       
     },
     error: (err) => {
