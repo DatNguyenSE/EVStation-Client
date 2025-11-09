@@ -18,6 +18,9 @@ export class ChargingHubService {
   private sessionCompletedSubject = new Subject<any>();
   sessionCompleted$ = this.sessionCompletedSubject.asObservable();
 
+  private insufficientFundsSubject = new Subject<any>();
+  insufficientFunds$ = this.insufficientFundsSubject.asObservable();
+
   private isConnecting = false;
 
 
@@ -78,7 +81,7 @@ export class ChargingHubService {
       this.chargingUpdateSubject.next(data);
     });
 
-    //  Khi phiên sạc dừng (stop manual hoặc hết tiền)
+    //  Khi phiên sạc dừng (stop manual)
     this.hubConnection.on('ReceiveSessionStopped', (data: any) => {
       console.warn(' Phiên sạc dừng:', data);
       this.sessionStoppedSubject.next(data);
@@ -89,6 +92,12 @@ export class ChargingHubService {
       console.log(' Phiên sạc hoàn tất:', data);
       this.sessionCompletedSubject.next(data);
     });
+
+    // Khi dừng sạc do hết tiền (khớp với tên sự kiện)
+    this.hubConnection.on('ReceiveSessionStopped_InsufficientFunds', (sessionId: any, status: any) => {
+      console.error('PHÁT HIỆN HẾT TIỀN!:', { sessionId, status });
+      this.insufficientFundsSubject.next({ sessionId, status });
+    });
 
     // Khi lỗi
     this.hubConnection.on('ReceiveSessionError', (error: any) => {

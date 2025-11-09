@@ -9,6 +9,7 @@ import { ChargingSessionService } from '../../core/service/charging-service';
 import { ChargingSessionHistory } from '../../_models/session';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { PaginationMeta } from '../../core/service/transaction-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,80 +25,76 @@ export class Dashboard implements OnInit {
   router = inject(Router);
   chargingService = inject(ChargingSessionService);
 
-  fullChargeHistory: ChargingSessionHistory[] = []; 
+  pagination = signal<PaginationMeta>({ currentPage: 1, pageSize: 5, totalPages: 1, totalCount: 0 });
   paginatedHistory: ChargingSessionHistory[] = [];
   isLoadingHistory = true;
 
-  pageSize = 5; // Số item mỗi trang
-  currentPage = signal(1); // Bắt đầu ở trang 1
-  
-  totalPages = computed(() => {
-    return Math.ceil(this.fullChargeHistory.length / this.pageSize);
-  });
-
-  hasPreviousPage = computed(() => this.currentPage() > 1);
-  hasNextPage = computed(() => this.currentPage() < this.totalPages());
+  get totalPages() { return this.pagination().totalPages; }
+  get currentPage() { return this.pagination().currentPage; }
+  get hasPreviousPage() { return this.currentPage > 1; }
+  get hasNextPage() { return this.currentPage < this.totalPages; }
   
   ngOnInit(): void {
     this.driverService.loadDriverProfile();
     this.loadDriverPackage();   
-    this.loadChargeHistory(); 
+    this.loadChargeHistory(1); 
   }
 
-  loadChargeHistory() {
+  // loadChargeHistory(page: number) {
+  //   this.isLoadingHistory = true;
+  //   this.chargingService.getHistory(page, this.pagination().pageSize).subscribe({
+  //     next: (res) => {
+  //       this.paginatedHistory = res.sessions;
+  //       this.pagination.set(res.pagination);
+  //       this.isLoadingHistory = false;
+  //       this.cdf.detectChanges();
+  //     },
+  //     error: (err) => {
+  //       console.error("Lỗi tải lịch sử sạc:", err);
+  //       this.isLoadingHistory = false;
+  //       this.cdf.detectChanges();
+  //     }
+  //   });
+  // }
+    loadChargeHistory(page: number) {
     this.isLoadingHistory = true;
-    this.chargingService.getHistory().subscribe({
+    this.chargingService.getHistory(page, this.pagination().pageSize).subscribe({
       next: (res) => {
-        this.fullChargeHistory = res; 
-
-        this.currentPage.set(1);
-        this.updatePaginatedHistory(); 
-
+        this.paginatedHistory = res?.sessions ?? []; // ✅ đảm bảo không undefined
+        this.pagination.set(res?.pagination ?? {
+          currentPage: 1, pageSize: 5, totalPages: 1, totalCount: 0
+        });
         this.isLoadingHistory = false;
         this.cdf.detectChanges();
-        console.log('Lịch sử sạc:', this.fullChargeHistory);
       },
       error: (err) => {
         console.error("Lỗi tải lịch sử sạc:", err);
+        this.paginatedHistory = []; // ✅ fallback
         this.isLoadingHistory = false;
         this.cdf.detectChanges();
       }
     });
   }
 
-  updatePaginatedHistory() {
-    // Tính toán vị trí bắt đầu và kết thúc
-    const startIndex = (this.currentPage() - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-
-    this.paginatedHistory = this.fullChargeHistory.slice(startIndex, endIndex);
-    
-    this.cdf.detectChanges();
-  }
-
-  goToPage(page: number) {
-    if (page < 1 || page > this.totalPages()) return;
-    this.currentPage.set(page);
-    this.updatePaginatedHistory();
-  }
-
   nextPage() {
-    this.goToPage(this.currentPage() + 1);
+    if (this.hasNextPage) this.loadChargeHistory(this.currentPage + 1);
   }
 
   prevPage() {
-    this.goToPage(this.currentPage() - 1);
+    if (this.hasPreviousPage) this.loadChargeHistory(this.currentPage - 1);
   }
 
   loadDriverPackage(){
     this.packageSvc.getMyPackage().subscribe({
       next : (res) =>{
-         this.driverPackage = res;
+        //  this.driverPackage = res;
+        this.driverPackage = Array.isArray(res) ? res : []; 
          console.log('Gói cước của tài xế:', this.driverPackage);
          this.cdf.detectChanges();
       },
       error :(err) =>{
         console.log("Lỗi Load Package",err);
+        this.driverPackage = [];
       }
     })
   }

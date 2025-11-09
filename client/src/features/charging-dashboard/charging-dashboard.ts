@@ -33,7 +33,10 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   private stationService = inject(StationService);
   protected isStopping = false;
   protected isPaused = false;
-  protected confirmed = signal(false);
+
+  // protected confirmed = signal(false);
+  protected isCompleted = signal(false);
+
   private toast = inject(ToastService);
   private presenceService = inject(PresenceService);
 
@@ -56,6 +59,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   private realtimeSub?: Subscription;
   private stopSub?: Subscription;
   private fullSub?: Subscription;
+  private insufficientFundsSub?: Subscription;
   private countdownInterval?: any;
 
   // Bắt đầu đếm ngược
@@ -193,6 +197,32 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
     this.fullSub = this.hubService.sessionCompleted$.subscribe(id => {
       console.log(`Phiên sạc ${id} đã đầy pin.`);
+      if (id === this.sessionId) {
+      this.isCompleted.set(true);
+      this.isPaused = true; // Cập nhật UI về trạng thái "đã dừng"
+      this.toast.success('Pin đã đầy! Bạn có thể hoàn tất phiên sạc.');
+    }
+    });
+
+    this.insufficientFundsSub = this.hubService.insufficientFunds$.subscribe(data => {
+      if (data.sessionId === this.sessionId) {
+        console.error('LỖI: Hết tiền, dừng sạc!');
+
+        // 1. Cập nhật trạng thái UI
+        // Dùng lại logic của "Pin đầy" để khóa nút "Tiếp tục" và mở nút "Hoàn tất"
+        this.isPaused = true; 
+        this.isCompleted.set(true);
+
+        // 2. Dừng đếm ngược
+        if (this.countdownInterval) clearInterval(this.countdownInterval);
+        this.timeRemain.set(0);
+
+        // 3. Thông báo khẩn cấp cho người dùng
+        this.toast.error('Sạc đã dừng do không đủ tiền trong ví!'); 
+        
+        // Bạn cũng có thể set errorMessage để hiển thị một box đỏ lớn (tùy chọn)
+        // this.errorMessage.set('Phiên sạc đã bị dừng do không đủ tiền.');
+      }
     });
   }
 
@@ -353,7 +383,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.startSession(); 
     this.isPaused = false;
     this.isStopping = false;
-    this.confirmed.set(false);
+    // this.confirmed.set(false);
     this.toast.success('Đã tiếp tục sạc');
   } else {
     this.chargingService.stopSession(this.sessionId).subscribe({
@@ -361,7 +391,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         await this.presenceService.sendDisconnectCharging(Number(this.idPost), this.sessionId);
         this.isPaused = true;
         this.isStopping = false;
-        this.confirmed.set(true);
+        // this.confirmed.set(true);
         console.log(this.sessionId + ' paused successfully');
         this.toast.success('Tạm dừng sạc thành công');
         
@@ -410,6 +440,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.realtimeSub?.unsubscribe();
     this.stopSub?.unsubscribe();
     this.fullSub?.unsubscribe();
+    this.insufficientFundsSub?.unsubscribe();
     this.hubService.stopConnection();
     this.presenceService.stopHubConnection();
   }

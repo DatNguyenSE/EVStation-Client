@@ -49,7 +49,7 @@
 
         <!-- Không có dữ liệu -->
         <div
-          *ngIf="!isLoadingHistory && fullChargeHistory.length === 0"
+          *ngIf="!isLoadingHistory && (paginatedHistory?.length ?? 0) === 0"
           class="flex flex-col items-center justify-center py-10 text-gray-400 border border-dashed border-base-300 rounded-xl"
         >
           <i class="fa-regular fa-folder-open text-5xl mb-3"></i>
@@ -58,7 +58,7 @@
         </div>
 
         <!-- Danh sách -->
-        <div *ngIf="!isLoadingHistory && fullChargeHistory.length > 0">
+        <div *ngIf="!isLoadingHistory && paginatedHistory.length > 0">
           <div class="overflow-x-auto rounded-xl border border-base-200">
             <table class="table table-zebra w-full">
               <thead class="bg-base-200">
@@ -120,22 +120,22 @@
           </div>
 
           <!-- Pagination -->
-          <div *ngIf="totalPages() > 1" class="flex justify-center mt-6 pt-4">
+          <div *ngIf="totalPages > 1" class="flex justify-center mt-6 pt-4">
             <div class="flex items-center gap-3 bg-base-200 p-2 rounded-full shadow-md">
               <button
                 class="btn btn-sm btn-circle bg-base-100 hover:bg-blue-500 hover:text-white transition-all"
                 (click)="prevPage()"
-                [disabled]="!hasPreviousPage()"
+                [disabled]="!hasPreviousPage"
               >
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
               <span class="text-sm font-semibold text-blue-600">
-                Trang {{ currentPage() }} / {{ totalPages() }}
+                Trang {{ currentPage }} / {{ totalPages }}
               </span>
               <button
                 class="btn btn-sm btn-circle bg-base-100 hover:bg-blue-500 hover:text-white transition-all"
                 (click)="nextPage()"
-                [disabled]="!hasNextPage()"
+                [disabled]="!hasNextPage"
               >
                 <i class="fa-solid fa-chevron-right"></i>
               </button>

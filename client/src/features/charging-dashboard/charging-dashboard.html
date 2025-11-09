@@ -142,7 +142,7 @@
 
       <!--  NÚT DỪNG -->
       <div class="mt-10 text-center">
-        <button (click)="pressStopSession()" [disabled]="isStopping" [ngClass]="{
+        <button (click)="pressStopSession()" [disabled]="isStopping || isCompleted()" [ngClass]="{
       'bg-red-600 hover:bg-red-700': !isPaused,
       'bg-green-600 hover:bg-green-700': isPaused
     }" class="text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
@@ -159,7 +159,7 @@
       </div>
 
       <div class="mt-10 text-center">
-        <button (click)="pressEndSession()" [disabled]="!this.confirmed()"
+        <button (click)="pressEndSession()" [disabled]="!isPaused && !isCompleted()"
           class="bg-red-500 hover:bg-red-600 text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
 
           <span class="i-ph-power text-lg mr-1"></span> Hoàn tất

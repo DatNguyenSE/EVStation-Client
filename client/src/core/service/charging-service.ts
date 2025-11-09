@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ChargingSessionDetailDto, ChargingSessionHistory } from '../../_models/session';
+import { PaginationMeta } from './transaction-service';
 
 export interface CreateChargingSessionDto {
   postId: number;
@@ -59,8 +60,19 @@ export class ChargingSessionService {
     return this.http.post(`${this.baseUrl}charging/validate-scan?postId=${postID}`,{});
   }
 
-  getHistory(): Observable<ChargingSessionHistory[]> {
-    return this.http.get<ChargingSessionHistory[]>(`${this.baseUrl}charging-sessions/history`);
+  // getHistory(): Observable<ChargingSessionHistory[]> {
+  //   return this.http.get<ChargingSessionHistory[]>(`${this.baseUrl}charging-sessions/history`);
+  // }
+
+  getHistory(page: number = 1, pageSize: number = 5): Observable<{sessions: ChargingSessionHistory[], pagination: PaginationMeta}> {
+    const params = new HttpParams()
+      .set('pageNumber', page)
+      .set('pageSize', pageSize);
+
+    return this.http.get<{sessions: ChargingSessionHistory[], pagination: PaginationMeta}>(
+        `${this.baseUrl}charging-sessions/history`,
+        { params }
+    );
   }
 
   getSessionDetail(sessionId: number) {
