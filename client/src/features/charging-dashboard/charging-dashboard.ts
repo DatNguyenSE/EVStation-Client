@@ -562,7 +562,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
 
         // 🗑️ XÓA LOCALSTORAGE
-        localStorage.removeItem(`charging_session_${this.idPost}`);
+        localStorage.removeItem(`charging_post_${this.idPost}`);
 
         console.log(`${this.sessionId} EndSession successfully`);
         this.toast.success('Đã kết thúc phiên sạc thành công');
