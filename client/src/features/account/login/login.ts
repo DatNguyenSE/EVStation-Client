@@ -28,8 +28,8 @@ export class Login {
         console.log(result),
         this.creds ={};
         this.toast.success('Đăng nhập thành công!');
-        if((this.accountService.currentAccount()?.roles)?.includes('Admin')){
-          window.location.href = '/quan-tri-vien';
+        if ((this.accountService.currentAccount()?.roles)?.includes('Admin')) {
+          this.router.navigateByUrl('/quan-tri-vien');
         }else  if((this.accountService.currentAccount()?.roles)?.includes('Operator')){
           window.location.href = '/nhan-vien-tram/trang-chu';
         }

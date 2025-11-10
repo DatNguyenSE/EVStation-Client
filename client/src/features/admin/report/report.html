@@ -1,1 +1,204 @@
-<p>report works!</p>
+<div class="p-6 bg-gray-50 min-h-screen space-y-8 mt-15">
+
+  <!-- 🧾 DANH SÁCH BÁO CÁO -->
+  <div class="bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+      Danh sách báo cáo
+    </h2>
+
+    <div *ngIf="reports.length === 0" class="text-gray-500 text-center py-4">
+      Không có báo cáo nào.
+    </div>
+
+    <div *ngIf="reports.length > 0" class="overflow-x-auto">
+      <table class="min-w-full border border-gray-300 rounded-md text-sm">
+        <thead class="bg-blue-100">
+          <tr>
+            <th class="p-2 text-left w-12">ID</th>
+            <th class="p-2 text-left w-20">ID Trụ</th>
+            <th class="p-2 text-left">Mô tả</th>
+            <th class="p-2 text-left">Trạng thái</th>
+            <th class="p-2 text-left">Độ nghiêm trọng</th>
+            <th class="p-2 text-left">Nhân viên</th>
+            <th class="p-2 text-center w-56">Thao tác</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let r of reports" class="border-t hover:bg-gray-50 transition">
+            <td class="p-2">{{ r.id }}</td>
+            <td class="p-2">{{ r.postId }}</td>
+            <td class="p-2">{{ r.description }}</td>
+            <td class="p-2">{{ r.status }}</td>
+            <td class="p-2">
+              <span [ngClass]="{
+                'text-red-600 font-semibold': r.severity === 'Critical',
+                'text-yellow-600 font-semibold': r.severity === 'Normal'
+              }">{{ r.severity }}</span>
+            </td>
+            <td class="p-2">{{ r.technicianName }}</td>
+            <td class="p-2 flex justify-center gap-2 flex-wrap">
+              <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                      (click)="openDetail(r.id)">Chi tiết</button>
+              <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                      (click)="openAssignModal(r)">Giao việc</button>
+              <button class="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600"
+                      (click)="openEvaluateModal(r)">Đánh giá</button>
+              <button class="bg-gray-700 text-white px-3 py-1 rounded text-sm hover:bg-gray-800"
+                      (click)="closeReport(r.id)">Đóng</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- 🧑‍🔧 POPUP GIAO VIỆC -->
+  <div *ngIf="showAssignModal"
+       class="fixed inset-0 backdrop-blur-sm bg-white/20 flex justify-center items-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative animate-fadeIn">
+      <button (click)="closeAssignModal()"
+              class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg">✕</button>
+
+      <h3 class="text-xl font-semibold mb-4 text-gray-800">Giao việc cho kỹ thuật viên</h3>
+      <p class="text-gray-600 mb-3">
+        Báo cáo: <strong>#{{ selectedReportForAssign?.id }} - {{ selectedReportForAssign?.description }}</strong>
+      </p>
+
+      <label class="block mb-3">
+        Chọn ID kỹ thuật viên:
+        <input type="text"
+               [(ngModel)]="technicianId"
+               placeholder="Nhập ID kỹ thuật viên"
+               class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200">
+      </label>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                (click)="assignTechnician(selectedReportForAssign!.id)">
+          Giao việc
+        </button>
+        <button class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                (click)="closeAssignModal()">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+<!-- 🔍 POPUP CHI TIẾT -->
+<div *ngIf="showDetailModal"
+     class="fixed inset-0 backdrop-blur-sm bg-white/20 flex justify-center items-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 relative animate-fadeIn">
+    <button (click)="closeModal()"
+            class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg">✕</button>
+
+    <h3 class="text-xl font-semibold mb-3 text-gray-800">
+      Chi tiết báo cáo #{{ selectedReport?.id }}
+    </h3>
+
+    <p><strong>Mô tả:</strong> {{ selectedReport?.description }}</p>
+    <p><strong>Trạng thái:</strong> {{ selectedReport?.status }}</p>
+    <p><strong>Độ nghiêm trọng:</strong> {{ selectedReport?.severity }}</p>
+    <p><strong>Nhân viên:</strong> {{ selectedReport?.staff?.fullName || '-' }}</p>
+    <p><strong>Kỹ thuật viên:</strong> {{ selectedReport?.technician?.fullName || '-' }}</p>
+
+    <hr class="my-4">
+
+    <!-- 🖼️ Hình ảnh trước và sau -->
+    <h4 class="font-medium text-gray-700 mb-2">Hình ảnh báo cáo</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div *ngIf="selectedReport?.createImageUrl; else noBefore"
+           class="border rounded-lg overflow-hidden shadow-sm group relative">
+        <img [src]="selectedReport!.createImageUrl"
+             alt="Ảnh khi tạo báo cáo"
+             class="w-full h-56 object-cover cursor-pointer transition-transform group-hover:scale-105"
+             (click)="openImagePreview(selectedReport!.createImageUrl)">
+        <div class="p-2 text-sm text-gray-600 text-center bg-gray-50">Trước khi sửa</div>
+      </div>
+      <ng-template #noBefore>
+        <div class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-400">
+          Chưa có ảnh trước khi sửa
+        </div>
+      </ng-template>
+
+      <div *ngIf="selectedReport?.completedImageUrl; else noAfter"
+           class="border rounded-lg overflow-hidden shadow-sm group relative">
+        <img [src]="selectedReport!.completedImageUrl"
+             alt="Ảnh sau khi hoàn thành"
+             class="w-full h-56 object-cover cursor-pointer transition-transform group-hover:scale-105"
+             (click)="openImagePreview(selectedReport!.completedImageUrl)">
+        <div class="p-2 text-sm text-gray-600 text-center bg-gray-50">Sau khi sửa</div>
+      </div>
+      <ng-template #noAfter>
+        <div class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-400">
+          Chưa có ảnh hoàn thành
+        </div>
+      </ng-template>
+    </div>
+
+    <hr class="my-4">
+
+    <p class="text-sm text-gray-500">Tạo lúc: {{ selectedReport?.createAt | date:'short' }}</p>
+    <p *ngIf="selectedReport?.fixedAt" class="text-sm text-gray-500">Hoàn thành: {{ selectedReport?.fixedAt | date:'short' }}</p>
+  </div>
+
+  <!-- 🖼️ Popup xem ảnh full -->
+  <div *ngIf="previewImageUrl"
+       class="fixed inset-0 bg-black/80 flex justify-center items-center z-[60] animate-fadeIn">
+    <img [src]="previewImageUrl" alt="Preview" class="max-h-[90vh] max-w-[90vw] rounded shadow-lg">
+    <button (click)="closeImagePreview()"
+            class="absolute top-4 right-6 text-white text-3xl hover:text-gray-300">✕</button>
+  </div>
+</div>
+
+
+
+
+<!-- 🧩 POPUP ĐÁNH GIÁ TÌNH TRẠNG TRỤ -->
+<div *ngIf="showEvaluateModal"
+     class="fixed inset-0 backdrop-blur-sm bg-white/20 flex justify-center items-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative animate-fadeIn">
+    <button (click)="closeEvaluateModal()"
+            class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg">✕</button>
+
+    <h3 class="text-xl font-semibold mb-4 text-gray-800">
+      Đánh giá tình trạng trụ (#{{ selectedReportForEvaluate?.id }})
+    </h3>
+
+    <!-- 🖼️ Ảnh nhân viên gửi -->
+   
+    <hr class="my-4">
+
+    <!-- 🧩 Form đánh giá -->
+    <div class="space-y-3">
+      <label class="inline-flex items-center">
+        <input type="checkbox" [(ngModel)]="evaluation.isCritical" class="mr-2">
+        <span class="font-medium text-gray-700">Nghiêm trọng</span>
+      </label>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="block">
+          Bắt đầu bảo trì:
+          <input type="datetime-local"
+                 [(ngModel)]="evaluation.maintenanceStartTime"
+                 class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200">
+        </label>
+
+        <label class="block">
+          Kết thúc bảo trì:
+          <input type="datetime-local"
+                 [(ngModel)]="evaluation.maintenanceEndTime"
+                 class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200">
+        </label>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              (click)="evaluateReport(selectedReportForEvaluate!.id)">Lưu</button>
+      <button class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              (click)="closeEvaluateModal()">Hủy</button>
+    </div>
+  </div>
+</div>
+</div>
