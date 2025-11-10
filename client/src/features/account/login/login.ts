@@ -34,7 +34,10 @@ export class Login {
           window.location.href = '/nhan-vien-tram/trang-chu';
         }else  if((this.accountService.currentAccount()?.roles)?.includes('Technician')){
           window.location.href = '/nhan-vien-ky-thuat/cong-viec';
+        }else  if((this.accountService.currentAccount()?.roles)?.includes('Manager')){
+          window.location.href = '/quan-ly-tram/trang-chu';
         }
+        
         else{
           window.location.href = '/';
         }
