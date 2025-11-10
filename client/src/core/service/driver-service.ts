@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Driver } from '../../_models/user';
 import { Vehicles } from '../../_models/vehicle';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -73,6 +74,8 @@ unBanDriver(userId : string){
   return this.http.post(`${this.baseUrl}account/UnbanUser/${userId}`,{});
 }
 
-
+  deactivateVehicle(vehicleId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}vehicle/my/delete/${vehicleId}`);
+  }
   
 }

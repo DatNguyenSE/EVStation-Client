@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DriverService } from '../../core/service/driver-service';
 import { Vehicles } from '../../_models/vehicle';
+import { ToastService } from '../../core/service/toast-service';
 
 @Component({
   selector: 'app-vehicle',
@@ -13,6 +14,8 @@ import { Vehicles } from '../../_models/vehicle';
 export class Vehicle implements OnInit {
   driverService = inject(DriverService);
   Vehicles = signal<Vehicles[]>([])
+  private toast = inject(ToastService);
+
   ngOnInit(): void {
     this.GetVehicles();
   }
@@ -48,11 +51,25 @@ export class Vehicle implements OnInit {
   setCurrentVehicle(index: number) {
     this.currentVehicleIndex.set(index);
   }
+
+  cancelVehicle(vehicleId: number) {
+    const confirmed = confirm('Bạn có chắc chắn muốn vô hiệu hóa phương tiện này không? Bạn có thể kích hoạt lại sau.');
+    
+    if (!confirmed) return;
+
+    // Gọi hàm "deactivate" (vô hiệu hóa) mới
+    this.driverService.deactivateVehicle(vehicleId).subscribe({
+      next: (response) => {
+        this.toast.success(response.message || 'Đã vô hiệu hóa phương tiện.');
+        this.GetVehicles();
+      },
+      error: (err) => {
+        console.error('Lỗi khi vô hiệu hóa phương tiện:', err);
+        this.toast.error(err.error?.message || 'Vô hiệu hóa thất bại.');
+      }
+    });
+  }
   
-  /**
-   * Trả về text và class CSS dựa trên trạng thái đăng ký của xe.
-   * @param status Giá trị string từ backend (Pending, Approved, Rejected)
-   */
   getStatusStyles(status: string): { text: string; cssClass: string } {
     switch (status) {
       case 'Approved':
