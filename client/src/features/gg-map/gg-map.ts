@@ -283,7 +283,7 @@ reserveStation(station: any) {
 
       this.map.setView([lat, lng], 14);
         this.findNearest(lat, lng);
-      this.cdRef.detectChanges();
+      this.cdRef.markForCheck();
     });
   }
 
@@ -307,7 +307,7 @@ private findNearest(lat: number, lon: number): void {
         this.clearStationMarkers();
         this.addStationMarkers();
 
-        this.cdRef.detectChanges();
+        this.cdRef.markForCheck();
     },
     error: (err) => {
       console.error('Lỗi tải trạm gần nhất', err);
@@ -388,7 +388,7 @@ onSearchChange(): void {
         next : (data: any[]) => {
           this.searchResults = data;
           this.showSearchResults();
-          this.cdRef.detectChanges();
+          this.cdRef.markForCheck();
         },
         error: (err) => console.error('Search lỗi:', err)
       });

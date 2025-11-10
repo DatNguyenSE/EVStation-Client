@@ -78,7 +78,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.idPost = this.route.snapshot.paramMap.get('idPost')!;
-    // ✨ KIỂM TRA RECONNECT TRƯỚC
+    //  KIỂM TRA RECONNECT TRƯỚC
     const savedSessionId = this.checkForExistingSession();
     
     if (savedSessionId) {
@@ -91,7 +91,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     }
   }
 
-  // ✨ HÀM MỚI: Kiểm tra localStorage
+  //  HÀM MỚI: Kiểm tra localStorage
   private checkForExistingSession(): number | null {
     try {
       const savedData = localStorage.getItem(`charging_session_${this.idPost}`);
@@ -115,11 +115,11 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     }
   }
 
-  // ✨ HÀM MỚI: Reconnect session
+  //  HÀM MỚI: Reconnect session
   private reconnectToSession(sessionId: number) {
     this.chargingService.reconnectSession(sessionId).subscribe({
       next: (response) => {
-        console.log('✅ Reconnect thành công:', response);
+        console.log(' Reconnect thành công:', response);
         
         // Khôi phục state
         this.sessionId = response.sessionId;
@@ -315,63 +315,57 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   // --- Bắt đầu phiên sạc ---
 
   startSession() {
-    this.chargingService.startSession({
-      postId: Number(this.idPost),
-      vehicleId: this.vehicleInfo?.vehicleId,
-      vehiclePlate: this.vehicleInfo?.plate,
-      reservationId: this.validateInfo?.reservationId
-    }).subscribe({
-      next: session => {
-        console.log(' Phiên sạc bắt đầu:', session);
-        // ====kết nối SignalR-ConnectCharging
+  this.chargingService.startSession({
+    postId: Number(this.idPost),
+    vehicleId: this.vehicleInfo?.vehicleId,
+    vehiclePlate: this.vehicleInfo?.plate,
+    reservationId: this.validateInfo?.reservationId
+  }).subscribe({
+    next: session => {
+      console.log(' Phiên sạc bắt đầu:', session);
 
+      // Gán sessionId trước khi gọi SignalR
+      this.sessionId = session.id;
+      // this.saveSessionToLocalStorage(session.id);
 
-         this.presenceService.sendConnectCharging(this.idPost);
-      
-        this.sessionId = session.id;
-        this.saveSessionToLocalStorage(session.id);
+      // ==== Kết nối SignalR
+      this.presenceService.sendConnectCharging(Number(this.idPost), this.sessionId);
 
-        const currentPost = this.postInfo(); // Lấy thông tin trụ hiện tại
-        if (currentPost) {
-          this.postInfo.set({
-            ...currentPost, // Giữ tất cả thông tin cũ (id, type, powerKW...)
-            status: 'Occupied' // Chỉ ghi đè trạng thái
-          });
-        } else {
-          // Phòng hờ nếu currentPost là null, thì mới gọi lại API
-          this.stationService.getPostById(this.idPost).subscribe({
-            next: updatedPost => this.postInfo.set(updatedPost)
-          });
-        }
-
-        // ====kết nối SignalR-ChargingHub
-        this.hubService.startConnection();
-        setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
-
-        // Subscribe to updates
-        this.subscribeToRealtimeUpdates();
-      },
-      error: err => {
-        console.error('Start session failed:', err);
-        this.errorMessage.set('Không thể bắt đầu phiên sạc.');
+      const currentPost = this.postInfo();
+      if (currentPost) {
+        this.postInfo.set({
+          ...currentPost,
+          status: 'Occupied'
+        });
       }
-    });
-  }
 
-  // ✨ HÀM MỚI: Lưu session vào localStorage
-  private saveSessionToLocalStorage(sessionId: number) {
-    try {
-      const data = {
-        sessionId: sessionId,
-        postId: this.idPost,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem(`charging_session_${this.idPost}`, JSON.stringify(data));
-      console.log('💾 Đã lưu sessionId vào localStorage');
-    } catch (error) {
-      console.error('Lỗi khi lưu localStorage:', error);
+      this.hubService.startConnection();
+      setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
+
+      this.subscribeToRealtimeUpdates();
+    },
+    error: err => {
+      console.error('Start session failed:', err);
+      this.errorMessage.set('Không thể bắt đầu phiên sạc.');
     }
-  }
+  });
+}
+
+
+  // // ✨ HÀM MỚI: Lưu session vào localStorage
+  // private saveSessionToLocalStorage(sessionId: number) {
+  //   try {
+  //     const data = {
+  //       sessionId: sessionId,
+  //       postId: this.idPost,
+  //       timestamp: new Date().toISOString()
+  //     };
+  //     localStorage.setItem(`charging_session_${this.idPost}`, JSON.stringify(data));
+  //     console.log(' Đã lưu sessionId vào localStorage');
+  //   } catch (error) {
+  //     console.error('Lỗi khi lưu localStorage:', error);
+  //   }
+  // }
 
 // --- Dừng phiên sạc ---
   async pressStopSession() {
@@ -385,8 +379,8 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   if (this.isPaused) {
     // Tiếp tục sạc
-    await this.presenceService.sendConnectCharging(this.idPost);
-    this.startSession(); // Gọi lại hàm có sẵn của bạn
+    await this.presenceService.sendConnectCharging(Number(this.idPost), this.sessionId);
+    this.startSession(); 
     this.isPaused = false;
     this.isStopping = false;
     // this.confirmed.set(false);
@@ -394,7 +388,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   } else {
     this.chargingService.stopSession(this.sessionId).subscribe({
       next: async () => {
-        await this.presenceService.sendDisconnectCharging(this.idPost);
+        await this.presenceService.sendDisconnectCharging(Number(this.idPost), this.sessionId);
         this.isPaused = true;
         this.isStopping = false;
         // this.confirmed.set(true);
@@ -420,15 +414,15 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   this.chargingService.completeSession(this.sessionId).subscribe({
     next: async () => {
-      await this.presenceService.sendDisconnectCharging(this.idPost);
+      await this.presenceService.sendDisconnectCharging(Number(this.idPost), this.sessionId);
+
       this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
 
-      // 🗑️ XÓA LOCALSTORAGE
-      localStorage.removeItem(`charging_session_${this.idPost}`);
+      // XÓA LOCALSTORAGE
+      localStorage.removeItem(`charging_session_${this.sessionId}`);
 
       console.log(`${this.sessionId} EndSession successfully`);
       this.toast.success('Đã kết thúc phiên sạc thành công');
-      // this.toast.success('Hóa đơn đã được gửi đến email của bạn');
       setTimeout(() => {window.location.href = '/lichsugiaodich';}, 3000);
       
     },

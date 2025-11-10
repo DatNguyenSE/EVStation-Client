@@ -1,3 +1,4 @@
+import { DtoStation } from "./station";
 import { Vehicles } from "./vehicle";
 
 export interface Account  {
@@ -18,6 +19,14 @@ export interface User  {
     roles: string[];
 }
 
+export interface AssignmentResponseDto {
+  id: number;
+  effectiveFrom: string;
+  effectiveTo: string;
+  isActive: boolean;
+  staff: Account;
+  station: DtoStation;
+}
 
 export type Driver = {
     id: string;

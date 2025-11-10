@@ -37,6 +37,7 @@ import { chargingGuard } from '../core/_guards/charging.guard';
 import { SessionDetail } from '../features/session-detail/session-detail';
 import { PricingConfig } from '../features/admin/pricing-config/pricing-config';
 
+
 export const routes: Routes = [
     { path: '', component: Home },
 
