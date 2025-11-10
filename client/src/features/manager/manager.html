@@ -1,1 +1,35 @@
-<p>manager works!</p>
+<div class="max-w-3xl mx-auto mt-15 min-h-screen bg-white rounded-2xl shadow-md p-6">
+  <h2 class="text-xl font-semibold text-gray-800 mb-3">Trạm sạc hiện tại</h2>
+
+  <div *ngIf="isLoading()">Đang tải dữ liệu...</div>
+  <div *ngIf="error()" class="text-red-600">{{ error() }}</div>
+
+  <ng-container *ngIf="!isLoading() && !error()">
+    <div class="text-gray-700 space-y-1 mb-6">
+      <p><span class="font-medium">Tên trạm:</span> {{ StationInfo()?.name }}</p>
+      <p><span class="font-medium">Địa chỉ:</span> {{ StationInfo()?.address }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div class="bg-blue-50 text-blue-900 px-4 py-2 rounded-xl shadow-sm">
+        Tổng số trụ: <span class="font-bold">{{ totalPosts() }}</span>
+      </div>
+
+      <div class="bg-green-50 text-green-900 px-4 py-2 rounded-xl shadow-sm">
+        Sẵn sàng: <span class="font-bold">{{ availablePosts() }}</span>
+      </div>
+
+      <div class="bg-yellow-50 text-yellow-900 px-4 py-2 rounded-xl shadow-sm">
+        Đang có xe: <span class="font-bold">{{ occupiedPosts() }}</span>
+      </div>
+
+      <div class="bg-orange-50 text-orange-900 px-4 py-2 rounded-xl shadow-sm">
+        Bảo trì: <span class="font-bold">{{ maintenancePosts() }}</span>
+      </div>
+
+      <!-- <div class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl shadow-sm">
+        Mất kết nối: <span class="font-bold">{{ offlinePosts() }}</span>
+      </div> -->
+    </div>
+  </ng-container>
+</div>
