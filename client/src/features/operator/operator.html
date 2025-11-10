@@ -10,13 +10,13 @@
 
     <div class="mt-4 flex flex-wrap gap-4 text-gray-800">
       <div class="bg-blue-50 px-4 py-2 rounded-xl shadow-sm">
-        Tổng số trụ: <strong>{{ chargingPost().length }}</strong>
+        Tổng số trụ: <strong>{{ chargingPostSession().length }}</strong>
       </div>
       <div class="bg-green-50 px-4 py-2 rounded-xl shadow-sm">
         Đang sử dụng: <strong>{{ usedCount() }}</strong>
       </div>
       <div class="bg-yellow-50 px-4 py-2 rounded-xl shadow-sm">
-        Còn trống: <strong>{{ chargingPost().length - usedCount() }}</strong>
+        Còn trống: <strong>{{ chargingPostSession().length - usedCount() }}</strong>
       </div>
     </div>
   </div>
@@ -39,9 +39,8 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let slot of chargingPost()"
-            class="border-b hover:bg-gray-50 transition-all duration-150"
-            [ngClass]="slot.status === 'charging' ? 'bg-green-50' : 'bg-white'">
+        <tr *ngFor="let slot of chargingPostSession()" class="border-b hover:bg-gray-50 transition-all duration-150"
+          [ngClass]="slot.status === 'charging' ? 'bg-green-50' : 'bg-white'">
 
           <!-- Mã trụ -->
           <td class="py-3 px-4 font-medium text-gray-800">{{ slot.code }}</td>
@@ -52,10 +51,15 @@
           <!-- Trạng thái -->
           <td class="py-3 px-4">
             <span [ngClass]="{
-              'text-green-600 font-semibold': slot.status === 'charging',
-              'text-gray-400 font-medium': slot.status === 'available'
-            }">
-              {{ slot.status === 'charging' ? 'Đang sạc' : 'Trống' }}
+  'text-green-600 font-semibold': slot.status === 'charging',
+  'text-yellow-600 font-semibold': slot.status === 'paused',
+  '': slot.status === 'available'
+}">
+              {{ slot.status === 'charging'
+              ? 'Đang sạc'
+              : slot.status === 'paused'
+              ? 'Đang tạm dừng'
+              : 'Trống' }}
             </span>
           </td>
 
@@ -71,10 +75,8 @@
 
           <!-- Biển số -->
           <td class="py-3 px-4">
-            <input type="text" [(ngModel)]="slot.plateInput"
-                   [readonly]="!slot.isWalkIn"
-                   placeholder="Nhập biển số"
-                   class="w-full px-3 py-2 rounded-lg border-2
+            <input type="text" [(ngModel)]="slot.plateInput" [readonly]="!slot.isWalkIn" placeholder="Nhập biển số"
+              class="w-full px-3 py-2 rounded-lg border-2
                           focus:outline-none transition-all duration-200
                           focus:ring-2 focus:ring-orange-300
                           focus:border-orange-600
@@ -86,9 +88,8 @@
 
           <!-- Nút xác nhận: chỉ hiện với vãng lai -->
           <td class="py-3 px-4">
-            <button *ngIf="slot.isWalkIn"
-                    (click)="updatePlateForWalkIn(slot)"
-                    class="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition-all duration-200">
+            <button *ngIf="slot.isWalkIn" (click)="updatePlateForWalkIn(slot)"
+              class="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition-all duration-200">
               Xác nhận
             </button>
           </td>
