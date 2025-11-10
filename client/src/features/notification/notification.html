@@ -1,1 +1,39 @@
-<p>notification works!</p>
+<div class="relative inline-block notification-wrapper">
+  <!-- 🔔 Icon chuông -->
+  <span class="material-icons text-3xl text-gray-800 cursor-pointer" (click)="toggleDropdown()">
+    notifications
+  </span>
+
+  <!-- 🔴 Badge số lượng -->
+  <span *ngIf="unreadCount > 0"
+        class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+    {{ unreadCount }}
+  </span>
+
+  <!-- 📋 Dropdown danh sách -->
+  <div *ngIf="isDropdownOpen"
+       class="absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+    <div class="flex justify-between items-center px-4 py-2 border-b">
+      <span class="font-semibold text-gray-700">Thông báo</span>
+      <button (click)="markAllAsRead()" class="text-sm text-blue-600 hover:underline">
+        Đánh dấu đã đọc
+      </button>
+    </div>
+
+    <ul class="max-h-64 overflow-y-auto">
+      <li *ngFor="let n of notifications" class="px-4 py-2 hover:bg-gray-50 transition">
+        <div class="text-sm">
+          <div class="font-semibold">{{ n.title || 'Thông báo' }}</div>
+          <div class="text-gray-600 text-sm">{{ n.message }}</div>
+          <div class="text-xs text-gray-400 mt-1">
+            {{ n.createdAt | date:'short' }}
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="border-t text-center py-2 text-sm text-gray-500">
+      <a routerLink="/thong-bao" class="hover:underline">Xem tất cả</a>
+    </div>
+  </div>
+</div>

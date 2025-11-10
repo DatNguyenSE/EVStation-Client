@@ -1,51 +1,121 @@
-import { Injectable } from '@angular/core';
-import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
+import * as signalR from '@microsoft/signalr';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AssignResponse, EvaluateReportRequest, EvaluateResponse, Reports } from '../../_models/report';
+import { Account } from '../../_models/user';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportService {
-  private hubConnection!: signalR.HubConnection;
-  private reportsSource = new BehaviorSubject<any[]>([]);
-  reports$ = this.reportsSource.asObservable();
+   private hubConnection!: signalR.HubConnection;
+  private notificationsSource = new BehaviorSubject<any[]>([]);
+  notifications$ = this.notificationsSource.asObservable();
 
-  // 👉 Chỉ cần define 1 lần base URL
   private hubUrl = environment.hubUrl;
+  private baseUrl = 'https://localhost:5001/api/';
+  private http = inject(HttpClient);
+   notifications = signal<any[]>([]); 
 
-  constructor() {}
+  getReports(){
+    const noCache = Date.now()
+    return this.http.get<Reports[]>(`${this.baseUrl}reports?noCache=${noCache}`,{
+      headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+    });
+    
+  }
+  getReportsById(id:number){
+      return this.http.get<Reports>(`${this.baseUrl}reports/${id}`);
+  }
+
+  evaluteReport(id:number, evaluteReport : EvaluateReportRequest){
+        return this.http.post<EvaluateResponse>(`${this.baseUrl}reports/${id}/evaluate`, evaluteReport);
+  }
+   assignTechnician(id: number, technicianId: string): Observable<AssignResponse> {
+    return this.http.post<AssignResponse>(`${this.baseUrl}reports/${id}/assign`, { technicianId });
+  }
+  closeReport(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}reports/${id}/close`, {});
+  }
+ 
+
+    isConnected(): boolean {
+    return this.hubConnection?.state === signalR.HubConnectionState.Connected;
+  }
+    
 
   // 🔌 Khởi tạo kết nối tới ReportHub
-  startConnection(): void {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${this.hubUrl}report`, {
-        accessTokenFactory: () => localStorage.getItem('token') || ''
-      })
-      .withAutomaticReconnect()
-      .build();
+createHubConnection(user: Account): void {
+   if (this.isConnected()) return;
+  const hubUrl = `${this.hubUrl}notification`;
+  this.hubConnection = new signalR.HubConnectionBuilder()
+    .withUrl(hubUrl, {
+      accessTokenFactory: () => user.token
+    })
+    .withAutomaticReconnect()
+    .build();
 
-    this.hubConnection
-      .start()
-      .then(() => console.log('✅ Connected to ReportHub'))
-      .catch(err => console.error('❌ SignalR connection error:', err));
+  this.hubConnection
+  .start()
+  .then(() => console.log('✅ Connected to notificationHub:'))
+  .catch(err => console.error('❌ ReportHub connection error:', err));
 
-    this.listenForReports();
+  this.listenForNotifications();
+}
+  
+reconnectIfNeeded(): void {
+  const storedAccount = localStorage.getItem('account');
+  if (!this.isConnected() && storedAccount) {
+    const user = JSON.parse(storedAccount);
+    this.createHubConnection(user);
+  }
+}
+
+
+  // 🧰 Lắng nghe sự kiện công việc mới (nếu admin muốn thấy phản hồi)
+ private listenForNotifications(): void {
+  this.hubConnection.on('ReceiveNotification', (notification) => {
+    console.log('🧰 New task notification:', notification);
+
+    // 🔹 Lưu thông báo vào localStorage để giữ khi reload
+    const stored = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const updated = [{ ...notification, read: false }, ...stored];
+    localStorage.setItem('notifications', JSON.stringify(updated));
+
+    // 🔹 Cập nhật BehaviorSubject cho UI hiển thị real-time
+    this.notificationsSource.next(updated);
+  });
+}
+getUnreadCount(): number {
+    const stored = JSON.parse(localStorage.getItem('notifications') || '[]');
+    return stored.filter((n: any) => !n.read).length;
   }
 
-  // 🧠 Lắng nghe sự kiện report mới từ server
-  private listenForReports(): void {
-    this.hubConnection.on('ReceiveReport', (report) => {
-      console.log('📢 New report received:', report);
-      const current = this.reportsSource.value;
-      this.reportsSource.next([report, ...current]);
-    });
+  markAllAsRead(): void {
+    const stored = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const updated = stored.map((n: any) => ({ ...n, read: true }));
+    localStorage.setItem('notifications', JSON.stringify(updated));
+    this.notificationsSource.next(updated);
   }
 
-  // ❌ Dừng kết nối (nếu cần)
+  // 🚀 Gửi công việc tới kỹ thuật viên
+  assignTaskToTechnician(technicianId: string, task: any): void {
+    this.hubConnection.invoke('AssignTaskToTechnician', technicianId, task)
+      .then(() => console.log(`📨 Task sent to technician ${technicianId}`))
+      .catch(err => console.error('❌ Error sending task:', err));
+  }
+
+  // ❌ Ngắt kết nối
   stopConnection(): void {
     if (this.hubConnection) {
       this.hubConnection.stop().then(() => console.log('🔌 Disconnected from ReportHub'));
     }
   }
+  
 }

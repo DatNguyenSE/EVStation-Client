@@ -8,6 +8,7 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
+import { ReportService } from '../../core/service/report-service';
 
 
 @Component({
@@ -26,9 +27,12 @@ export class Nav implements OnInit {
   driverService = inject(DriverService);
   busyService = inject(BusyService);
   routers = inject(Router);
-  route = inject(ActivatedRoute)
+  route = inject(ActivatedRoute);
+  reportService = inject(ReportService)
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
+   unreadCount = 0;
+   private sub: any;
 
   /**  Lấy danh sách menu theo role hiện tại */
 
@@ -73,19 +77,27 @@ export class Nav implements OnInit {
       }
     });
   }
-
-  ngOnInit(): void {
-    document.documentElement.setAttribute('data-theme', this.selectedTheme());
-    const role = this.accountService.currentAccount()?.roles?.[0] || '';
-    this.menuItems = this.getMenuForRole(role);
+   updateUnread() {
+    this.unreadCount = this.reportService.getUnreadCount();
   }
 
+ ngOnInit(): void {
+  document.documentElement.setAttribute('data-theme', this.selectedTheme());
+  const role = this.accountService.currentAccount()?.roles?.[0] || '';
+  this.menuItems = this.getMenuForRole(role);
 
-  /* Lấy danh sách menu theo role hiện tại */
+  this.reportService.reconnectIfNeeded();
+
+  // 🔔 Lắng nghe realtime từ ReportService
+  this.reportService.notifications$.subscribe(() => this.updateUnread());
+  this.updateUnread();
+}
 
 
+ngOnDestroy(): void {
+  if (this.sub) this.sub.unsubscribe();
+}
 
-  
 
   onLogoClick() {
     const acc = this.accountService.currentAccount()?.roles;
