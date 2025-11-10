@@ -21,6 +21,9 @@ export class ChargingHubService {
   private insufficientFundsSubject = new Subject<any>();
   insufficientFunds$ = this.insufficientFundsSubject.asObservable();
 
+  private idleFeeUpdateSubject = new Subject<any>();
+  idleFeeUpdate$ = this.idleFeeUpdateSubject.asObservable();
+
   private isConnecting = false;
 
 
@@ -95,9 +98,14 @@ export class ChargingHubService {
 
     // Khi dừng sạc do hết tiền (khớp với tên sự kiện)
     this.hubConnection.on('ReceiveSessionStopped_InsufficientFunds', (sessionId: any, status: any) => {
-      console.error('PHÁT HIỆN HẾT TIỀN!:', { sessionId, status });
-      this.insufficientFundsSubject.next({ sessionId, status });
-    });
+      console.error('PHÁT HIỆN HẾT TIỀN!:', { sessionId, status });
+      this.insufficientFundsSubject.next({ sessionId, status });
+    });
+
+    this.hubConnection.on('ReceiveIdleFeeUpdated', (data: any) => {
+      console.log('Cập nhật phí phạt:', data);
+      this.idleFeeUpdateSubject.next(data);
+    });
 
     // Khi lỗi
     this.hubConnection.on('ReceiveSessionError', (error: any) => {

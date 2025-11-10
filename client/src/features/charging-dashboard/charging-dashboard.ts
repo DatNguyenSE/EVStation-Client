@@ -39,6 +39,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   private toast = inject(ToastService);
   private presenceService = inject(PresenceService);
+  private cdr = inject(ChangeDetectorRef);
 
   // === Trạng thái ===
   idPost!: string;
@@ -49,22 +50,32 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   // private cdr = inject(ChangeDetectorRef);
   protected validateInfo!: ValidateScanResponse;
   protected vehicleInfo: Vehicles | undefined;
+
   // === Dữ liệu realtime ===
   chargedKwh = signal(0);
   totalPrice = signal(0);
   batteryPercent = signal(0);
   timeRemain = signal(0);
 
+  // Dữ liệu phí phạt
+  idleFee = signal(0);
+  overstayFee = signal(0);
+  graceTimeRemain = signal(0);
+
   // === Đăng ký lắng nghe realtime ===
   private realtimeSub?: Subscription;
   private stopSub?: Subscription;
   private fullSub?: Subscription;
   private insufficientFundsSub?: Subscription;
+  private idleFeeSub?: Subscription;
   private countdownInterval?: any;
+  private graceCountdownInterval?: any;
 
   // Bắt đầu đếm ngược
   private startCountdown() {
     if (this.countdownInterval) clearInterval(this.countdownInterval);
+
+    if (this.isPaused) return;
 
     this.countdownInterval = setInterval(() => {
       const current = this.timeRemain();
@@ -76,9 +87,34 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  private startGraceCountdown(initialSeconds?: number) {
+    if (this.graceCountdownInterval) clearInterval(this.graceCountdownInterval);
+
+    // Đặt thời gian ân hạn = 3 phút (180 giây)
+    const totalSeconds = initialSeconds ?? 3 * 60;
+    this.graceTimeRemain.set(totalSeconds);
+
+    this.graceCountdownInterval = setInterval(() => {
+      const current = this.graceTimeRemain();
+      if (current > 0) {
+        this.graceTimeRemain.set(current - 1);
+      } else {
+        clearInterval(this.graceCountdownInterval);
+        console.log('Hết thời gian ân hạn, bắt đầu tính phí phạt!');
+      }
+    }, 1000);
+  }
+
+  private stopGraceCountdown() {
+    if (this.graceCountdownInterval) {
+      clearInterval(this.graceCountdownInterval);
+      this.graceTimeRemain.set(0);
+    }
+  }
+
   ngOnInit() {
     this.idPost = this.route.snapshot.paramMap.get('idPost')!;
-    // ✨ KIỂM TRA RECONNECT TRƯỚC
+    // KIỂM TRA RECONNECT TRƯỚC
     const savedSessionId = this.checkForExistingSession();
     
     if (savedSessionId) {
@@ -91,7 +127,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     }
   }
 
-  // ✨ HÀM MỚI: Kiểm tra localStorage
+  // Kiểm tra localStorage
   private checkForExistingSession(): number | null {
     try {
       const savedData = localStorage.getItem(`charging_session_${this.idPost}`);
@@ -115,7 +151,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     }
   }
 
-  // ✨ HÀM MỚI: Reconnect session
+  // Reconnect session
   private reconnectToSession(sessionId: number) {
     this.chargingService.reconnectSession(sessionId).subscribe({
       next: (response) => {
@@ -159,6 +195,28 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         this.chargedKwh.set(response.currentState.chargedKwh);
         this.totalPrice.set(response.currentState.totalPrice);
         
+        if (response.currentState.status === 'Idle') {
+          this.isPaused = true;
+
+          if (response.currentState.batteryPercent >= 99.9) { // Giả định Pin đầy là >= 99.9%
+            this.isCompleted.set(true);
+            console.log('✅ Khôi phục trạng thái: Pin đã đầy');
+          }
+
+          // Nếu còn thời gian ân hạn, bật countdown
+          const remaining = response.currentState.graceTimeRemainingSeconds ?? 0;
+          if (remaining > 0) {
+            this.graceTimeRemain.set(remaining);
+            this.startGraceCountdown(remaining);
+            console.log(`⏰ Khôi phục ân hạn: ${remaining}s`);
+          } else {
+            // Đã hết ân hạn → set 0
+            this.graceTimeRemain.set(0);
+            console.log('⚠️ Đã hết thời gian ân hạn');
+          }
+        }
+        this.cdr.markForCheck();
+
         // Reconnect SignalR
         this.presenceService.createHubConnection();
         this.hubService.startConnection();
@@ -172,13 +230,18 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       error: (err) => {
         console.error('❌ Reconnect thất bại:', err);
         localStorage.removeItem(`charging_session_${this.idPost}`);
-        this.toast.error('Không thể khôi phục phiên sạc. Vui lòng bắt đầu mới.');
-        this.errorMessage.set('Phiên sạc đã kết thúc hoặc không tồn tại.');
+        if (err.status === 403) {
+          this.toast.error('Bạn không có quyền truy cập phiên sạc này.');
+          this.errorMessage.set('Phiên sạc này thuộc về người dùng khác.');
+        } else {
+          this.toast.error('Không thể khôi phục phiên sạc. Vui lòng bắt đầu mới.');
+          this.errorMessage.set('Phiên sạc đã kết thúc hoặc không tồn tại.');
+        }
       }
     });
   }
 
-  // ✨ REFACTOR: Tách logic subscribe ra hàm riêng
+  // REFACTOR: Tách logic subscribe ra hàm riêng
   private subscribeToRealtimeUpdates() {
     this.realtimeSub = this.hubService.chargingUpdate$.subscribe(data => {
       if (!data) return;
@@ -187,7 +250,23 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         this.chargedKwh.set(data.energyConsumed ?? this.chargedKwh());
         this.totalPrice.set(data.cost ?? this.totalPrice());
         this.timeRemain.set(data.timeRemainTotalSeconds ?? this.timeRemain());
-        this.startCountdown();
+        if (data.vehicleInfo) {
+          this.vehicleInfo = {
+            vehicleId: this.vehicleInfo?.vehicleId ?? 0,
+            plate: data.vehicleInfo.plate,
+            model: data.vehicleInfo.model,
+            batteryCapacityKWh: data.vehicleInfo.batteryCapacityKWh,
+            type: this.vehicleInfo?.type ?? '',
+            maxChargingPowerKW: this.vehicleInfo?.maxChargingPowerKW ?? 0,
+            connectorType: this.vehicleInfo?.connectorType ?? '',
+            registrationStatus: this.vehicleInfo?.registrationStatus ?? ''
+          } as Vehicles;
+          this.cdr.markForCheck();
+          console.log('✅ Đã cập nhật thông tin xe:', this.vehicleInfo);
+        }
+        if (!this.isPaused) {
+          this.startCountdown();
+        }
       });
     });
 
@@ -198,10 +277,12 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.fullSub = this.hubService.sessionCompleted$.subscribe(id => {
       console.log(`Phiên sạc ${id} đã đầy pin.`);
       if (id === this.sessionId) {
-      this.isCompleted.set(true);
-      this.isPaused = true; // Cập nhật UI về trạng thái "đã dừng"
-      this.toast.success('Pin đã đầy! Bạn có thể hoàn tất phiên sạc.');
-    }
+        this.isCompleted.set(true);
+        this.stopCountdown(); // ✅ Dừng đếm ngược timeRemain
+        this.startGraceCountdown();
+        this.isPaused = true; // Cập nhật UI về trạng thái "đã dừng"
+        this.toast.success('Pin đã đầy! Bạn có thể hoàn tất phiên sạc.');
+      }
     });
 
     this.insufficientFundsSub = this.hubService.insufficientFunds$.subscribe(data => {
@@ -212,6 +293,9 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         // Dùng lại logic của "Pin đầy" để khóa nút "Tiếp tục" và mở nút "Hoàn tất"
         this.isPaused = true; 
         this.isCompleted.set(true);
+        this.isCompleted.set(true);
+        this.stopCountdown(); // ✅ Dừng đếm ngược
+        this.startGraceCountdown();
 
         // 2. Dừng đếm ngược
         if (this.countdownInterval) clearInterval(this.countdownInterval);
@@ -224,6 +308,20 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         // this.errorMessage.set('Phiên sạc đã bị dừng do không đủ tiền.');
       }
     });
+
+    this.idleFeeSub = this.hubService.idleFeeUpdate$.subscribe(data => {
+      if (data.sessionId === this.sessionId) {
+        console.log('Cập nhật phí phạt:', data);
+        this.idleFee.set(data.idleFee || 0);
+        this.overstayFee.set(data.overstayFee || 0);
+      }
+    });
+  }
+
+  private stopCountdown() {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
   }
 
   // --- Lấy thông tin trụ, trạm , reservationID, VehicleID---
@@ -312,6 +410,16 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
+  protected formatGraceTime(): string {
+    const totalSeconds = this.graceTimeRemain();
+    if (totalSeconds <= 0) return '00:00';
+
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   // --- Bắt đầu phiên sạc ---
 
   startSession() {
@@ -358,7 +466,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     });
   }
 
-  // ✨ HÀM MỚI: Lưu session vào localStorage
+  // Lưu session vào localStorage
   private saveSessionToLocalStorage(sessionId: number) {
     try {
       const data = {
@@ -383,70 +491,112 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   this.isStopping = true;
 
-  if (this.isPaused) {
-    // Tiếp tục sạc
-    await this.presenceService.sendConnectCharging(this.idPost);
-    this.startSession(); // Gọi lại hàm có sẵn của bạn
-    this.isPaused = false;
-    this.isStopping = false;
-    // this.confirmed.set(false);
-    this.toast.success('Đã tiếp tục sạc');
-  } else {
-    this.chargingService.stopSession(this.sessionId).subscribe({
-      next: async () => {
-        await this.presenceService.sendDisconnectCharging(this.idPost);
-        this.isPaused = true;
-        this.isStopping = false;
-        // this.confirmed.set(true);
-        console.log(this.sessionId + ' paused successfully');
-        this.toast.success('Tạm dừng sạc thành công');
-        
-
-      },
-      error: () => {
-        this.isStopping = false;
-        this.toast.error('Dừng sạc thất bại');
+  try {
+      if (this.isPaused) {
+        // Tiếp tục sạc
+        console.log('🔄 Đang tiếp tục sạc...');
+        await this.presenceService.sendConnectCharging(this.idPost);
+        this.startSession();
+        this.isPaused = false;
+        this.stopGraceCountdown(); // ✅ Dừng đếm ngược ân hạn
+        this.idleFee.set(0); // ✅ Reset phí phạt
+        this.overstayFee.set(0);
+        this.cdr.markForCheck();
+        this.toast.success('Đã tiếp tục sạc');
+      } else {
+        // Dừng sạc
+        console.log('⏸️ Đang dừng sạc...');
+        this.chargingService.stopSession(this.sessionId).subscribe({
+          next: async () => {
+            console.log('✅ Backend confirmed stop');
+            try {
+              await this.presenceService.sendDisconnectCharging(this.idPost);
+              console.log('✅ SignalR disconnect sent');
+            } catch (signalRError) {
+              console.error('⚠️ SignalR disconnect failed:', signalRError);
+              // Không block flow chính
+            }
+            
+            this.isPaused = true;
+            this.stopCountdown(); // ✅ Dừng đếm ngược timeRemain
+            this.startGraceCountdown(); // ✅ Bắt đầu đếm ngược ân hạn
+            this.cdr.markForCheck();
+            console.log('✅ Session paused successfully');
+            this.toast.success('Tạm dừng sạc thành công');
+          },
+          error: (err) => {
+            console.error('❌ Stop session failed:', err);
+            this.toast.error('Dừng sạc thất bại: ' + (err.error?.message || err.message));
+            this.cdr.markForCheck();
+          },
+          complete: () => {
+            // ✅ QUAN TRỌNG: Reset isStopping trong mọi trường hợp
+            this.isStopping = false;
+            console.log('🔓 isStopping reset');
+          }
+        });
+        return; // Thoát sớm để không chạy code bên dưới
       }
-    });
-  }
+    } catch (error) {
+      console.error('❌ Error in pressStopSession:', error);
+      this.toast.error('Có lỗi xảy ra');
+      this.cdr.markForCheck();
+    } finally {
+      // ✅ Đảm bảo reset isStopping cho trường hợp "Tiếp tục sạc"
+      if (this.isPaused === false) {
+        this.isStopping = false;
+        this.cdr.markForCheck();
+      }
+    }
 }
 
   // --- Kết thúc phiên sạc ---
   pressEndSession() {
-  if (!this.sessionId) return;
+    if (!this.sessionId) return;
 
-  const confirmed = confirm('Bạn có chắc hoàn tất phiên sạc này không?');
-  if (!confirmed) return;
+    const confirmed = confirm('Bạn có chắc hoàn tất phiên sạc này không?');
+    if (!confirmed) return;
 
-  this.chargingService.completeSession(this.sessionId).subscribe({
-    next: async () => {
-      await this.presenceService.sendDisconnectCharging(this.idPost);
-      this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
+    this.chargingService.completeSession(this.sessionId).subscribe({
+      next: async (receipt) => {
+        await this.presenceService.sendDisconnectCharging(this.idPost);
+        this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
 
-      // 🗑️ XÓA LOCALSTORAGE
-      localStorage.removeItem(`charging_session_${this.idPost}`);
+        // 🗑️ XÓA LOCALSTORAGE
+        localStorage.removeItem(`charging_session_${this.idPost}`);
 
-      console.log(`${this.sessionId} EndSession successfully`);
-      this.toast.success('Đã kết thúc phiên sạc thành công');
-      // this.toast.success('Hóa đơn đã được gửi đến email của bạn');
-      setTimeout(() => {window.location.href = '/lichsugiaodich';}, 3000);
-      
-    },
-    error: (err) => {
-      console.error('End session failed', err);
-      this.toast.error('Hoàn tất sạc thất bại');
-    }
-  });
-}
+        console.log(`${this.sessionId} EndSession successfully`);
+        this.toast.success('Đã kết thúc phiên sạc thành công');
+        // this.toast.success('Hóa đơn đã được gửi đến email của bạn');
+        const hasIdleFees = (receipt.idleFee && receipt.idleFee > 0) || 
+                            (receipt.overstayFee && receipt.overstayFee > 0);
+        const isCashPayment = receipt.paymentMethod === 'Tiền mặt';
+        
+        if (!isCashPayment) {
+          setTimeout(() => { window.location.href = '/lichsugiaodich'; }, 3000);
+        } else {
+          this.toast.success('Cảm ơn bạn đã sử dụng dịch vụ!');
+          setTimeout(() => { window.location.href = '/'; }, 2000);
+        }
+        
+      },
+      error: (err) => {
+        console.error('End session failed', err);
+        this.toast.error('Hoàn tất sạc thất bại');
+      }
+    });
+  }
 
 
   ngOnDestroy() {
-    if (this.countdownInterval) clearInterval(this.countdownInterval);
+    this.stopCountdown(); 
+    this.stopGraceCountdown();
     if (this.sessionId) this.hubService.leaveSession(this.sessionId);
     this.realtimeSub?.unsubscribe();
     this.stopSub?.unsubscribe();
     this.fullSub?.unsubscribe();
     this.insufficientFundsSub?.unsubscribe();
+    this.idleFeeSub?.unsubscribe();
     this.hubService.stopConnection();
     this.presenceService.stopHubConnection();
   }

@@ -78,6 +78,33 @@
       </div>
       }
 
+      <!-- THÔNG TIN PHÍ PHẠT (chỉ hiện khi isPaused = true) -->
+      @if (isPaused && graceTimeRemain() === 0 && (idleFee() > 0 || overstayFee() > 0)) {
+      <div class="mt-6 border-t border-orange-100 pt-4 bg-orange-50/30 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-orange-700 mb-3 flex items-center gap-2">
+          <i class="i-ph-warning text-xl"></i> Phí phạt
+        </h3>
+        <ul class="text-gray-700 space-y-2">
+          @if (idleFee() > 0) {
+          <li class="flex justify-between">
+            <strong>Phí chiếm dụng:</strong>
+            <span class="text-orange-600 font-bold">{{ idleFee() | number }} đ</span>
+          </li>
+          }
+          @if (overstayFee() > 0) {
+          <li class="flex justify-between">
+            <strong>Phí quá giờ:</strong>
+            <span class="text-red-600 font-bold">{{ overstayFee() | number }} đ</span>
+          </li>
+          }
+          <li class="flex justify-between border-t border-orange-200 pt-2 mt-2">
+            <strong class="text-orange-800">Tổng phí phạt:</strong>
+            <span class="text-orange-800 font-bold text-lg">{{ (idleFee() + overstayFee()) | number }} đ</span>
+          </li>
+        </ul>
+      </div>
+      }
+
       <!--  THÔNG TIN ĐẶT LỊCH -->
       <!-- @if (reservationInfo) {
             <div class="mt-6 border-t border-blue-100 pt-4">
@@ -140,12 +167,24 @@
         </div>
       </div>
 
+      <!-- ✨ MỚI: ĐỒNG HỒ ÂN HẠN (chỉ hiện khi isPaused = true và còn thời gian ân hạn) -->
+      @if (isPaused && graceTimeRemain() > 0) {
+      <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center">
+        <p class="text-yellow-700 font-semibold mb-2">⏰ Thời gian ân hạn còn lại</p>
+        <p class="text-3xl font-extrabold text-yellow-800">{{ formatGraceTime() }}</p>
+        <p class="text-xs text-yellow-600 mt-2">Sau đó sẽ bắt đầu tính phí phạt</p>
+      </div>
+      }
+
       <!--  NÚT DỪNG -->
       <div class="mt-10 text-center">
-        <button (click)="pressStopSession()" [disabled]="isStopping || isCompleted()" [ngClass]="{
-      'bg-red-600 hover:bg-red-700': !isPaused,
-      'bg-green-600 hover:bg-green-700': isPaused
-    }" class="text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+        <button (click)="pressStopSession()" [disabled]="isStopping || isCompleted() || (isPaused && graceTimeRemain() === 0)" 
+        [ngClass]="{
+          'bg-red-600 hover:bg-red-700': !isPaused,
+          'bg-green-600 hover:bg-green-700': isPaused && graceTimeRemain() > 0,
+          'bg-gray-400': isPaused && graceTimeRemain() === 0
+        }" 
+        class="text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
           @if (isStopping) {
           <span class="animate-pulse">Đang xử lý...</span>
           } @else {
@@ -156,6 +195,10 @@
           }
           }
         </button>
+        <!-- ✨ THÔNG BÁO KHI HẾT ÂN HẠN -->
+        @if (isPaused && graceTimeRemain() === 0) {
+        <p class="text-sm text-orange-600 mt-2">Đã hết thời gian ân hạn. Vui lòng hoàn tất phiên sạc.</p>
+        }
       </div>
 
       <div class="mt-10 text-center">
