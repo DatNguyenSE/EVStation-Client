@@ -1,87 +1,101 @@
-<div class="p-6 space-y-8 mt-20 min-h-screen">
+<div class="min-h-screen mt-20 p-6 max-w-7xl mx-auto space-y-8 font-sans">
+
   <!-- Thông tin trạm -->
-  <div class="bg-white rounded-2xl shadow p-6 border border-gray-200">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Trạm sạc hiện tại</h2>
-    <p class="text-gray-700"><strong>Tên trạm:</strong> {{ station.name }}</p>
-    <p class="text-gray-700"><strong>Địa chỉ:</strong> {{ station.address }}</p>
+  <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Trạm sạc hiện tại</h2>
+    <div class="text-gray-700 space-y-1">
+      <p><span class="font-semibold">Tên trạm:</span> {{ StationInfo()?.name }}</p>
+      <p><span class="font-semibold">Địa chỉ:</span> {{ StationInfo()?.address }}</p>
+    </div>
 
     <div class="mt-4 flex flex-wrap gap-4 text-gray-800">
-      <div class="bg-blue-50 px-4 py-2 rounded-xl">
-        Tổng số trụ: <strong>{{ station.totalSlots }}</strong>
+      <div class="bg-blue-50 px-4 py-2 rounded-xl shadow-sm">
+        Tổng số trụ: <strong>{{ chargingPostSession().length }}</strong>
       </div>
-      <div class="bg-green-50 px-4 py-2 rounded-xl">
-        Đang sử dụng: <strong>{{ station.activeSlots }}</strong>
+      <div class="bg-green-50 px-4 py-2 rounded-xl shadow-sm">
+        Đang sử dụng: <strong>{{ usedCount() }}</strong>
       </div>
-      <div class="bg-yellow-50 px-4 py-2 rounded-xl">
-        Còn trống: <strong>{{ station.totalSlots - station.activeSlots }}</strong>
+      <div class="bg-yellow-50 px-4 py-2 rounded-xl shadow-sm">
+        Còn trống: <strong>{{ chargingPostSession().length - usedCount() }}</strong>
       </div>
     </div>
   </div>
 
   <!-- Danh sách trụ -->
-  <div class="bg-white rounded-2xl shadow p-6 border border-gray-200">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Danh sách trụ sạc</h2>
+  <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-6 overflow-x-auto">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Danh sách trụ sạc</h2>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-gray-700">
-            <th class="py-3 px-4 rounded-l-lg">Mã trụ</th>
-            <th class="py-3 px-4">Loại trụ</th>
-            <th class="py-3 px-4">Trạng thái</th>
-            <th class="py-3 px-4">Người dùng</th>
-            <th class="py-3 px-4">Thời gian bắt đầu</th>
-            <th class="py-3 px-4">Nhập biển số (vãng lai)</th>
-            <th class="py-3 px-4 rounded-r-lg">Xác nhận</th>
-          </tr>
-        </thead>
+    <table class="w-full table-auto border-collapse text-left">
+      <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+        <tr>
+          <th class="py-3 px-4 rounded-l-lg">Mã trụ</th>
+          <th class="py-3 px-4">Loại trụ</th>
+          <th class="py-3 px-4">Trạng thái</th>
+          <th class="py-3 px-4">Loại người dùng</th>
+          <th class="py-3 px-4">Thời gian bắt đầu</th>
+          <th class="py-3 px-4">Biển số</th>
+          <th class="py-3 px-4 rounded-r-lg">Xác nhận</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          <tr *ngFor="let slot of chargingSlots" class="border-b hover:bg-gray-50 transition">
-            <td class="py-3 px-4 font-medium text-gray-800">{{ slot.id }}</td>
-            <td class="py-3 px-4 capitalize">{{ slot.type }}</td>
+      <tbody>
+        <tr *ngFor="let slot of chargingPostSession()" class="border-b hover:bg-gray-50 transition-all duration-150"
+          [ngClass]="slot.status === 'charging' ? 'bg-green-50' : 'bg-white'">
 
-            <td class="py-3 px-4">
-              <span
-                [ngClass]="{
-                  'text-green-600 font-semibold': slot.status === 'charging',
-                  'text-gray-400': slot.status === 'available'
-                }">
-                {{ slot.status === 'charging' ? 'Đang sạc' : 'Trống' }}
-              </span>
-            </td>
+          <!-- Mã trụ -->
+          <td class="py-3 px-4 font-medium text-gray-800">{{ slot.code }}</td>
 
-            <td class="py-3 px-4">
-              <span [ngClass]="{ 'text-gray-800': slot.user?.registered, 'text-red-500': !slot.user?.registered }">
-                {{ slot.user?.name || '---' }}
-              </span>
-            </td>
+          <!-- Loại trụ -->
+          <td class="py-3 px-4 capitalize">{{ slot.type }}</td>
 
-            <td class="py-3 px-4">
-              {{ slot.startTime ? (slot.startTime | date: 'HH:mm dd/MM') : '---' }}
-            </td>
+          <!-- Trạng thái -->
+          <td class="py-3 px-4">
+            <span [ngClass]="{
+  'text-green-600 font-semibold': slot.status === 'charging',
+  'text-yellow-600 font-semibold': slot.status === 'paused',
+  '': slot.status === 'available'
+}">
+              {{ slot.status === 'charging'
+              ? 'Đang sạc'
+              : slot.status === 'paused'
+              ? 'Đang tạm dừng'
+              : 'Trống' }}
+            </span>
+          </td>
 
-            <td class="py-3 px-4">
-              <input
-                type="text"
-                [(ngModel)]="slot.plateInput"
-                placeholder="VD: 51A-12345"
-                class="border border-gray-300 rounded-lg px-3 py-2 w-36 focus:outline-none focus:ring focus:ring-blue-200"
-                [disabled]="slot.type !== 'vãng lai'"
-              />
-            </td>
+          <!-- Loại người dùng -->
+          <td class="py-3 px-4">
+            <span class="capitalize">{{ slot.isWalkIn ? 'Vãng lai' : 'Đặt chỗ' }}</span>
+          </td>
 
-            <td class="py-3 px-4">
-              <button
-                (click)="checkPlate(slot)"
-                [disabled]="slot.type !== 'vãng lai'"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300">
-                Kiểm tra
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          <!-- Thời gian bắt đầu -->
+          <td class="py-3 px-4 text-gray-600">
+            {{ slot.startTime ? (slot.startTime | date:'HH:mm:ss') : '-' }}
+          </td>
+
+          <!-- Biển số -->
+          <td class="py-3 px-4">
+            <input type="text" [(ngModel)]="slot.plateInput" [readonly]="!slot.isWalkIn" placeholder="Nhập biển số"
+              class="w-full px-3 py-2 rounded-lg border-2
+                          focus:outline-none transition-all duration-200
+                          focus:ring-2 focus:ring-orange-300
+                          focus:border-orange-600
+                          border-orange-400 bg-orange-50
+                          placeholder-gray-400
+                          font-medium
+                          {{ slot.isWalkIn ? '' : 'bg-gray-100 cursor-not-allowed text-gray-500' }}">
+          </td>
+
+          <!-- Nút xác nhận: chỉ hiện với vãng lai -->
+          <td class="py-3 px-4">
+            <button *ngIf="slot.isWalkIn" (click)="updatePlateForWalkIn(slot)"
+              class="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition-all duration-200">
+              Xác nhận
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

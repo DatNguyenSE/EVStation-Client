@@ -4,3 +4,8 @@ export interface Revenues {
   period: string;        // ví dụ: "2025-11"
   totalRevenue: number;
 }
+export interface RevenuesPack{
+  totalPackageRevenue:number;
+  startDate:string;
+  endDate:string;
+}

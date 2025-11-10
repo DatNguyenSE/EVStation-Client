@@ -12,8 +12,7 @@ import { ValidateScanResponse } from '../../_models/charging';
 import { Vehicles } from '../../_models/vehicle';
 import { DriverService } from '../../core/service/driver-service';
 import { PresenceService } from '../../core/service/presence-service';
-import { ReservationService } from '../../core/service/reservation-service';
-import { HubConnectionState } from '@microsoft/signalr';
+
 
 @Component({
   selector: 'app-charging-dashboard',
@@ -118,10 +117,10 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     const savedSessionId = this.checkForExistingSession();
     
     if (savedSessionId) {
-      console.log('🔄 Phát hiện session cũ, đang reconnect...');
+      console.log(' Phát hiện session cũ, đang reconnect...');
       this.reconnectToSession(savedSessionId);
     } else {
-      console.log('🆕 Bắt đầu session mới...');
+      console.log(' Bắt đầu session mới...');
       this.presenceService.createHubConnection();
       this.getPostInfo();
     }
@@ -130,17 +129,17 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   // Kiểm tra localStorage
   private checkForExistingSession(): number | null {
     try {
-      const savedData = localStorage.getItem(`charging_session_${this.idPost}`);
+      const savedData = localStorage.getItem(`charging_post_${this.idPost}`);
       if (!savedData) return null;
       
       const data = JSON.parse(savedData);
       const savedTime = new Date(data.timestamp);
       const now = new Date();
       
-      // Chỉ cho phép reconnect trong vòng 24h
+      // Chỉ cho phép reconnect trong vòng nửa h
       const hoursDiff = (now.getTime() - savedTime.getTime()) / (1000 * 60 * 60);
-      if (hoursDiff > 24) {
-        localStorage.removeItem(`charging_session_${this.idPost}`);
+      if (hoursDiff > 0.5) {
+        localStorage.removeItem(`charging_post_${this.idPost}`);
         return null;
       }
       
@@ -155,7 +154,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   private reconnectToSession(sessionId: number) {
     this.chargingService.reconnectSession(sessionId).subscribe({
       next: (response) => {
-        console.log('✅ Reconnect thành công:', response);
+        console.log(' Reconnect thành công:', response);
         
         // Khôi phục state
         this.sessionId = response.sessionId;
@@ -178,17 +177,20 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         } as DtoStation);
         
         if (response.vehicleInfo) {
-          this.vehicleInfo = {
-            vehicleId: 0, // BE không trả về vehicleId, có thể thêm sau
-            plate: response.vehicleInfo.plate,
-            model: response.vehicleInfo.model,
-            batteryCapacityKWh: response.vehicleInfo.batteryCapacityKWh,
-            type: '', // BE không trả về
-            maxChargingPowerKW: 0, // BE không trả về
-            connectorType: '', // BE không trả về
-            registrationStatus: '' // BE không trả về
-          } as Vehicles; // Cast để bypass TypeScript
-        }
+        this.vehicleInfo = {
+          vehicleId: response.vehicleInfo.vehicleId || response.vehicle?.id || 0,
+          //  ƯU TIÊN vehiclePlate từ session, không phải vehicle.plate
+          plate: response.vehiclePlate || response.vehicleInfo.plate || '',
+          model: response.vehicleInfo.model || response.vehicle?.model || '',
+          batteryCapacityKWh: response.vehicleInfo.batteryCapacityKWh || response.vehicle?.batteryCapacityKWh || 0,
+          type: response.vehicleInfo.type || response.vehicle?.type || '',
+          maxChargingPowerKW: response.vehicleInfo.maxChargingPowerKW || response.vehicle?.maxChargingPowerKW || 0,
+          connectorType: response.vehicleInfo.connectorType || response.vehicle?.connectorType || '',
+          registrationStatus: response.vehicleInfo.registrationStatus || response.vehicle?.registrationStatus || ''
+        };
+        
+        console.log('✅ Vehicle info after mapping:', this.vehicleInfo);
+      }
         
         // Khôi phục state realtime
         this.batteryPercent.set(response.currentState.batteryPercent);
@@ -423,59 +425,56 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   // --- Bắt đầu phiên sạc ---
 
   startSession() {
-    this.chargingService.startSession({
-      postId: Number(this.idPost),
-      vehicleId: this.vehicleInfo?.vehicleId,
-      vehiclePlate: this.vehicleInfo?.plate,
-      reservationId: this.validateInfo?.reservationId
-    }).subscribe({
-      next: session => {
-        console.log(' Phiên sạc bắt đầu:', session);
-        // ====kết nối SignalR-ConnectCharging
+  this.chargingService.startSession({
+    postId: Number(this.idPost),
+    vehicleId: this.vehicleInfo?.vehicleId,
+    vehiclePlate: this.vehicleInfo?.plate,
+    reservationId: this.validateInfo?.reservationId
+  }).subscribe({
+    next: session => {
+      console.log(' Phiên sạc bắt đầu:', session);
 
+      // Gán sessionId trước khi gọi SignalR
+      this.sessionId = session.id;
+      this.saveSessionToLocalStorage(session.id);
 
-         this.presenceService.sendConnectCharging(this.idPost);
-      
-        this.sessionId = session.id;
-        this.saveSessionToLocalStorage(session.id);
+      // ==== Kết nối SignalR
+      this.presenceService.sendConnectCharging(Number(this.idPost), this.sessionId);
 
-        const currentPost = this.postInfo(); // Lấy thông tin trụ hiện tại
-        if (currentPost) {
-          this.postInfo.set({
-            ...currentPost, // Giữ tất cả thông tin cũ (id, type, powerKW...)
-            status: 'Occupied' // Chỉ ghi đè trạng thái
-          });
-        } else {
-          // Phòng hờ nếu currentPost là null, thì mới gọi lại API
-          this.stationService.getPostById(this.idPost).subscribe({
-            next: updatedPost => this.postInfo.set(updatedPost)
-          });
-        }
-
-        // ====kết nối SignalR-ChargingHub
-        this.hubService.startConnection();
-        setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
-
-        // Subscribe to updates
-        this.subscribeToRealtimeUpdates();
-      },
-      error: err => {
-        console.error('Start session failed:', err);
-        this.errorMessage.set('Không thể bắt đầu phiên sạc.');
+      const currentPost = this.postInfo();
+      if (currentPost) {
+        this.postInfo.set({
+          ...currentPost,
+          status: 'Occupied'
+        });
       }
-    });
-  }
 
-  // Lưu session vào localStorage
+      this.hubService.startConnection();
+      setTimeout(() => this.hubService.joinSession(this.sessionId), 1000);
+
+      this.subscribeToRealtimeUpdates();
+    },
+    error: err => {
+      console.error('Start session failed:', err);
+      this.errorMessage.set('Không thể bắt đầu phiên sạc.');
+    }
+  });
+}
+
+
+  //  Lưu session vào localStorage để reconnect
   private saveSessionToLocalStorage(sessionId: number) {
     try {
+      const now = new Date();
+      // Cộng thêm 7 giờ (7 * 60 * 60 * 1000 ms)
+      const vnTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
       const data = {
         sessionId: sessionId,
         postId: this.idPost,
-        timestamp: new Date().toISOString()
+        timestamp: vnTime.toISOString()
       };
-      localStorage.setItem(`charging_session_${this.idPost}`, JSON.stringify(data));
-      console.log('💾 Đã lưu sessionId vào localStorage');
+      localStorage.setItem(`charging_post_${this.idPost}`, JSON.stringify(data));
+      console.log(' Đã lưu sessionId vào localStorage');
     } catch (error) {
       console.error('Lỗi khi lưu localStorage:', error);
     }
@@ -495,7 +494,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       if (this.isPaused) {
         // Tiếp tục sạc
         console.log('🔄 Đang tiếp tục sạc...');
-        await this.presenceService.sendConnectCharging(this.idPost);
+        await this.presenceService.sendConnectCharging(Number(this.idPost), this.sessionId);
         this.startSession();
         this.isPaused = false;
         this.stopGraceCountdown(); // ✅ Dừng đếm ngược ân hạn
@@ -510,7 +509,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
           next: async () => {
             console.log('✅ Backend confirmed stop');
             try {
-              await this.presenceService.sendDisconnectCharging(this.idPost);
+              await this.presenceService.sendDisconnectCharging(Number(this.idPost), this.sessionId);
               console.log('✅ SignalR disconnect sent');
             } catch (signalRError) {
               console.error('⚠️ SignalR disconnect failed:', signalRError);
@@ -559,7 +558,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
     this.chargingService.completeSession(this.sessionId).subscribe({
       next: async (receipt) => {
-        await this.presenceService.sendDisconnectCharging(this.idPost);
+        await this.presenceService.sendDisconnectCharging(Number(this.idPost), this.sessionId);
         this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
 
         // 🗑️ XÓA LOCALSTORAGE
