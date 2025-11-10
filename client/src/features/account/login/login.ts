@@ -28,10 +28,12 @@ export class Login {
         console.log(result),
         this.creds ={};
         this.toast.success('Đăng nhập thành công!');
-        if ((this.accountService.currentAccount()?.roles)?.includes('Admin')) {
+        if ((this.accountService.currentAccount()?.roles)?.includes('Admin')) { 
           window.location.href ='/quan-tri-vien/trang-chu';
         }else  if((this.accountService.currentAccount()?.roles)?.includes('Operator')){
           window.location.href = '/nhan-vien-tram/trang-chu';
+        }else  if((this.accountService.currentAccount()?.roles)?.includes('Technician')){
+          window.location.href = '/nhan-vien-ky-thuat/cong-viec';
         }
         else{
           window.location.href = '/';

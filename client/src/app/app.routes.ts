@@ -36,6 +36,8 @@ import { ReceiptPending } from '../features/operator/receipt-pending/receipt-pen
 import { chargingGuard } from '../core/_guards/charging.guard';
 import { SessionDetail } from '../features/session-detail/session-detail';
 import { PricingConfig } from '../features/admin/pricing-config/pricing-config';
+import { OpReport } from '../features/operator/op-report/op-report';
+import { Technicain } from '../features/technicain/technicain';
 
 
 export const routes: Routes = [
@@ -94,7 +96,17 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
             { path: 'trang-chu', component: Operator },
-            { path:'bien-lai', component: ReceiptPending }
+            { path:'bien-lai', component: ReceiptPending },
+            {path:'bao-cao',component:OpReport}
+        ]
+    },
+     {
+        path: 'nhan-vien-ky-thuat',
+        runGuardsAndResolvers: 'always',
+        canActivate: [authGuard] ,
+        children: [
+            { path: '', redirectTo: 'cong-viec', pathMatch: 'full' },
+            { path: 'cong-viec', component: Technicain },
         ]
     },
 

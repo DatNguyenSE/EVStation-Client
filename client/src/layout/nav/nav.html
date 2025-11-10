@@ -23,7 +23,7 @@
       </a>
 
     <!-- Nav chỉ hiện với Driver hoặc Admin -->
-    <nav *appHasRole="['Driver', 'Admin', 'Operator']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
+    <nav *appHasRole="['Driver', 'Admin', 'Operator','Technician','Manager']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
             shadow-lg sm:shadow-none transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
       <!-- Lặp menu theo role -->
       <a *ngFor="let item of menuItems" [routerLink]="item.link" routerLinkActive="text-cyan-600"

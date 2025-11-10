@@ -50,7 +50,19 @@ export class Nav implements OnInit {
         { label: 'Báo Cáo', link: '/quan-tri-vien/bao-cao'},
       ],
       Operator: [
-        { label: 'Biên lai', link: '/nhan-vien-tram/bien-lai' }
+        { label: 'Biên lai', link: '/nhan-vien-tram/bien-lai' },
+         { label: 'Báo cáo sự cố', link: '/nhan-vien-tram/bao-cao' }
+
+      ],
+      Technician:[
+        {label:'Công việc', link:'nhan-vien-ky-thuat/cong-viec'}
+      ],
+      Manager:[
+        { label: 'Quản lý nhân viên', link: '/quan-ly-tram/quan-ly-nhan-vien'},
+         { label: 'Báo cáo sự cố', link: '/quan-ly-tram/bao-cao'},
+         { label: 'Biên lai', link: '/quan-ly-tram/bien-lai' }
+
+
       ]
     };
     return menus[role] ?? [];
@@ -86,7 +98,7 @@ export class Nav implements OnInit {
   const role = this.accountService.currentAccount()?.roles?.[0] || '';
   this.menuItems = this.getMenuForRole(role);
 
-  this.reportService.reconnectIfNeeded();
+  // this.reportService.reconnectIfNeeded();
 
   // 🔔 Lắng nghe realtime từ ReportService
   this.reportService.notifications$.subscribe(() => this.updateUnread());
@@ -105,7 +117,12 @@ ngOnDestroy(): void {
       window.location.href = '/quan-tri-vien/trang-chu';
     } else if (acc?.includes('Staff')) {
       window.location.href = '/#';
-    } else {
+    }else if (acc?.includes('Technician')) {
+      window.location.href = '/nhan-vien-ky-thuat/cong-viec';
+    }else if (acc?.includes('Manager')) {
+      window.location.href = '/quan-ly-tram/trang-chu';
+    }
+     else {
       window.location.href = '/';
     }
   }

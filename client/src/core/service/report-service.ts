@@ -43,11 +43,18 @@ export class ReportService {
   closeReport(id: number): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.baseUrl}reports/${id}/close`, {});
   }
+
+  uploadReport(formData : FormData){
+    return this.http.post<Reports>(`${this.baseUrl}reports`,formData);
+
+  }
  
 
     isConnected(): boolean {
     return this.hubConnection?.state === signalR.HubConnectionState.Connected;
   }
+
+
     
 
   // 🔌 Khởi tạo kết nối tới ReportHub

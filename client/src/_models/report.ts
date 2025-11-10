@@ -32,6 +32,7 @@ export interface Technician {
   fullName: string;
   email: string;
 }
+
 export interface EvaluateReportRequest {
   isCritical: boolean;
   maintenanceStartTime: string;
@@ -42,5 +43,22 @@ export interface EvaluateResponse {
 }
 
 export interface AssignResponse {
+  message : string;
+}
+
+export interface Task {
+  id:number;
+  description: string;
+  status: string;
+  severity: string;
+  createAt: string;
+  maintenanceStartTime:string;
+  maintenanceEndTime:string;
+  postId:number;
+  postCode:string;
+  technicianName:string;
+}
+
+export interface Repair{
   message : string;
 }

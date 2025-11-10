@@ -39,8 +39,8 @@ import { ReportService } from './report-service';
             this.setCurrentAccount(account);     
             
             // KẾT NỐI SIGNALR REALTIME
-            this.reportService.createHubConnection(account);
-            this.reportService.reconnectIfNeeded();
+            // this.reportService.createHubConnection(account);
+            // this.reportService.reconnectIfNeeded();
             this.reservationService.createHubConnection(account);
           }
           return account;
