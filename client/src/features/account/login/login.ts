@@ -29,7 +29,7 @@ export class Login {
         this.creds ={};
         this.toast.success('Đăng nhập thành công!');
         if ((this.accountService.currentAccount()?.roles)?.includes('Admin')) {
-          this.router.navigateByUrl('/quan-tri-vien');
+          window.location.href ='/quan-tri-vien/trang-chu';
         }else  if((this.accountService.currentAccount()?.roles)?.includes('Operator')){
           window.location.href = '/nhan-vien-tram/trang-chu';
         }
