@@ -15,7 +15,7 @@ export class OperatorService {
 
 
   getAssignment(idStaff: string) {
-    return this.http.get<AssignmentResponseDto>(`${this.apiUrl.apiUrl}assignments/${idStaff}`)
+    return this.http.get<AssignmentResponseDto>(`${this.apiUrl.apiUrl}assignments/staff/${idStaff}`)
   }
 
   UpdatePlateForWalkIn(sessionId :number, plateNumber: string) {
