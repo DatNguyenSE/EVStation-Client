@@ -127,9 +127,9 @@ export class ChargingHubService {
     });
 
     // Khi lỗi
-    this.hubConnection.on('ReceiveSessionEnded', (error: any) => {
-      console.error(' Lỗi trong phiên sạc:', error);
-      this.errorStopPostSubject.next(error);
+    this.hubConnection.on('ReceiveSessionEnded', (data) => {
+      console.error(' Lỗi trong phiên sạc:', data);
+      this.errorStopPostSubject.next(data);
     });
   }
 
