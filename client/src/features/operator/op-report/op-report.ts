@@ -65,6 +65,8 @@ export class OpReport {
           this.route.navigate(['/quan-ly-tram/trang-chu']);
         } else if (role === 'Operator') {
           this.route.navigate(['/nhan-vien-tram/trang-chu']);
+        }else if (role === 'Technician') {
+          this.route.navigate(['/nhan-vien-ky-thuat/cong-viec']);
         }
         },2000);
         
