@@ -95,8 +95,8 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   private startGraceCountdown(initialSeconds?: number) {
     if (this.graceCountdownInterval) clearInterval(this.graceCountdownInterval);
 
-    // Đặt thời gian ân hạn = 3 phút (180 giây)
-    const totalSeconds = initialSeconds ?? 3 * 60;
+    // Đặt thời gian ân hạn = 2 phút (180 giây)
+    const totalSeconds = initialSeconds ?? 2 * 60;
     this.graceTimeRemain.set(totalSeconds);
 
     this.graceCountdownInterval = setInterval(() => {
@@ -548,7 +548,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       if (this.isPaused) {
         // Tiếp tục sạc
         console.log('🔄 Đang tiếp tục sạc...');
-        await this.presenceService.sendConnectCharging(Number(this.idPost), this.sessionId);
+        // await this.presenceService.sendConnectCharging(Number(this.idPost), this.sessionId);
         this.startSession();
         this.isPaused = false;
         this.stopGraceCountdown(); // ✅ Dừng đếm ngược ân hạn
@@ -628,7 +628,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         const hasWalletTransaction = (!isCashPayment && !isPackagePayment) || (isPackagePayment && hasIdleFees); 
         
         if (hasWalletTransaction) {
-          setTimeout(() => { window.location.href = '/lichsugiaodich'; }, 3000);
+          setTimeout(() => { window.location.href = '/bien-lai'; }, 3000);
         } else {
           this.toast.success('Cảm ơn bạn đã sử dụng dịch vụ!');
           setTimeout(() => { window.location.href = '/'; }, 2000);
