@@ -56,7 +56,8 @@ export class Nav implements OnInit {
 
       ],
       Technician:[
-        {label:'Công việc', link:'nhan-vien-ky-thuat/cong-viec'}
+        {label:'Công việc', link:'nhan-vien-ky-thuat/cong-viec'},
+        { label: 'Báo cáo sự cố', link: '/nhan-vien-tram/bao-cao' }
       ],
       Manager:[
         { label: 'Quản lý nhân viên', link: '/quan-ly-tram/quan-ly-nhan-vien'},
@@ -91,7 +92,7 @@ export class Nav implements OnInit {
     });
   }
    updateUnread() {
-    this.unreadCount = this.reportService.getUnreadCount();
+    this.unreadCount = this.reportService.getAdminUnreadCount();
   }
 
  ngOnInit(): void {
@@ -102,7 +103,7 @@ export class Nav implements OnInit {
   // this.reportService.reconnectIfNeeded();
 
   // 🔔 Lắng nghe realtime từ ReportService
-  this.reportService.notifications$.subscribe(() => this.updateUnread());
+  this.reportService.adminNotifications$.subscribe(() => this.updateUnread());
   this.updateUnread();
 }
 

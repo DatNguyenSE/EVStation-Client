@@ -50,33 +50,35 @@ export class Report {
 
 
   openEvaluateModal(report: Reports): void {
-  this.selectedReportForEvaluate = report;
-  this.showEvaluateModal = true;
-}
+    this.selectedReportForEvaluate = report;
+    this.showEvaluateModal = true;
+  }
 
-closeEvaluateModal(): void {
-  this.showEvaluateModal = false;
-  this.selectedReportForEvaluate = undefined;
-}
+  closeEvaluateModal(): void {
+    this.showEvaluateModal = false;
+    this.selectedReportForEvaluate = undefined;
+  }
 
-openImagePreview(url?: string | null): void {
-  if (!url) return;
-  this.previewImageUrl = url;
-}
+  openImagePreview(url?: string | null): void {
+    if (!url) return;
+    this.previewImageUrl = url;
+  }
 
-closeImagePreview(): void {
-  this.previewImageUrl = null;
-}
+  closeImagePreview(): void {
+    this.previewImageUrl = null;
+  }
 
   // 🚀 Lifecycle
   ngOnInit(): void {
     this.loadReports();
 
-    const notiSub = this.reportService.notifications$.subscribe(noti => {
+    const notiSub = this.reportService.adminNotifications$.subscribe(noti => {
       // ✅ Dùng setTimeout để tránh ExpressionChangedAfterItHasBeenCheckedError
       setTimeout(() => {
         this.notifications = noti;
-        this.unreadCount = this.reportService.getUnreadCount();
+        this.unreadCount = this.reportService.getAdminUnreadCount();
+
+        this.loadReports();
         this.cdr.detectChanges();
       });
     });

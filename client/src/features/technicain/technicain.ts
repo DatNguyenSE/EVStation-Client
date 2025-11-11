@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { AccountService } from '../../core/service/account-service';
 import { StationService } from '../../core/service/station-service';
 import { ToastService } from '../../core/service/toast-service';
@@ -6,6 +6,8 @@ import { Task } from '../../_models/report';
 import { TechnicainService } from '../../core/service/technicain-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReportService } from '../../core/service/report-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-technicain',
@@ -14,7 +16,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './technicain.html',
   styleUrl: './technicain.css',
 })
-export class Technicain {
+export class Technicain implements OnInit, OnDestroy{
+  private reportService = inject(ReportService);
   protected stationService = inject(StationService);
   private technicainService = inject(TechnicainService);
   private toast = inject(ToastService);
@@ -23,11 +26,26 @@ export class Technicain {
   task : Task[] = [];
   startedTasks = new Set<number>();
   resolvedTasks = new Set<number>();
+  private subs: Subscription[] = [];
 
   ngOnInit(){
     this.getTask();
+    // (5) LẮNG NGHE SỰ KIỆN "TaskCompleted" TỪ SERVICE
+    const taskCompletedSub = this.reportService.taskCompleted$.subscribe((message: string) => {
+      // ✅ BẮT ĐƯỢC TIN NHẮN TỪ ADMIN!
+      console.log('✅ Received confirmation from Admin:', message);
+      this.toast.success(message); // "Công việc của bạn tại trụ... đã được Admin xác nhận"
+      this.getTask(); 
+      this.cdf.detectChanges();
+    });
+
+    // (6) Thêm vào mảng để cleanup
+    this.subs.push(taskCompletedSub);
   }
 
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+  }
 
    getTask(){
       this.technicainService.getMyTask().subscribe({
@@ -82,7 +100,4 @@ export class Technicain {
     })
 
    }
-  
-
-
 }

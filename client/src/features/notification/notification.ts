@@ -23,15 +23,15 @@ export class Notification implements OnInit, OnDestroy {
     console.log('🔔 Notification component loaded!');
 
     // ✅ Load dữ liệu từ localStorage trước (để hiện ngay khi reload trang)
-    const stored = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const stored = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
     this.notifications = stored;
-    this.unreadCount = this.reportService.getUnreadCount();
+    this.unreadCount = this.reportService.getAdminUnreadCount();
 
     // 🔔 Lắng nghe realtime từ ReportService (SignalR push event)
-    const sub = this.reportService.notifications$.subscribe(noti => {
+    const sub = this.reportService.adminNotifications$.subscribe(noti => {
       console.log('📬 Notifications cập nhật:', noti);
       this.notifications = noti;
-      this.unreadCount = this.reportService.getUnreadCount();
+      this.unreadCount = this.reportService.getAdminUnreadCount();
     });
 
     this.subs.push(sub);
@@ -44,7 +44,7 @@ export class Notification implements OnInit, OnDestroy {
 
   /** ✅ Đánh dấu tất cả đã đọc */
   markAllAsRead(): void {
-    this.reportService.markAllAsRead();
+    this.reportService.markAdminAllAsRead();
     this.unreadCount = 0;
   }
 
