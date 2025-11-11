@@ -8,6 +8,7 @@ import { themes } from '../theme';
 import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
+import { ReportService } from '../../core/service/report-service';
 
 
 @Component({
@@ -26,9 +27,12 @@ export class Nav implements OnInit {
   driverService = inject(DriverService);
   busyService = inject(BusyService);
   routers = inject(Router);
-  route = inject(ActivatedRoute)
+  route = inject(ActivatedRoute);
+  reportService = inject(ReportService)
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
+   unreadCount = 0;
+   private sub: any;
 
   /**  Lấy danh sách menu theo role hiện tại */
 
@@ -43,10 +47,23 @@ export class Nav implements OnInit {
         { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
         { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
         {label:  'Quản Lí Giá Tiền và Gói' , link:'/quan-tri-vien/quan-ly-gia-tien-va-goi'},
+         {label:  'Phân Trạm' , link:'/quan-tri-vien/phan-tram'},
         { label: 'Báo Cáo', link: '/quan-tri-vien/bao-cao'},
       ],
       Operator: [
-        { label: 'Biên lai', link: '/nhan-vien-tram/bien-lai' }
+        { label: 'Biên lai', link: '/nhan-vien-tram/bien-lai' },
+         { label: 'Báo cáo sự cố', link: '/nhan-vien-tram/bao-cao' }
+
+      ],
+      Technician:[
+        {label:'Công việc', link:'nhan-vien-ky-thuat/cong-viec'},
+        { label: 'Báo cáo sự cố', link: '/nhan-vien-tram/bao-cao' }
+      ],
+      Manager:[
+         { label: 'Báo cáo sự cố', link: '/quan-ly-tram/bao-cao'},
+         { label: 'Biên lai', link: '/quan-ly-tram/bien-lai' }
+
+
       ]
     };
     return menus[role] ?? [];
@@ -73,19 +90,27 @@ export class Nav implements OnInit {
       }
     });
   }
-
-  ngOnInit(): void {
-    document.documentElement.setAttribute('data-theme', this.selectedTheme());
-    const role = this.accountService.currentAccount()?.roles?.[0] || '';
-    this.menuItems = this.getMenuForRole(role);
+   updateUnread() {
+    this.unreadCount = this.reportService.getAdminUnreadCount();
   }
 
+ ngOnInit(): void {
+  document.documentElement.setAttribute('data-theme', this.selectedTheme());
+  const role = this.accountService.currentAccount()?.roles?.[0] || '';
+  this.menuItems = this.getMenuForRole(role);
 
-  /* Lấy danh sách menu theo role hiện tại */
+  // this.reportService.reconnectIfNeeded();
+
+  // 🔔 Lắng nghe realtime từ ReportService
+  this.reportService.adminNotifications$.subscribe(() => this.updateUnread());
+  this.updateUnread();
+}
 
 
+ngOnDestroy(): void {
+  if (this.sub) this.sub.unsubscribe();
+}
 
-  
 
   onLogoClick() {
     const acc = this.accountService.currentAccount()?.roles;
@@ -93,7 +118,12 @@ export class Nav implements OnInit {
       window.location.href = '/quan-tri-vien/trang-chu';
     } else if (acc?.includes('Staff')) {
       window.location.href = '/#';
-    } else {
+    }else if (acc?.includes('Technician')) {
+      window.location.href = '/nhan-vien-ky-thuat/cong-viec';
+    }else if (acc?.includes('Manager')) {
+      window.location.href = '/quan-ly-tram/trang-chu';
+    }
+     else {
       window.location.href = '/';
     }
   }

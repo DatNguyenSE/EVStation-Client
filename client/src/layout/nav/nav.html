@@ -23,7 +23,7 @@
       </a>
 
     <!-- Nav chỉ hiện với Driver hoặc Admin -->
-    <nav *appHasRole="['Driver', 'Admin', 'Operator']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
+    <nav *appHasRole="['Driver', 'Admin', 'Operator','Technician','Manager']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
             shadow-lg sm:shadow-none transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
       <!-- Lặp menu theo role -->
       <a *ngFor="let item of menuItems" [routerLink]="item.link" routerLinkActive="text-cyan-600"
@@ -62,16 +62,17 @@
         </a>
    
       </ng-container>
-      <!-- Thông báo --> <a routerLink="/thong-bao" routerLinkActive="text-gray-300" (click)="isMenuOpen = false"
-        class=" cursor-pointer flex items-center ">
-        <div class="relative inline-block">
-          <span class="material-icons text-3xl cursor-pointer">notifications</span>
-          <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
-            0
-          </span>
-        </div>
-        <span class="ml-6">|</span>
-      </a>
+      <!-- Thông báo --> <a routerLink="/thong-bao" class="cursor-pointer flex items-center">
+  <div class="relative inline-block">
+    <span class="material-icons text-3xl cursor-pointer">notifications</span>
+    <span *ngIf="unreadCount > 0"
+          class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+      {{ unreadCount }}
+    </span>
+  </div>
+  <span class="ml-6">|</span>
+</a>
+
       <!-- chọn theme -->
       <div class="dropdown dropdown-end mr-5">
         <button tabindex="1"
