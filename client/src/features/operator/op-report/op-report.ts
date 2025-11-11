@@ -5,6 +5,7 @@ import { ToastService } from '../../../core/service/toast-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AccountService } from '../../../core/service/account-service';
 
 @Component({
   selector: 'app-op-report',
@@ -15,6 +16,7 @@ import { Router } from '@angular/router';
 })
 export class OpReport {
   private reportSvc = inject(ReportService);
+  private accountSvc = inject(AccountService);
   private toast = inject(ToastService);
   private route = inject(Router)
 
@@ -43,7 +45,6 @@ export class OpReport {
       this.toast.warning('Vui lòng nhập đầy đủ thông tin báo cáo');
       return;
     }
-
     const formData = new FormData();
     formData.append('PostId', this.report.postId.toString());
     formData.append('Description', this.report.description.trim());
@@ -56,8 +57,15 @@ export class OpReport {
       next: (res) => {
         this.toast.success('Gửi báo cáo thành công!');
         this.resetForm();
+
+        const acc= this.accountSvc.currentAccount();
+        const role = acc?.roles?.[0];
         setTimeout(() =>{
+          if (role === 'Manager') {
+          this.route.navigate(['/quan-ly-tram/trang-chu']);
+        } else if (role === 'Operator') {
           this.route.navigate(['/nhan-vien-tram/trang-chu']);
+        }
         },2000);
         
       },
