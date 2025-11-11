@@ -33,6 +33,9 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   protected isStopping = false;
   protected isPaused = false;
 
+  protected isReservationExpired = signal(false);
+
+
   // protected confirmed = signal(false);
   protected isCompleted = signal(false);
 
@@ -63,10 +66,13 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   // === Đăng ký lắng nghe realtime ===
   private realtimeSub?: Subscription;
+  private sessionUpdateSub?: Subscription;
   private stopSub?: Subscription;
   private fullSub?: Subscription;
   private insufficientFundsSub?: Subscription;
   private idleFeeSub?: Subscription;
+  private reservationExpiredSub?: Subscription;
+  private errorStopPostSub?: Subscription;
   private countdownInterval?: any;
   private graceCountdownInterval?: any;
 
@@ -205,6 +211,8 @@ export class ChargingDashboard implements OnInit, OnDestroy {
             console.log('✅ Khôi phục trạng thái: Pin đã đầy');
           }
 
+          this.timeRemain.set(response.currentState.timeRemainTotalSeconds ?? 0);
+
           // Nếu còn thời gian ân hạn, bật countdown
           const remaining = response.currentState.graceTimeRemainingSeconds ?? 0;
           if (remaining > 0) {
@@ -231,7 +239,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('❌ Reconnect thất bại:', err);
-        localStorage.removeItem(`charging_session_${this.idPost}`);
+        localStorage.removeItem(`charging_post_${this.idPost}`);
         if (err.status === 403) {
           this.toast.error('Bạn không có quyền truy cập phiên sạc này.');
           this.errorMessage.set('Phiên sạc này thuộc về người dùng khác.');
@@ -252,6 +260,25 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         this.chargedKwh.set(data.energyConsumed ?? this.chargedKwh());
         this.totalPrice.set(data.cost ?? this.totalPrice());
         this.timeRemain.set(data.timeRemainTotalSeconds ?? this.timeRemain());
+        
+        if (!this.isPaused) {
+          this.startCountdown();
+        }
+      });
+    });
+
+    this.sessionUpdateSub = this.hubService.sessionUpdate$.subscribe(data => {
+      if (!data || data.sessionId !== this.sessionId) return;
+      
+      console.log('🔄 [SessionUpdate] Nhận cập nhật từ staff:', data);
+      
+      queueMicrotask(() => {
+        // Cập nhật các giá trị cơ bản
+        this.batteryPercent.set(data.batteryPercentage ?? this.batteryPercent());
+        this.chargedKwh.set(data.energyConsumed ?? this.chargedKwh());
+        this.totalPrice.set(data.cost ?? this.totalPrice());
+        
+        // ✅ CẬP NHẬT THÔNG TIN XE (chỉ có trong event này)
         if (data.vehicleInfo) {
           this.vehicleInfo = {
             vehicleId: this.vehicleInfo?.vehicleId ?? 0,
@@ -263,12 +290,12 @@ export class ChargingDashboard implements OnInit, OnDestroy {
             connectorType: this.vehicleInfo?.connectorType ?? '',
             registrationStatus: this.vehicleInfo?.registrationStatus ?? ''
           } as Vehicles;
-          this.cdr.markForCheck();
+          
           console.log('✅ Đã cập nhật thông tin xe:', this.vehicleInfo);
+          this.toast.success(`Đã nhận diện xe: ${this.vehicleInfo.plate} - ${this.vehicleInfo.model}`);
         }
-        if (!this.isPaused) {
-          this.startCountdown();
-        }
+        
+        this.cdr.markForCheck();
       });
     });
 
@@ -318,6 +345,33 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         this.overstayFee.set(data.overstayFee || 0);
       }
     });
+
+    this.reservationExpiredSub = this.hubService.reservationExpired$.subscribe(data => {
+      if (data.sessionId === this.sessionId) {
+        console.warn('⏰ Hết thời gian đặt chỗ!');
+        this.isPaused = true;
+        this.isCompleted.set(true); // ✅ Khóa nút "Tiếp tục sạc"
+        this.isReservationExpired.set(true);
+        this.stopCountdown();
+        this.stopGraceCountdown(); // ✅ KHÔNG CÓ ÂN HẠN
+        this.graceTimeRemain.set(0);
+        this.toast.warning('Đã hết thời gian đặt chỗ. Vui lòng hoàn tất phiên sạc.');
+        this.cdr.markForCheck();
+      }
+    });
+
+    this.errorStopPostSub = this.hubService.errorStopPost$.subscribe(data => {
+      if (data.sessionId === this.sessionId) {
+        console.warn('Trụ bị dừng do hỏng!');
+        this.isPaused = true;
+        this.isCompleted.set(true); // ✅ Khóa nút "Tiếp tục sạc"
+        this.stopCountdown();
+        this.stopGraceCountdown(); // ✅ KHÔNG CÓ ÂN HẠN
+        this.graceTimeRemain.set(0);
+        this.toast.warning('Trụ đã bị dừng do gặp sự cố. Vui lòng hoàn tất phiên sạc.');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   private stopCountdown() {
@@ -363,7 +417,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
           console.log('Reservation info:', res);
 
           // Nếu là walk-in thì bỏ qua bước lấy vehicle
-          if (this.postInfo()?.isWalkIn) {
+          if (this.postInfo()?.isWalkIn || !res.vehicleId) {
             return of(null); // trả về Observable rỗng để không bị lỗi switchMap
           } else {
             return this.driverService.GetVehicleById(res.vehicleId);
@@ -562,7 +616,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         this.presenceService.stopHubConnection(); // Dừng kết nối SignalR-ConnectCharging
 
         // 🗑️ XÓA LOCALSTORAGE
-        localStorage.removeItem(`charging_session_${this.idPost}`);
+        localStorage.removeItem(`charging_post_${this.idPost}`);
 
         console.log(`${this.sessionId} EndSession successfully`);
         this.toast.success('Đã kết thúc phiên sạc thành công');
@@ -570,8 +624,10 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         const hasIdleFees = (receipt.idleFee && receipt.idleFee > 0) || 
                             (receipt.overstayFee && receipt.overstayFee > 0);
         const isCashPayment = receipt.paymentMethod === 'Tiền mặt';
+        const isPackagePayment = receipt.paymentMethod === 'Gói thuê bao';
+        const hasWalletTransaction = (!isCashPayment && !isPackagePayment) || (isPackagePayment && hasIdleFees); 
         
-        if (!isCashPayment) {
+        if (hasWalletTransaction) {
           setTimeout(() => { window.location.href = '/lichsugiaodich'; }, 3000);
         } else {
           this.toast.success('Cảm ơn bạn đã sử dụng dịch vụ!');
@@ -592,10 +648,12 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     this.stopGraceCountdown();
     if (this.sessionId) this.hubService.leaveSession(this.sessionId);
     this.realtimeSub?.unsubscribe();
+    this.sessionUpdateSub?.unsubscribe();
     this.stopSub?.unsubscribe();
     this.fullSub?.unsubscribe();
     this.insufficientFundsSub?.unsubscribe();
     this.idleFeeSub?.unsubscribe();
+    this.reservationExpiredSub?.unsubscribe();
     this.hubService.stopConnection();
     this.presenceService.stopHubConnection();
   }

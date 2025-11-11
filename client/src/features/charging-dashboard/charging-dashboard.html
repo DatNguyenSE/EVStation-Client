@@ -170,7 +170,7 @@
       <!-- ✨ MỚI: ĐỒNG HỒ ÂN HẠN (chỉ hiện khi isPaused = true và còn thời gian ân hạn) -->
       @if (isPaused && graceTimeRemain() > 0) {
       <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center">
-        <p class="text-yellow-700 font-semibold mb-2">⏰ Thời gian ân hạn còn lại</p>
+        <p class="text-yellow-700 font-semibold mb-2">Thời gian ân hạn còn lại</p>
         <p class="text-3xl font-extrabold text-yellow-800">{{ formatGraceTime() }}</p>
         <p class="text-xs text-yellow-600 mt-2">Sau đó sẽ bắt đầu tính phí phạt</p>
       </div>
@@ -178,26 +178,39 @@
 
       <!--  NÚT DỪNG -->
       <div class="mt-10 text-center">
-        <button (click)="pressStopSession()" [disabled]="isStopping || isCompleted() || (isPaused && graceTimeRemain() === 0)" 
-        [ngClass]="{
-          'bg-red-600 hover:bg-red-700': !isPaused,
-          'bg-green-600 hover:bg-green-700': isPaused && graceTimeRemain() > 0,
-          'bg-gray-400': isPaused && graceTimeRemain() === 0
-        }" 
-        class="text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-          @if (isStopping) {
-          <span class="animate-pulse">Đang xử lý...</span>
-          } @else {
-          @if (isPaused) {
-          <i class="i-ph-play text-lg mr-1"></i> Tiếp tục sạc
-          } @else {
-          <i class="i-ph-power text-lg mr-1"></i> Dừng sạc
-          }
-          }
+        <button (click)="pressStopSession()" 
+          [disabled]="isStopping || isCompleted() || (isPaused && graceTimeRemain() === 0)" 
+          [ngClass]="{
+            'bg-red-600 hover:bg-red-700': !isPaused && !isCompleted(),
+            'bg-green-600 hover:bg-green-700': isPaused && graceTimeRemain() > 0 && !isCompleted(),
+            'bg-gray-400': isPaused && (graceTimeRemain() === 0 || isCompleted())
+          }" 
+          class="text-white py-3 px-10 rounded-2xl font-semibold shadow-md active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (isStopping) {
+            <span class="animate-pulse">Đang xử lý...</span>
+            } @else {
+            @if (isPaused && !isCompleted()) {
+            <i class="i-ph-play text-lg mr-1"></i> Tiếp tục sạc
+            } @else {
+            <i class="i-ph-power text-lg mr-1"></i> Dừng sạc
+            }
+            }
         </button>
         <!-- ✨ THÔNG BÁO KHI HẾT ÂN HẠN -->
         @if (isPaused && graceTimeRemain() === 0) {
-        <p class="text-sm text-orange-600 mt-2">Đã hết thời gian ân hạn. Vui lòng hoàn tất phiên sạc.</p>
+          @if (isReservationExpired()) {
+            <!-- Thông báo hết giờ đặt chỗ (ưu tiên cao hơn) -->
+            <p class="text-sm text-red-600 mt-2 font-semibold">
+              <i class="i-ph-warning text-lg"></i>
+              Đã hết thời gian đặt chỗ. Vui lòng hoàn tất phiên sạc ngay.
+            </p>
+          } @else {
+            <!-- Thông báo hết ân hạn (cho trường hợp dừng thủ công) -->
+            <p class="text-sm text-orange-600 mt-2">
+              <i class="i-ph-warning text-lg"></i>
+              Đã hết thời gian ân hạn. Vui lòng hoàn tất phiên sạc.
+            </p>
+          }
         }
       </div>
 

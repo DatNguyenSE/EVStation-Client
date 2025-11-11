@@ -12,6 +12,9 @@ export class ChargingHubService {
   private chargingUpdateSubject = new Subject<any>();
   chargingUpdate$ = this.chargingUpdateSubject.asObservable();
 
+  private sessionUpdateSubject = new Subject<any>();
+  public sessionUpdate$ = this.sessionUpdateSubject.asObservable();
+
   private sessionStoppedSubject = new Subject<any>();
   sessionStopped$ = this.sessionStoppedSubject.asObservable();
 
@@ -23,6 +26,12 @@ export class ChargingHubService {
 
   private idleFeeUpdateSubject = new Subject<any>();
   idleFeeUpdate$ = this.idleFeeUpdateSubject.asObservable();
+
+  private reservationExpiredSubject = new Subject<any>();
+  public reservationExpired$ = this.reservationExpiredSubject.asObservable();
+
+  private errorStopPostSubject = new Subject<any>();
+  public errorStopPost$ = this.errorStopPostSubject.asObservable();
 
   private isConnecting = false;
 
@@ -84,6 +93,11 @@ export class ChargingHubService {
       this.chargingUpdateSubject.next(data);
     });
 
+    this.hubConnection.on('ReceiveSessionUpdate', (data) => {
+      console.log('🔄 Nhận session update:', data);
+      this.sessionUpdateSubject.next(data);
+    });
+
     //  Khi phiên sạc dừng (stop manual)
     this.hubConnection.on('ReceiveSessionStopped', (data: any) => {
       console.warn(' Phiên sạc dừng:', data);
@@ -107,9 +121,15 @@ export class ChargingHubService {
       this.idleFeeUpdateSubject.next(data);
     });
 
+    this.hubConnection.on('ReceiveReservationExpired', (data) => {
+      console.warn('Nhận thông báo hết giờ đặt chỗ:', data);
+      this.reservationExpiredSubject.next(data);
+    });
+
     // Khi lỗi
-    this.hubConnection.on('ReceiveSessionError', (error: any) => {
+    this.hubConnection.on('ReceiveSessionEnded', (error: any) => {
       console.error(' Lỗi trong phiên sạc:', error);
+      this.errorStopPostSubject.next(error);
     });
   }
 
