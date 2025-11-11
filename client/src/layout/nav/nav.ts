@@ -59,7 +59,6 @@ export class Nav implements OnInit {
         {label:'Công việc', link:'nhan-vien-ky-thuat/cong-viec'}
       ],
       Manager:[
-        { label: 'Quản lý nhân viên', link: '/quan-ly-tram/quan-ly-nhan-vien'},
          { label: 'Báo cáo sự cố', link: '/quan-ly-tram/bao-cao'},
          { label: 'Biên lai', link: '/quan-ly-tram/bien-lai' }
 
