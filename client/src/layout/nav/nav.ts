@@ -49,6 +49,7 @@ export class Nav implements OnInit {
         {label:  'Quản Lí Giá Tiền và Gói' , link:'/quan-tri-vien/quan-ly-gia-tien-va-goi'},
          {label:  'Phân Trạm' , link:'/quan-tri-vien/phan-tram'},
         { label: 'Báo Cáo', link: '/quan-tri-vien/bao-cao'},
+        { label: 'Biên lai', link: '/quan-tri-vien/bien-lai' }
       ],
       Operator: [
         { label: 'Biên lai', link: '/nhan-vien-tram/bien-lai' },
