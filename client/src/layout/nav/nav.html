@@ -1,4 +1,4 @@
-<header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-800 via-cyan-600 to-cyan-700 shadow-lg">
+<header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-800 via-blue-700 to-cyan-700 shadow-lg">
   <div class="flex items-center px-4 sm:px-10 mx-auto gap-6 h-full  text-white">
     <!-- Logo - Title -->
     <a (click)="onLogoClick()" routerLinkActive="text-accent" [routerLinkActiveOptions]="{ exact: true }"
@@ -62,7 +62,8 @@
         </a>
    
       </ng-container>
-      <!-- Thông báo --> <a routerLink="/thong-bao" class="cursor-pointer flex items-center">
+      <!-- Thông báo --> 
+       <a routerLink="/thong-bao" class="cursor-pointer flex items-center">
   <div class="relative inline-block">
     <span class="material-icons text-3xl cursor-pointer">notifications</span>
     <span *ngIf="unreadCount > 0"

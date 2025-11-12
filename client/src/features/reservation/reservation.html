@@ -1,18 +1,18 @@
-<div class="flex justify-center items-center min-h-screen bg-gray-900 text-white">
-  <div class="bg-gray-800 shadow-lg rounded-2xl p-8 w-full max-w-lg">
+<div class="flex justify-center items-center min-h-screen bg-base-300 text-base-content">
+  <div class="bg-base-100 shadow-lg rounded-2xl p-8 w-full max-w-lg">
 
-    <h2 class="text-2xl font-bold text-center mb-6">
+    <h2 class="text-2xl font-bold text-center mb-6 ">
       Đặt chỗ sạc tại trạm {{ station?.name || '...' }}
     </h2>
 
     <!-- Chọn xe -->
     <div class="mb-5">
-      <label class="block mb-2 text-gray-300 font-semibold"  >Chọn xe</label>
+      <label class="block mb-2 text-base-content font-semibold"  >Chọn xe</label>
    <div *ngIf="vehicles.length > 0;">
   <select
     [(ngModel)]="vehicleid"
     (change)="onVehicleChange()"
-    class="w-full p-2 rounded bg-gray-700 border border-gray-600"
+    class="w-full p-2 rounded bg-base-200 border border-blue-600"
   >
      <option value="">Chọn xe của bạn</option>
     <option *ngFor="let v of vehicles" [value]="v.vehicleId">
@@ -28,11 +28,11 @@
 
     <!-- Chọn trụ sạc -->
     <div *ngIf="compatiblePosts.length > 0" class="mb-5">
-      <label class="block mb-2 text-gray-300 font-semibold">Chọn trụ sạc</label>
+      <label class="block mb-2 text-base-content font-semibold">Chọn trụ sạc</label>
       <select
         [(ngModel)]="selectedPostId"
         (change)="onPostChange()"
-        class="w-full p-2 rounded bg-gray-700 border border-gray-600"
+        class="w-full p-2 roundedd bg-base-200 border border-blue-600"
       >
         <option value="">Chọn trụ sạc phù hợp</option>
         <option *ngFor="let p of compatiblePosts" [value]="p.id">
@@ -43,11 +43,11 @@
 
     <!-- Chọn ngày -->
     <div *ngIf="availableDates.length > 0" class="mb-5">
-      <label class="block mb-2 text-gray-300 font-semibold">Chọn ngày</label>
+      <label class="block mb-2 text-base-content font-semibold">Chọn ngày</label>
       <select
         [(ngModel)]="selectedDate"
         (change)="selectedSlot = undefined"
-        class="w-full p-2 rounded bg-gray-700 border border-gray-600"
+        class="w-full p-2 rounded bg-base-200 border border-blue-600"
       >
         <option value="">Chọn ngày</option>
         <option *ngFor="let d of availableDates" [value]="d">
@@ -58,7 +58,7 @@
 
   <!-- Danh sách slot -->
 <div *ngIf="selectedDate && availableSlotsMap[selectedDate]?.length" class="mb-6">
-  <label class="block mb-3 text-gray-300 font-semibold">Chọn thời gian sạc</label>
+  <label class="block mb-3 text-base-content font-semibold">Chọn thời gian sạc</label>
   <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
     <button
       *ngFor="let s of availableSlotsMap[selectedDate]"
@@ -76,13 +76,13 @@
 
     <!-- Thời lượng slot -->
     <div *ngIf="selectedSlot" class="mb-5">
-      <label class="block mb-2 text-gray-300 font-semibold">Số slot (mỗi slot 60 phút)</label>
+      <label class="block mb-2 text-base-content font-semibold">Số slot (mỗi slot 60 phút)</label>
      <input
   type="number"
   [(ngModel)]="slotCount"
   min="1"
   [max]="selectedSlotObj?.maxConsecutiveSlots || 4"
-  class="w-full p-2 rounded bg-gray-700 border border-gray-600"
+  class="w-full p-2 rounded bg-base-200 border border-blue-600"
   [disabled]="!selectedSlotObj"
 />
 <p class="text-xs text-gray-400 mt-1" *ngIf="selectedSlotObj">
