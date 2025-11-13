@@ -26,21 +26,21 @@
           <!-- Username -->
           <div>
             <input type="text" name="username" required [(ngModel)]="creds.username" placeholder="Tên hiển thị"
-              class="input input-bordered w-full rounded-lg font-medium" #username="ngModel" />
+              class="input input-bordered w-full rounded-lg font-medium" #username="ngModel" autocomplete="off" />
 
           </div>
 
           <!-- Email -->
           <div>
             <input type="email" name="email" required [(ngModel)]="creds.email" placeholder="Email"
-              class="input input-bordered w-full rounded-lg font-medium" #email="ngModel" />
+              class="input input-bordered w-full rounded-lg font-medium " #email="ngModel" autocomplete="off" />
 
           </div>
 
           <!-- Họ và tên -->
           <div>
             <input type="text" name="fullname" required [(ngModel)]="creds.fullname" placeholder="Họ và tên"
-              class="input input-bordered w-full rounded-lg font-medium" #fullname="ngModel" />
+              class="input input-bordered w-full rounded-lg font-medium" #fullname="ngModel"  autocomplete="off"/>
 
           </div>
 
@@ -75,7 +75,7 @@
           <!-- Ngày sinh -->
           <div>
             <input type="date" name="dateOfBirth" required [(ngModel)]="creds.dateOfBirth" placeholder="Ngày sinh"
-              class="input input-bordered w-full rounded-lg font-medium" #dateOfBirth="ngModel" />
+              class="input input-bordered w-full rounded-lg font-medium" #dateOfBirth="ngModel"  autocomplete="off"/>
 
 
           </div>
@@ -104,9 +104,9 @@
         </form>
 
 
-        <!-- ✅ Thông báo xác nhận email -->
+        <!--  Thông báo xác nhận email -->
         <div *ngIf="showConfirmMessage" class="animate-fade-in text-center mt-10 p-6 bg-blue-50 rounded-xl">
-          <div class="text-green-600 text-2xl font-bold mb-2">🎉 Đăng ký thành công!</div>
+          <div class="text-green-600 text-2xl font-bold mb-2"> Đăng ký thành công!</div>
           <p class="text-gray-700">Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập.</p>
         </div>
 

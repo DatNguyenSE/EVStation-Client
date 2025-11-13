@@ -1,0 +1,106 @@
+import { HttpClient } from '@angular/common/http';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { environment } from '../../environments/environment.development';
+import { HubConnection } from '@microsoft/signalr';
+import { eventReservation } from '../../_models/reservation';
+import { Account } from '../../_models/user';
+import * as signalR from '@microsoft/signalr';
+import { ToastService } from './toast-service';
+import { ReservationRequest, ReservationResponse } from '../../_models/reservation';
+import { ReservationDetail } from '../../_models/reservation-detail';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReservationService {
+  private http = inject(HttpClient);
+  private baseUrl = 'https://localhost:5001/api';
+  toast = inject(ToastService);
+
+  createReservationChecked(req: ReservationRequest) {
+ 
+    return this.checkAvailableSlots(req.chargingPostId).pipe(
+      switchMap(() => {
+        return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation`, req);
+      })
+    );
+  }
+
+  // check so slot cua post available
+  // Sau (đúng kiểu BE trả về)
+  checkAvailableSlots(postId: number) {
+    return this.http.get<Record<string, { startTime: string; maxConsecutiveSlots: number }[]>>(
+      `${this.baseUrl}/posts/${postId}/available-slots`
+    );
+  }
+
+  // lấy danh sách trụ sạc phù hợp với xe 
+  getCompatiblePosts(stationId: number, vehicleId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/station/${stationId}/compatible-posts/${vehicleId}`);
+  }
+
+  LoadEventReservation(ts?: number) {
+    const url = `${this.baseUrl}/reservation/history?t=${ts ?? new Date().getTime()}`;
+    return this.http.get<eventReservation[]>(url, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+  }
+
+
+
+  cancelReservation(id: string) {
+    return this.http.post<ReservationResponse>(`${this.baseUrl}/reservation/${id}/cancel`, {});
+  }
+
+
+
+
+  //signalR Reservation
+  private hubUrl = environment.hubUrl;
+  hubConnection?: HubConnection;
+  upcomingReservations = signal<eventReservation[]>([]);
+
+  async createHubConnection(user: Account) {
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(this.hubUrl + 'reservation', {
+        accessTokenFactory: () => user.token
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    this.hubConnection.on('UpdateUpcomingReservations', (reservations: eventReservation[]) => {
+      console.log('Realtime update:', reservations);
+      const confirmedReservations = reservations.filter(r => r.status === 'Confirmed');
+      this.upcomingReservations.set(confirmedReservations);
+    });
+    // this.hubConnection.on('ReservationCancelled', (reservationId: string) => {
+    //     const current = this.upcomingReservations();
+    //     const updated = current.filter(r => r.id !== reservationId);
+    //     this.upcomingReservations.set(updated);
+    //     this.toast.info(`Đặt chỗ #${reservationId} đã bị huỷ`, 2500);
+    //   });
+    try {
+      await this.hubConnection.start();
+      console.log('Successfully, Connected to ReservationHub');
+    } catch (error) {
+      console.error(' Error connecting to ReservationHub:', error);
+    }
+  }
+
+  getReservationDetail(reservationId: number): Observable<ReservationDetail> {
+    return this.http.get<ReservationDetail>(`${this.baseUrl}/reservation/${reservationId}`);
+  }
+
+  stopHubConnection() {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.stop().catch(error => console.error(error));
+    }
+  }
+
+}

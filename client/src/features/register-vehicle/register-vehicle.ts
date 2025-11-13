@@ -1,9 +1,9 @@
-import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { VehicleService } from '../../core/service/vehicle-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Vehicles, VehicleModelDetail } from '../../_models/user'; // Đảm bảo import VehicleModelDetail
+import { Vehicles, VehicleModelDetail } from '../../_models/vehicle';
 
 @Component({
   selector: 'app-register-vehicle',
@@ -32,6 +32,12 @@ export class RegisterVehicle implements OnInit, OnDestroy {
   
   message = '';
   isError = false;
+
+  // Thêm 2 file
+  selectedFrontFile: File | null = null;
+  selectedBackFile: File | null = null;
+  @ViewChild('frontFileInput') frontFileInput?: ElementRef;
+  @ViewChild('backFileInput') backFileInput?: ElementRef;
   
   private typeChangesSub?: Subscription;
   private modelChangesSub?: Subscription;
@@ -45,7 +51,9 @@ export class RegisterVehicle implements OnInit, OnDestroy {
       maxChargingPowerKW: [{ value: null, disabled: true }, [Validators.required, Validators.min(1)]],
       connectorType: [{ value: '', disabled: true }, Validators.required],
       useDualBattery: [false],
-      plate: ['', Validators.required]
+      plate: ['', Validators.required],
+      registrationImageFront: [null, Validators.required],
+      registrationImageBack: [null, Validators.required]
     });
   }
 
@@ -53,6 +61,34 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     this.listenToTypeChanges();
     this.listenToModelChanges();
     this.listenToDualBatteryChanges();
+  }
+
+  // Hàm chọn file (2 loại)
+  onFileSelected(event: any, side: 'front' | 'back'): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (side === 'front') {
+      this.selectedFrontFile = file || null;
+      this.registerForm.patchValue({ registrationImageFront: file ? file.name : null });
+      this.registerForm.get('registrationImageFront')?.updateValueAndValidity();
+    } else {
+      this.selectedBackFile = file || null;
+      this.registerForm.patchValue({ registrationImageBack: file ? file.name : null });
+      this.registerForm.get('registrationImageBack')?.updateValueAndValidity();
+    }
+    this.registerForm.get('registrationFrontImage')?.updateValueAndValidity();
+  }
+
+  onBackFileSelected(event: any): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.selectedBackFile = file;
+      this.registerForm.patchValue({ registrationBackImage: file.name });
+    } else {
+      this.selectedBackFile = null;
+      this.registerForm.patchValue({ registrationBackImage: null });
+    }
+    this.registerForm.get('registrationBackImage')?.updateValueAndValidity();
   }
 
   private listenToTypeChanges(): void {
@@ -109,21 +145,47 @@ export class RegisterVehicle implements OnInit, OnDestroy {
     });
   }
 
+  // Cập nhật onSubmit
   onSubmit(): void {
-    if (this.registerForm.invalid) {
-      this.message = 'Vui lòng điền đầy đủ thông tin.';
+    if (this.registerForm.invalid || !this.selectedFrontFile || !this.selectedBackFile) {
+      this.message = 'Vui lòng điền đầy đủ thông tin và tải lên cả hai mặt cà vẹt.';
       this.isError = true;
+      this.registerForm.markAllAsTouched(); 
       return;
     }
-    const vehicle: Vehicles = this.registerForm.getRawValue();
-    this.vehicleservice.register(vehicle).subscribe({
+
+    const formData = new FormData();
+    const formValue = this.registerForm.getRawValue();
+
+    formData.append('model', formValue.model);
+    formData.append('type', formValue.type.toString());
+    formData.append('batteryCapacityKWh', formValue.batteryCapacityKWh.toString());
+    formData.append('maxChargingPowerKW', formValue.maxChargingPowerKW.toString());
+    formData.append('connectorType', formValue.connectorType.toString());
+    formData.append('plate', formValue.plate);
+
+    // Thêm 2 file
+    formData.append('registrationImageFront', this.selectedFrontFile, this.selectedFrontFile.name);
+    formData.append('registrationImageBack', this.selectedBackFile, this.selectedBackFile.name);
+
+    this.vehicleservice.register(formData).subscribe({
         next: (res) => {
-            this.message = "Đăng ký xe thành công!";
+            this.message = "Đăng ký xe thành công! Xe của bạn đang chờ duyệt.";
             this.isError = false;
+            setTimeout(() => {
+               window.location.href = '/';
+            }, 2000);
+
             this.registerForm.reset();
             this.registerForm.get('model')?.disable();
             this.vehicleModels = [];
             this.canHaveDualBattery = false;
+            this.selectedFrontFile = null;
+            this.selectedBackFile = null;
+
+            if (this.frontFileInput) this.frontFileInput.nativeElement.value = "";
+            if (this.backFileInput) this.backFileInput.nativeElement.value = "";
+            
             this.cdRef.detectChanges();
         },
         error: (err) => {

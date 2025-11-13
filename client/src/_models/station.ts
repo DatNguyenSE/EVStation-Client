@@ -1,12 +1,14 @@
+
 export type Post = {
-    id: string,
-    stationId: string;
+    id: number,
+    stationId: number;
     code: string,
     type: string,
     powerKW: string,
     connectorType: string,
     status: string,
     isWalkIn: boolean,
+  
   };
 
   export interface DtoStation {
@@ -20,4 +22,17 @@ export type Post = {
   openTime: string;
   closeTime: string;
   status: string;
+  distance:number;
+  chargingPosts: Post[];
 }
+
+export interface Pricing{
+  id:number;
+  name:string;
+  priceType:string;
+  pricePerKwh:number;
+  pricePerMinute:number;
+  isActive:boolean;
+}
+
+

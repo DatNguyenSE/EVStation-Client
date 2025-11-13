@@ -1,67 +1,117 @@
-<header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-800 via-cyan-600 to-cyan-700 shadow-lg">
+<header class="h-20 w-full fixed top-0 z-50 bg-gradient-to-r from-blue-800 via-blue-700 to-cyan-700 shadow-lg">
   <div class="flex items-center px-4 sm:px-10 mx-auto gap-6 h-full  text-white">
     <!-- Logo - Title -->
-    <a routerLink="/" routerLinkActive="text-accent" [routerLinkActiveOptions]="{ exact: true }"
+    <a (click)="onLogoClick()" routerLinkActive="text-accent" [routerLinkActiveOptions]="{ exact: true }"
       (click)="isMenuOpen = false"
-      class="flex items-center gap-3 text-xl font-bold tracking-wide text-white hover:text-cyan-600 transition-colors duration-200">
+      class="flex items-center gap-3 text-xl font-bold tracking-wide text-white hover:text-cyan-600 transition-colors duration-200 cursor-pointer">
       <img src="/assets/logo.png" alt="Logo" class="w-11 h-11 rounded-full shadow-md">
-      <span>EVolt<span class="text-cyan-600">Station</span></span>
+      <span>EVolt<span class="text-cyan-600 ">Station</span></span>
+    </a>
+    <!--Quet ma khi chua dang nhap-->
+    <a *ngIf="this.accountService.currentAccount() === null" routerLink="/quet-ma" routerLinkActive="text-cyan-600"
+      (click)="isMenuOpen = false" class=" hover:text-cyan-600 cursor-pointer pl-2">
+      <div class="relative inline-block">
+
+        <svg class="w-6 h-6 ml-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
+          </path>
+        </svg>
+        <span>Quét mã ngay</span>
+      </div>
     </a>
 
-
-    <!-- Navigation (ẩn trên mobile, hiện trên desktop hoặc khi mở menu) -->
-    <nav class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium  text-white
-             absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0 shadow-lg sm:shadow-none
-             transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
-
-
-      <a routerLink="/dang-nhap" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
-        class="hover:text-cyan-600 cursor-pointer text-lg font-medium block sm:hidden">
-        Đăng nhập
+    <!-- Nav chỉ hiện với Driver hoặc Admin -->
+    <nav *appHasRole="['Driver', 'Admin', 'Operator','Technician','Manager']" class="flex flex-col sm:flex-row gap-4 sm:gap-6 my-2 text-sm sm:text-lg font-medium text-white            absolute sm:static top-18 left-0 w-full sm:w-auto bg-blue-900 sm:bg-transparent px-6 py-4 sm:p-0
+            shadow-lg sm:shadow-none transition-all duration-300" [class.hidden]="!isMenuOpen && isMobile">
+      <!-- Lặp menu theo role -->
+      <a *ngFor="let item of menuItems" [routerLink]="item.link" routerLinkActive="text-cyan-600"
+        (click)="isMenuOpen = false" class="hover:text-cyan-600 cursor-pointer flex items-center gap-2">
+        <span>{{ item.label }}</span>
       </a>
 
-      <a routerLink="/dich-vu" routerLinkActive="text-cyan-600 " (click)="isMenuOpen = false"
-        class=" hover:text-cyan-600 cursor-pointer">Dịch vụ
-      </a>
-      <a routerLink="/thanh-toan" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
-        class=" hover:text-cyan-600 cursor-pointer">Thanh
-        toán</a>
+      <!--  Chỉ hiển thị phần riêng của Driver -->
+      <ng-container *appHasRole="['Driver']"> <!--ngContainer: xóa khi sai đk | còn div thì vẫn giữ thẻ div -->
+        <!-- Đặt lịch sạc -->
+        <a routerLink="/su-kien" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
+          class=" hover:text-cyan-600 cursor-pointer pl-2">
+          <div class="relative inline-block">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+            </svg>
+            <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+              {{this.reservationService.upcomingReservations().length}}
+            </span>
+          </div>
+        </a>
+        <!-- Quét mã QR -->
+        <a routerLink="/quet-ma" routerLinkActive="text-cyan-600" (click)="isMenuOpen = false"
+          class=" hover:text-cyan-600 cursor-pointer pl-2">
+          <div class="relative inline-block">
 
-      <a routerLink="/thong-bao" routerLinkActive="text-gray-300" (click)="isMenuOpen = false"
-        class=" cursor-pointer flex items-center ">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
+              </path>
+            </svg>
+          </div>
+        </a>
+      </ng-container>
+      <!-- Thông báo  rieng cua mỗi role-->
+      <a [routerLink]="getNotificationLink(currentRole|| 'Driver')" class="cursor-pointer flex items-center">
         <div class="relative inline-block">
           <span class="material-icons text-3xl cursor-pointer">notifications</span>
-
-          <!-- Badge số thông báo -->
-          <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
-            0
+          <span *ngIf="unreadCount > 0"
+            class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+            {{ unreadCount }}
           </span>
         </div>
+        <span class="ml-6">|</span>
       </a>
 
-      <a routerLink="/profile" (click)="isMenuOpen = false" class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài
-        khoản</a>
-      @if(accountService.currentAccount()) {
-      <a class="cursor-pointer hover:text-cyan-600 sm:hidden" (click)="logout()" (click)="isMenuOpen = false">Đăng
-        xuất</a>
-      }
 
+
+
+      <!-- chọn theme -->
+      <div class="dropdown dropdown-end mr-5">
+        <button tabindex="1"
+          class="flex flex-col justify-center items-center cursor-pointer uppercase text-xs text-base-content hover:text-primary transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+          </svg> </button>
+        <ul tabindex="1"
+          class="dropdown-content menu bg-base-100 text-base-content rounded-box w-52 p-2 shadow max-h-60 overflow-y-auto scroll-smooth">
+          @for (theme of themes; track $index) {
+          <li (click)="handleSelectedTheme(theme)"> <a class="capitalize hover:bg-base-200">{{ theme }}</a>
+          </li>
+          }
+        </ul>
+      </div>
+      <!-- loading busy -->
+      @if(busyService.busyRequestCount() > 0) { <span class="loading loading-spinner text-accent"></span>
+      }
+      <!-- Mobile --> <a routerLink="/profile" (click)="isMenuOpen = false"
+        class="hover:text-cyan-300 cursor-pointer sm:hidden">Tài khoản</a>
+      @if(accountService.currentAccount()) { <a class="cursor-pointer hover:text-cyan-600 sm:hidden"
+        (click)="logout(); isMenuOpen = false">Đăng xuất</a> }
     </nav>
 
-    @if (accountService.currentAccount() ; as account ) {
 
-    <!-- User Logo (chỉ hiện khi đăng nhập) -->
+    <div class="hidden sm:flex align-middle ml-auto gap-3" *ngIf="(accountService.currentAccount() ) as account">
 
-    @if(account.emailConfirmed){
-      
-    <div class="hidden sm:flex align-middle ml-auto gap-3">
-
-      <div class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
+      <div *appHasRole="['Driver']" class="bg-base-100 shadow-md rounded-xl px-4 py-2 flex items-center space-x-2">
         <span class="text-sm text-gray-600 font-semibold">Số dư:</span>
-        <span class="text-base font-bold text-gray-800">
-          {{ showBalance() ? (getCurrentBalance() | number) + ' đ' : '•••••• đ' }}
+        <span class="text-base font-bold text-base-content">
+          {{ showBalance() ? (this.driverService.walletBalance()| number) + ' đ' : '•••••• đ' }}
         </span>
-        <button (click)="toggleBalance()" class="text-gray-500 hover:text-gray-700 transition" title="Ẩn/Hiện số dư">
+        <button (click)="toggleBalance()" class="text-base-content hover:text-gray-700 transition"
+          title="Ẩn/Hiện số dư">
           <svg *ngIf="showBalance()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,11 +134,11 @@
       </div>
 
       <div class="dropdown dropdown-end ">
-        <div tabindex="0" role="button" class="flex items-center text-white text-xl gap-3 cursor-pointer">
+        <div tabindex="0" role="button" class="flex items-center text-xl gap-3 cursor-pointer">
           <div class="flex flex-col items-start">
             <span class="text-sm">Xin chào,
               <span class="text-xl font-bold ">
-                {{account.username | titlecase}}
+                {{ account.username | titlecase}}
               </span>
             </span>
           </div>
@@ -100,18 +150,18 @@
           </svg>
 
         </div>
-        <ul tabindex="0" class=" text-gray-800 dark:text-gray-100
-         bg-white dark:bg-gray-800 dropdown-content menu rounded-box z-1 w-52 p-2 shadow-sm">
+        <ul tabindex="0" class=" text-base-content
+         bg-base-100 dark:bg-gray-800 dropdown-content menu rounded-box z-1 w-52 p-2 shadow-sm">
           <li><a routerLink="/tai-khoan">Profile</a></li>
-          <li><a class="" (click)="logout()">Logout</a></li>
+          <li *appHasRole="['Driver']"><a routerLink="/lichsugiaodich">Transaction</a></li>
+          <li><a class="bg-red-500 text-white" (click)="logout()">Logout</a></li>
         </ul>
       </div>
     </div>
-    
-    }
-    } @else {
 
-    <div class="ml-auto">
+
+
+    <div class="ml-auto" *ngIf="(accountService.currentAccount() ) === null">
       <!-- Nút hamburger (chỉ hiện trên mobile) -->
       <button class="sm:hidden ml-auto text-white focus:outline-none" (click)="isMenuOpen = !isMenuOpen">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
@@ -127,6 +177,6 @@
       </a>
 
     </div>
-    }
+
   </div>
 </header>

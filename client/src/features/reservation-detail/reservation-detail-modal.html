@@ -1,0 +1,74 @@
+<div class="modal modal-open">
+  <div class="modal-box max-w-2xl">
+    <div class="flex justify-between items-start mb-4">
+      <h3 class="text-xl font-bold text-base-content">Chi tiết đặt chỗ #{{ detail()?.id }}</h3>
+      <button class="btn btn-ghost btn-circle" (click)="close.emit()">
+        <i class="bi bi-x-lg text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Trạng thái -->
+    <div class="mb-5">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold"
+            [ngClass]="{
+              'bg-emerald-100 text-emerald-800': detail()?.status === 'Confirmed',
+              'bg-amber-100 text-amber-800': detail()?.status === 'Pending',
+              'bg-red-100 text-red-800': detail()?.status === 'Cancelled',
+              'bg-slate-100 text-slate-800': detail()?.status === 'Completed',
+              'bg-purple-100 text-purple-800': detail()?.status === 'Expired'
+            }">
+        {{ detail()?.status }}
+      </span>
+    </div>
+
+    <!-- Thời gian -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+      <div>
+        <p class="text-sm text-base-content/60">Bắt đầu</p>
+        <p class="font-semibold">{{ detail()?.timeSlotStart | date: 'HH:mm, EEE, dd/MM/yyyy' }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-base-content/60">Kết thúc</p>
+        <p class="font-semibold">{{ detail()?.timeSlotEnd | date: 'HH:mm, EEE, dd/MM/yyyy' }}</p>
+      </div>
+    </div>
+
+    <!-- Trạm sạc -->
+    <div class="bg-base-200/50 p-4 rounded-xl mb-4">
+      <h4 class="font-semibold text-base-content mb-3 flex items-center gap-2">
+        <i class="bi bi-geo-alt-fill text-primary"></i> Trạm sạc
+      </h4>
+      <p class="font-medium">{{ detail()?.stationName }}</p>
+      <p class="text-sm text-base-content/70 mt-1">{{ detail()?.stationAddress }}</p>
+    </div>
+
+    <!-- Trụ sạc -->
+    <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200/50">
+        <h4 class="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
+            <i class="bi bi-ev-station-fill"></i> Trụ sạc
+        </h4>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+            <div>
+            <p class="text-xs text-emerald-700">ID</p>
+            <p class="font-bold">#{{ detail()?.postId }}</p>
+            </div>
+            <div>
+            <p class="text-xs text-emerald-700">Mã trụ</p>
+            <p class="font-bold">{{ detail()?.postCode }}</p> <!-- ← Thêm dòng này -->
+            </div>
+            <div>
+            <p class="text-xs text-emerald-700">Loại cổng</p>
+            <p class="font-bold">{{ detail()?.connectorType }}</p>
+            </div>
+            <div>
+            <p class="text-xs text-emerald-700">Công suất</p>
+            <p class="font-bold">{{ detail()?.powerKW }} kW</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn btn-primary" (click)="close.emit()">Đóng</button>
+    </div>
+  </div>
+</div>

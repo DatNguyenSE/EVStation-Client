@@ -1,20 +1,15 @@
-<main
-  class="relative z-0 mt-[-35px] min-h-[calc(100vh-80px)] flex justify-center items-center px-6 py-12"
->
+<main class="relative z-0 mt-[-35px] min-h-[calc(100vh-80px)] flex justify-center items-center px-6 py-12">
   <div class="relative z-10 w-full max-w-lg bg-white/95 rounded-3xl p-8 pb-10">
     <h2
-      class="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-    >
-       Đăng ký xe điện
+      class="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+      Đăng ký xe điện
     </h2>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
       <div>
         <label class="block font-semibold mb-2 text-gray-700">Loại xe (Type)</label>
-        <select
-          formControlName="type"
-          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
-        >
+        <select formControlName="type"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition">
           <option [ngValue]="null">-- Chọn loại xe --</option>
           <option *ngFor="let type of vehicleTypes" [ngValue]="type.value">
             {{ type.display }}
@@ -24,22 +19,16 @@
 
       <div>
         <label class="block font-semibold mb-2 text-gray-700">Mẫu xe (Model)</label>
-        <select
-          formControlName="model"
-          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed"
-        >
+        <select formControlName="model"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed">
           <option value="">-- Chọn mẫu xe --</option>
           <option *ngFor="let model of vehicleModels" [value]="model">{{ model }}</option>
         </select>
       </div>
 
       <div *ngIf="canHaveDualBattery" class="flex items-center space-x-2 my-2 animate-fadeIn">
-        <input
-          type="checkbox"
-          id="dualBattery"
-          formControlName="useDualBattery"
-          class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-        />
+        <input type="checkbox" id="dualBattery" formControlName="useDualBattery"
+          class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
         <label for="dualBattery" class="font-mediu m text-gray-700 cursor-pointer">
           Sử dụng 2 pin (x2 dung lượng)
         </label>
@@ -48,47 +37,67 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block font-semibold mb-2 text-gray-700">Dung lượng pin (kWh)</label>
-          <input
-            type="number"
-            formControlName="batteryCapacityKWh"
-            class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 bg-gray-100 cursor-not-allowed"
-          />
+          <input type="number" formControlName="batteryCapacityKWh"
+            class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 bg-gray-100 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block font-semibold mb-2 text-gray-700">Công suất sạc tối đa (kW)</label>
-          <input
-            type="number"
-            formControlName="maxChargingPowerKW"
-            class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 bg-gray-100 cursor-not-allowed"
-          />
+          <input type="number" formControlName="maxChargingPowerKW"
+            class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 bg-gray-100 cursor-not-allowed" />
         </div>
       </div>
 
       <div>
         <label class="block font-semibold mb-2 text-gray-700">Loại cổng sạc</label>
-        <input
-          type="text"
-          formControlName="connectorType"
-          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 bg-gray-100 cursor-not-allowed"
-        />
+        <input type="text" formControlName="connectorType"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 bg-gray-100 cursor-not-allowed" />
       </div>
 
       <div>
         <label class="block font-semibold mb-2 text-gray-700">Biển số xe</label>
-        <input
-          type="text"
-          formControlName="plate"
-          placeholder="VD: 51H-12345"
-          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
-        />
+        <input type="text" formControlName="plate" placeholder="VD: 51H-12345"
+          class="w-full border border-gray-300 rounded-xl p-3 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition" />
       </div>
 
-      <button
-        type="submit"
-        [disabled]="registerForm.invalid"
-        class="w-full py-3 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition disabled:opacity-50"
+      <!-- ẢNH MẶT TRƯỚC -->
+      <div>
+        <label class="block font-semibold mb-2 text-gray-700">Ảnh chụp Cà vẹt (mặt trước)</label>
+        <input
+          type="file"
+          accept="image/png, image/jpeg"
+          (change)="onFileSelected($event, 'front')"
+          #frontFileInput
+          class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-xl p-0 cursor-pointer"
+        />
+        <div
+          *ngIf="registerForm.get('registrationImageFront')?.invalid && registerForm.get('registrationImageFront')?.touched"
+          class="text-red-600 text-sm mt-1"
         >
+          Vui lòng tải lên ảnh trước cà vẹt.
+        </div>
+      </div>
+
+      <!-- ẢNH MẶT SAU -->
+      <div>
+        <label class="block font-semibold mb-2 text-gray-700">Ảnh chụp Cà vẹt (mặt sau)</label>
+        <input
+          type="file"
+          accept="image/png, image/jpeg"
+          (change)="onFileSelected($event, 'back')"
+          #backFileInput
+          class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-xl p-0 cursor-pointer"
+        />
+        <div
+          *ngIf="registerForm.get('registrationImageBack')?.invalid && registerForm.get('registrationImageBack')?.touched"
+          class="text-red-600 text-sm mt-1"
+        >
+          Vui lòng tải lên ảnh sau cà vẹt.
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid"
+        class="w-full py-3 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition disabled:opacity-50">
         Đăng ký
       </button>
     </form>

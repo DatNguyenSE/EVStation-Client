@@ -1,0 +1,223 @@
+<div
+  class="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-10 font-sans bg-gray-50 mt-5"
+>
+  <div class="w-full max-w-6xl">
+    <div class="max-w-6xl mx-auto px-4 py-10 pt-20 font-sans bg-gray-50 min-h-screen">
+      <div *ngIf="isLoading" class="text-center text-gray-500 py-16">
+        <span class="loading loading-spinner loading-lg text-blue-500"></span>
+        <p class="mt-2 text-lg">Đang tải chi tiết...</p>
+      </div>
+
+      <div *ngIf="!isLoading && errorMessage" class="text-center text-red-500 py-16">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="!isLoading && receipt" class="mb-4">
+        <button class="btn btn-ghost btn-sm" (click)="goBack()">
+          <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </button>
+      </div>
+
+      <div *ngIf="!isLoading && receipt" class="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i class="bi bi-person-badge text-blue-600"></i>
+                Thông tin Giao dịch
+              </h3>
+              <span
+                class="px-3 py-1 rounded-full text-xs font-bold"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': receipt.status === 'Paid',
+                  'bg-red-100 text-red-800': receipt.status === 'Refunded',
+                  'bg-gray-100 text-gray-800': receipt.status === 'Pending'
+                }"
+              >
+                {{ receipt.status }}
+              </span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Khách hàng</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.appUserName || 'N/A' }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">ID Biên lai</label>
+                <p class="text-base font-semibold text-gray-800">#{{ receipt.id }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Ngày tạo</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.createAt | date : 'HH:mm:ss dd/MM/yyyy' }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Phương thức TT</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.paymentMethod || '---' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+              <i class="bi bi-ev-station text-blue-600"></i>
+              Chi tiết Phiên sạc
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Gói sạc</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.packageName || 'Không có' }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Bảng giá</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.pricingName }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">Năng lượng tiêu thụ</label>
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.energyConsumed }} kWh
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500"
+                  >Giá điện (thời điểm sạc)</label
+                >
+                <p class="text-base font-semibold text-gray-800">
+                  {{ receipt.pricePerKwhSnapshot | number }} ₫/kWh
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-1 space-y-6 mt-6 lg:mt-0">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+              <i class="bi bi-cash-coin text-blue-600"></i>
+              Chi tiết Thanh toán
+            </h3>
+            <div class="space-y-2 text-sm text-gray-700">
+              <div class="flex justify-between">
+                <span>Phí năng lượng</span>
+                <span>{{ receipt.energyCost | number }} ₫</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Phí chờ</span>
+                <span>{{ receipt.idleFee | number }} ₫</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Phí quá giờ</span>
+                <span>{{ receipt.overstayFee | number }} ₫</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Giảm giá</span>
+                <span class="font-medium text-green-600"
+                  >-{{ receipt.discountAmount | number }} ₫</span
+                >
+              </div>
+            </div>
+
+            <hr class="my-4 border-gray-200" />
+
+            <div class="flex justify-between items-center">
+              <h3 class="text-base font-semibold text-gray-800">Tổng thanh toán</h3>
+              <p class="text-2xl font-bold text-blue-700">{{ receipt.totalCost | number }} ₫</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+              <i class="bi bi-gear text-blue-600"></i>
+              Hành động
+            </h3>
+            <div class="flex flex-col gap-3">
+              <button
+                class="btn btn-warning text-white w-full"
+                (click)="openCancelModal()"
+                [disabled]="receipt.status === 'Refunded' || receipt.status === 'Cancelled'"
+              >
+                Hủy hóa đơn
+              </button>
+
+              <button
+                class="btn btn-error text-white w-full"
+                (click)="openRefundModal()"
+                [disabled]="receipt.status !== 'Paid'"
+              >
+                Hoàn tiền
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <dialog #cancelDialog class="modal">
+      <form method="dialog" class="modal-box bg-white">
+        <h3 class="font-bold text-lg mb-4 text-yellow-600">
+          <i class="bi bi-exclamation-triangle-fill"></i> Hủy hóa đơn
+        </h3>
+        <p class="text-sm text-gray-600 mb-3">
+          Bạn có chắc chắn muốn hủy hóa đơn này? Hành động này không thể hoàn tác.
+        </p>
+        <label class="block text-sm font-medium text-gray-600 mb-1"
+          >Nhập lý do hủy (bắt buộc):</label
+        >
+        <textarea
+          [(ngModel)]="cancelReason"
+          name="cancelReason"
+          class="textarea textarea-bordered w-full"
+          rows="3"
+          placeholder="VD: Hóa đơn tạo nhầm"
+        ></textarea>
+        <div class="mt-5 flex justify-end gap-3">
+          <button class="btn btn-sm btn-ghost" (click)="closeCancelModal()">Đóng</button>
+          <button class="btn btn-sm btn-warning text-white" (click)="confirmCancel()">
+            Xác nhận Hủy
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog #refundDialog class="modal">
+      <form method="dialog" class="modal-box bg-white">
+        <h3 class="font-bold text-lg mb-4 text-red-600">
+          <i class="bi bi-arrow-counterclockwise"></i> Thực hiện Hoàn tiền
+        </h3>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Số tiền hoàn:</label>
+        <input
+          type="number"
+          [(ngModel)]="refundAmount"
+          name="refundAmount"
+          placeholder="Số tiền hoàn"
+          class="input input-bordered w-full mb-3"
+        />
+        <label class="block text-sm font-medium text-gray-600 mb-1"
+          >Lý do hoàn tiền (bắt buộc):</label
+        >
+        <textarea
+          [(ngModel)]="refundReason"
+          name="refundReason"
+          class="textarea textarea-bordered w-full"
+          rows="3"
+          placeholder="VD: Khách hàng khiếu nại"
+        ></textarea>
+        <div class="mt-5 flex justify-end gap-3">
+          <button class="btn btn-sm btn-ghost" (click)="closeRefundModal()">Đóng</button>
+          <button class="btn btn-sm btn-error text-white" (click)="confirmRefund()">
+            Xác nhận Hoàn tiền
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </div>
+</div>

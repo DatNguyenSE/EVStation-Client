@@ -1,0 +1,104 @@
+<div
+  class="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-10 font-sans bg-gray-50"
+>
+  <div class="w-full max-w-6xl">
+    <div class="min-h-screen max-w-7xl mx-auto px-4 py-8 pt-24">
+      <h2 class="text-3xl font-bold mb-6 flex items-center gap-3 text-base-content">
+        <i class="bi bi-receipt-cutoff text-blue-600"></i>
+        Lịch sử Biên lai
+      </h2>
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="text-center py-12 opacity-70">
+        <span class="loading loading-spinner loading-lg text-blue-500"></span>
+        <p class="mt-2">Đang tải dữ liệu...</p>
+      </div>
+
+      <!-- Empty -->
+      <div
+        *ngIf="!isLoading && receipts.length === 0"
+        class="text-center py-16 bg-base-100 rounded-xl shadow-sm border border-base-200"
+      >
+        <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
+        <h3 class="text-xl font-semibold">Bạn chưa có biên lai nào</h3>
+        <p class="opacity-70">Tất cả biên lai sau khi sạc sẽ xuất hiện ở đây.</p>
+      </div>
+
+      <!-- Table -->
+      <div
+        *ngIf="!isLoading && receipts.length > 0"
+        class="bg-base-100 rounded-xl shadow-sm border border-base-200"
+      >
+        <div class="overflow-x-auto">
+          <table class="table w-full text-base">
+            <thead>
+              <tr class="bg-base-200">
+                <th class="font-semibold text-base-content">Mã hóa đơn</th>
+                <th class="font-semibold text-base-content">Gói dịch vụ</th>
+                <th class="font-semibold text-base-content">Ngày tạo</th>
+                <th class="font-semibold text-base-content">Trạng thái</th>
+                <th class="font-semibold text-base-content">Thanh toán</th>
+                <th class="font-semibold text-base-content">Xác nhận bởi</th>
+                <th class="font-semibold text-base-content text-right">Tổng chi phí</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of receipts" class="hover:bg-base-200 border-t">
+                <td>
+                  <div class="font-semibold">#{{ r.id }}</div>
+                </td>
+                <td>{{ r.pricingName }}</td>
+                <td>{{ r.createAt | date : 'HH:mm dd/MM/yyyy' }}</td>
+                <td>
+                  <span
+                    class="badge badge-sm font-semibold"
+                    [ngClass]="{
+                      'badge-success badge-outline': r.status === 'Paid',
+                      'badge-error badge-outline': r.status === 'Refunded',
+                      'badge-ghost': r.status === 'Pending'
+                    }"
+                  >
+                    {{ r.status }}
+                  </span>
+                </td>
+                <td>{{ r.paymentMethod || '---' }}</td>
+                <td>{{ r.confirmedByStaffName || 'N/A' }}</td>
+                <td class="font-semibold text-blue-700 text-right">
+                  {{ r.totalCost | number }} ₫
+                </td>
+                <td class="text-right">
+                  <button
+                    class="btn btn-ghost btn-sm text-blue-600 hover:text-blue-700"
+                    [routerLink]="['/bien-lai', r.id]"
+                  >
+                    Xem chi tiết
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1 && !isLoading" class="flex justify-center items-center mt-8 gap-4">
+        <div class="join">
+          <button class="join-item btn btn-sm btn-ghost" [disabled]="currentPage === 1" (click)="prevPage()">
+            «
+          </button>
+          <button class="join-item btn btn-sm btn-ghost">
+            Trang {{ currentPage }} / {{ totalPages }}
+          </button>
+          <button
+            class="join-item btn btn-sm btn-ghost"
+            [disabled]="currentPage === totalPages"
+            (click)="nextPage()"
+          >
+            »
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

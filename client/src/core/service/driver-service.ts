@@ -1,7 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Driver, DriverBalance, Vehicles } from '../../_models/user';
+import { Driver } from '../../_models/user';
+import { Vehicles } from '../../_models/vehicle';
+import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +13,22 @@ export class DriverService {
   private http = inject(HttpClient);
   protected router = inject(Router);
   baseUrl = 'https://localhost:5001/api/';
-  
+
   currentDriver = signal<Driver | null>(null);
-  Vehicles = signal<Vehicles[] >([]);
   walletBalance = signal<number>(0);
 
-  GetProfile_Driver() {
-    return this.http.get<Driver>(
-      `${this.baseUrl}users/profile-driver`);
+
+
+  loadDriverProfile() {
+    this.http.get<Driver>(
+      `${this.baseUrl}users/profile-driver`).subscribe({
+        next: (driver) => {
+          this.currentDriver.set(driver);
+        },
+        error: (err) => {
+          console.error('Không thể tải thông tin tài xế:', err);
+        }
+      });
   }
 
   GetVehicles() {
@@ -25,12 +36,46 @@ export class DriverService {
       `${this.baseUrl}vehicle/my`);
   }
 
-   loadWallet() {
-      this.http.get<{ balance: number }>(`${this.baseUrl}wallet/my`).subscribe({
-        next: (res) => {
-          this.walletBalance.set(res.balance);
-        }
-      });
+  GetVehicleById(id: number) {
+    return this.http.post<Vehicles>(
+      `${this.baseUrl}vehicle/info/${id}`,{});
   }
 
+  GetVehiclesApproved() {
+    return this.http.get<Vehicles[]>(
+      `${this.baseUrl}vehicle/my-approved`);
+  }
+
+  loadWallet() {
+    this.http.get<{ balance: number }>(`${this.baseUrl}wallet/me`).subscribe({
+      next: (res) => {
+        this.walletBalance.set(res.balance);
+      }
+    });
+  }
+ 
+  loadDriverResolver() {
+    return this.http.get<Driver>(
+      `${this.baseUrl}users/profile-driver`)
+  }
+  
+
+  getAllDriver(){
+    const noCache = new Date().getTime();
+    return this.http.get<Driver[]>(`${this.baseUrl}account/drivers?noCache=${noCache}`);
+  }
+
+ banDriver(userId: string, days: number) {
+   console.log('Gửi request banUser:', userId, days);
+  return this.http.post(`${this.baseUrl}account/BanUser/${userId}?days=${days}`, {});
+}
+
+unBanDriver(userId : string){
+  return this.http.post(`${this.baseUrl}account/UnbanUser/${userId}`,{});
+}
+
+  deactivateVehicle(vehicleId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}vehicle/my/delete/${vehicleId}`);
+  }
+  
 }

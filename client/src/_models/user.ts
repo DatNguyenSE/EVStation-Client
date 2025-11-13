@@ -1,14 +1,16 @@
-import { DecimalPipe } from "@angular/common";
+import { DtoStation } from "./station";
+import { Vehicles } from "./vehicle";
 
-export type Account = {
+export interface Account  {
     id: string;
     username: string;
     email: string;
     token: string;
     emailConfirmed: boolean;
+    roles: string[];
 }
 
-export type User = {
+export interface User  {
     id: string
     userName: string;
     email: string;
@@ -17,18 +19,13 @@ export type User = {
     roles: string[];
 }
 
-export type Vehicles = {
-  vehicleId: number;
-  model: string;
-  type: string;
-  batteryCapacityKWh: number;
-  maxChargingPowerKW: number;
-  connectorType: string;
-  plate: string;
-};
-export interface VehicleResponse {
-  message: string;
-  data: Vehicles;
+export interface AssignmentResponseDto {
+  id: number;
+  effectiveFrom: string;
+  effectiveTo: string;
+  isActive: boolean;
+  staff: Account;
+  station: DtoStation;
 }
 
 export type Driver = {
@@ -38,12 +35,9 @@ export type Driver = {
     fullName: string;
     dateOfBirth: number;
     vehicles: Vehicles[];
+    isBanned : boolean,
+    lockoutEnd :string | null;
 };
-export type DriverBalance = {
-  balance : number;
-}
-
-    
 
 export type LoginCreds = {
     username: string;
@@ -56,21 +50,4 @@ export type RegisterCreds = {
     fullname: string;
     dateOfBirth: string;
     password: string;
-}
-export type Package = {
-    id:number;
-    name:string;
-    description:string;
-    vehicleType : number;
-    price : number;
-    durationsDay : number;
-}
-
-export interface VehicleModelDetail {
-  model: string;
-  type: string;
-  batteryCapacityKWh: number;
-  maxChargingPowerKW: number;
-  connectorType: string;
-  hasDualBattery: boolean;
 }
