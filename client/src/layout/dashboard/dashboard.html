@@ -208,4 +208,11 @@
       </ng-template>
     </section>
   </main>
+  <div
+    *ngIf="directLine"
+    class="fixed bottom-5 right-5 z-50 h-[500px] w-[350px] overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-xl"
+  >
+    <!-- Render Web Chat into this container. Replaced custom <bot-chat> element with a div target -->
+    <div id="webchat" class="h-full w-full"></div>
+  </div>
 </div>
