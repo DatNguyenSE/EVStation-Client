@@ -37,6 +37,7 @@ export class GgMap implements AfterViewInit, OnDestroy {
   public  userMarker?: L.Marker;
   private routing?: any;
   private stationLayer = L.layerGroup();
+  private mapReady = false;
   stations: any[] = [];
  
   nearest: any;
@@ -105,7 +106,11 @@ private clearRoute(): void {
      
 
     // ép map vẽ lại khi hiển thị lần đầu
-     setTimeout(() => this.map.invalidateSize(), 300);
+     setTimeout(() => {
+      this.map.invalidateSize();
+      this.mapReady = true; // ✅ báo là map đã sẵn sàng
+     }, 300);
+
      this.map.on('focus', () => this.map.scrollWheelZoom.enable());
     this.map.on('blur', () => this.map.scrollWheelZoom.disable());
 
@@ -113,7 +118,10 @@ private clearRoute(): void {
     // Lấy danh sách trạm sạc
     this.stationSvc.getStations().subscribe({
       next: (data: any) => {
-        this.stations = data || [];
+        this.stations = data;
+        setTimeout(() => {
+          this.cdRef.detectChanges();
+        }, 0);
         this.addStationMarkers();
       },
       error: (err) => console.error('Lỗi tải trạm:', err),
