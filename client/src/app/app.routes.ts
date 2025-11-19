@@ -89,6 +89,7 @@ export const routes: Routes = [
              {path:'quan-ly-gia-tien-va-goi',component:PricingConfig},
              {path:'bien-lai',component:ReceiptAdmin},
              {path:'bien-lai/:id',component:ReceiptDetailAdmin},
+             { path: 'thong-bao', component: Notification },
              {path:'phan-tram',component:Assignment},
         ]
     },
@@ -100,6 +101,7 @@ export const routes: Routes = [
             { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
             { path: 'trang-chu', component: Operator },
             { path:'bien-lai', component: ReceiptPending },
+            { path: 'thong-bao', component: Notification },
             {path:'bao-cao',component:OpReport}
         ]
     },
@@ -110,6 +112,8 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'cong-viec', pathMatch: 'full' },
             { path: 'cong-viec', component: Technicain },
+            { path: 'thong-bao', component: Notification },
+            {path:'bao-cao',component:OpReport}
         ]
     },
     {
@@ -121,6 +125,7 @@ export const routes: Routes = [
             { path: 'trang-chu', component: Manager },
             //  {path:'quan-ly-nhan-vien',component:OpReport},
             { path:'bien-lai', component: ReceiptPending },
+            { path: 'thong-bao', component: Notification },
             {path:'bao-cao',component:OpReport}
 
         ]

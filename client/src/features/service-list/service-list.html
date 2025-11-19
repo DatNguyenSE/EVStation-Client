@@ -191,10 +191,10 @@
         </div>
       </div>
       <div *ngIf="activeTab==='qr'"
-        class="flex flex-col items-center mt-9 bg-white rounded-xl shadow-2xl max-w-md mx-auto border border-gray-100">
+        class="flex flex-col items-center  bg-base-100 rounded-xl shadow-2xl mx-7  border border-e-gray-300">
         <app-qr-code />
       </div>
-      <div *ngIf="activeTab==='find'">
+      <div *ngIf="activeTab==='find'" >
         <app-gg-map></app-gg-map>
       </div>
       <div *ngIf="activeTab==='register-vehicle'">

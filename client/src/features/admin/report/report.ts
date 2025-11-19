@@ -51,6 +51,10 @@ export class Report {
 
   openEvaluateModal(report: Reports): void {
     this.selectedReportForEvaluate = report;
+    console.log('Opening evaluate modal for report:', report);
+  this.selectedReportForEvaluate = report;
+  this.showEvaluateModal = true;
+  console.log('showEvaluateModal:', this.showEvaluateModal);
     this.showEvaluateModal = true;
   }
 
@@ -90,7 +94,10 @@ export class Report {
     this.reportService.getReportsById(id).subscribe({
       next: res => {
         this.selectedReport = res;
-        setTimeout(() => this.showDetailModal = true);
+        setTimeout(() => {
+          this.showDetailModal = true;
+           this.cdr.detectChanges();
+        },0) ;
       },
       error: err => console.error(err)
     });
@@ -184,6 +191,18 @@ evaluateReport(id: number): void {
       error: err => console.error('❌ Lỗi khi đóng báo cáo:', err)
     });
   }
+   getInProgressCount(): number {
+    return this.reports.filter(r => r.status === 'InProgress').length;
+  }
+
+  getCriticalCount(): number {
+    return this.reports.filter(r => r.severity === 'Critical').length;
+  }
+
+  getClosedCount(): number {
+    return this.reports.filter(r => r.status === 'Closed').length;
+  }
+
 
   // 🧹 Cleanup
   ngOnDestroy(): void {

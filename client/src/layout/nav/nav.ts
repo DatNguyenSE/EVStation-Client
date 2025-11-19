@@ -31,7 +31,7 @@ export class Nav implements OnInit {
   reportService = inject(ReportService)
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
-   unreadCount = 0;
+  unreadCount = 0;
    private sub: any;
 
   /**  Lấy danh sách menu theo role hiện tại */
@@ -58,17 +58,28 @@ export class Nav implements OnInit {
       ],
       Technician:[
         {label:'Công việc', link:'nhan-vien-ky-thuat/cong-viec'},
-        { label: 'Báo cáo sự cố', link: '/nhan-vien-tram/bao-cao' }
+        { label: 'Báo cáo sự cố', link: '/nhan-vien-ky-thuat/bao-cao' }
       ],
       Manager:[
          { label: 'Báo cáo sự cố', link: '/quan-ly-tram/bao-cao'},
          { label: 'Biên lai', link: '/quan-ly-tram/bien-lai' }
-
-
       ]
     };
     return menus[role] ?? [];
   }
+  getNotificationLink(role: string): string {
+  const links: Record<string, string> = {
+    Driver: '/thong-bao',
+    Admin: '/quan-tri-vien/thong-bao',
+    Operator: '/nhan-vien-tram/thong-bao',
+    Technician: '/nhan-vien-ky-thuat/thong-bao',
+    Manager: '/quan-ly-tram/thong-bao'
+  };
+
+  return links[role] ?? '/thong-bao'; // fallback nếu role lạ
+} 
+currentRole = this.accountService.currentAccount()?.roles[0]; 
+
   constructor() {
     // lắng nghe currentAccount thay đổi (login/logout)
     effect(() => {

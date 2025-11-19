@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AssignResponse, EvaluateReportRequest, EvaluateResponse, Reports, Task } from '../../_models/report';
 import { Account } from '../../_models/user';
 import { HttpClient } from '@angular/common/http';
+import { ToastService } from './toast-service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,7 @@ export class ReportService {
 
   private taskCompletedSource = new Subject<string>(); // Gửi cả object Task mới
   taskCompleted$ = this.taskCompletedSource.asObservable();
+  toast = inject(ToastService);
 
   getReports(){
     const noCache = Date.now()
@@ -54,8 +56,6 @@ export class ReportService {
     return this.http.post<Reports>(`${this.baseUrl}reports`,formData);
 
   }
- 
-
     isConnected(): boolean {
     return this.hubConnection?.state === signalR.HubConnectionState.Connected;
   }
@@ -84,8 +84,8 @@ createHubConnection(user: Account): void {
 
   this.hubConnection
   .start()
-  .then(() => console.log('✅ Connected to notificationHub:'))
-  .catch(err => console.error('❌ ReportHub connection error:', err));
+  .then(() => console.log(' Connected to notificationHub:'))
+  .catch(err => console.error(' ReportHub connection error:', err));
 
   this.startListeningToAllEvents();
 }
@@ -100,6 +100,7 @@ createHubConnection(user: Account): void {
       const updated = [newNotification, ...stored];
       localStorage.setItem('admin_notifications', JSON.stringify(updated));
       this.adminNotificationsSource.next(updated);
+      this.toast.error(`Có báo cáo sự cố mới`, 4000);
     });
     
     this.hubConnection.on('FixCompleted', (message: string) => {
@@ -109,6 +110,8 @@ createHubConnection(user: Account): void {
       const updated = [newNotification, ...stored];
       localStorage.setItem('admin_notifications', JSON.stringify(updated));
       this.adminNotificationsSource.next(updated);
+      this.toast.success(`Có công việc đã được hoàn thành`, 4000);
+
     });
 
     // === SỰ KIỆN CHO TECHNICIAN ===
@@ -116,6 +119,7 @@ createHubConnection(user: Account): void {
       console.log('🧑‍🔧 TECHNICIAN Event: TaskCompleted', message);
       // (Dòng này giờ sẽ chạy đúng vì 'taskCompletedSource' là rxjs Subject)
       this.taskCompletedSource.next(message);
+      this.toast.success(`Công việc của bạn đã được hoàn thành, cảm ơn`, 4000);
     });
   }
 
@@ -140,14 +144,14 @@ reconnectIfNeeded(): void {
     this.adminNotificationsSource.next(updated);
   }
 
-  // 🚀 Gửi công việc tới kỹ thuật viên
+  //  Gửi công việc tới kỹ thuật viên
   assignTaskToTechnician(technicianId: string, task: any): void {
     this.hubConnection.invoke('AssignTaskToTechnician', technicianId, task)
       .then(() => console.log(`📨 Task sent to technician ${technicianId}`))
       .catch(err => console.error('❌ Error sending task:', err));
   }
 
-  // ❌ Ngắt kết nối
+  //  Ngắt kết nối
   stopConnection(): void {
     if (this.hubConnection) {
       this.hubConnection.stop().then(() => console.log('🔌 Disconnected from ReportHub'));

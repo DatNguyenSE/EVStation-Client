@@ -26,7 +26,7 @@ export class Revenue {
   totalPackageRevenue = 0;
   startDate = '';
   endDate = '';
-  granularity = 'Month';
+  granularity = 'Day';
   chart: any;
   pieChart: any;
   ngOnInit() {
@@ -38,8 +38,8 @@ export class Revenue {
 
     // Format yyyy/MM/dd
     const pad = (n: number) => n.toString().padStart(2, '0');
-    this.startDate = `${firstDay.getFullYear()}/${pad(firstDay.getMonth() + 1)}/${pad(firstDay.getDate())}`;
-    this.endDate = `${lastDay.getFullYear()}/${pad(lastDay.getMonth() + 1)}/${pad(lastDay.getDate())}`;
+    this.startDate = `${firstDay.getFullYear()}-${pad(firstDay.getMonth() + 1)}-${pad(firstDay.getDate())}`;
+    this.endDate = `${lastDay.getFullYear()}-${pad(lastDay.getMonth() + 1)}-${pad(lastDay.getDate())}`;
   }
     ngAfterViewInit() {
     // Chờ DOM sẵn sàng rồi mới vẽ biểu đồ
@@ -48,8 +48,19 @@ export class Revenue {
   }
 
   loadDoanhThu() {
-    this.revenueSvc.loadRevenue(this.startDate, this.endDate, this.granularity).subscribe({
+    const start = this.formatDateToAPI(this.startDate);
+    const end = this.formatDateToAPI(this.endDate);
+    this.revenueSvc.loadRevenue(start,end,this.granularity).subscribe({
       next: (res: any) => {
+
+         if (!res || res.length === 0) {
+        this.revenues = [];
+        this.totalRevenueSum = 0;
+        this.toast.info("Không có doanh thu trong ngày này");
+        this.renderRevenueChart([]);   // vẽ chart trống
+        this.cdf.detectChanges();
+        return;
+      }
         this.revenues = (res as Revenues[]).map(r => ({
           ...r,
           period: this.formatDateFromBE(r.period)
@@ -60,13 +71,22 @@ export class Revenue {
         this.cdf.detectChanges();
       },
       error: (err) => {
+         if (err.status === 204) {
+        this.revenues = [];
+        this.totalRevenueSum = 0;
+        this.renderRevenueChart([]);
+        this.cdf.detectChanges();
+        return;
+      }
         this.toast.error('Lỗi khi tải doanh thu');
         console.error(err);
       }
     });
   }
   loadDoanhThuGoi(){
-    this.revenueSvc.loadPackageRevenue(this.startDate, this.endDate).subscribe({
+    const start = this.formatDateToAPI(this.startDate);
+    const end = this.formatDateToAPI(this.endDate);
+    this.revenueSvc.loadPackageRevenue(start,end).subscribe({
       next: (res) => {
         this.pkgRevenue = res;
         this.totalPackageRevenue = res.totalPackageRevenue;
@@ -81,39 +101,93 @@ export class Revenue {
     return `${d}/${m}/${y}`;
   }
 
-  renderRevenueChart(data: Revenues[]) {
-    const ctx = document.getElementById('revenueChart') as HTMLCanvasElement;
-    if (this.chart) this.chart.destroy();
+  // renderRevenueChart(data: Revenues[]) {
+  //   const ctx = document.getElementById('revenueChart') as HTMLCanvasElement;
+  //   if (this.chart) this.chart.destroy();
 
+  //   this.chart = new Chart(ctx, {
+  //     type: 'bar',
+  //     data: {
+  //       labels: data.map(r => r.stationName),
+  //       datasets: [
+  //         {
+  //           label: 'Doanh thu (VNĐ)',
+  //         data: data.map(r => r.totalRevenue),
+  //         backgroundColor: 'rgba(59, 130, 246, 0.3)', // xanh nhẹ (blue-500 30%)
+  //         borderColor: 'rgba(37, 99, 235, 0.8)',      // xanh đậm hơn 1 chút
+  //         borderWidth: 0.8,                           // 🌟 border mảnh hơn
+  //         borderRadius: 6,                            // Bo góc cột mềm mại
+  //         barPercentage: 0.6,                         // Thu hẹp cột cho gọn
+  //         categoryPercentage: 0.7                     // Khoảng cách giữa nhóm
+  //         }
+  //       ]
+  //     },
+  //     options: {
+  //       plugins: {
+  //         title: { display: true, text: 'Doanh thu theo trạm - tháng hiện tại' },
+  //         legend: { display: false }
+  //       },
+  //       scales: {
+  //         y: { beginAtZero: true, title: { display: true, text: 'VNĐ' } },
+  //         x: { title: { display: true, text: 'Trạm sạc' } }
+  //       }
+  //     }
+  //   });
+  // }
+  renderRevenueChart(data: Revenues[]) {
+  const ctx = document.getElementById('revenueChart') as HTMLCanvasElement;
+  if (!ctx) return;
+
+  if (this.chart) this.chart.destroy();
+
+  // ⛔ Chart trống (không label, không dataset)
+  if (data.length === 0) {
     this.chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: data.map(r => r.stationName),
-        datasets: [
-          {
-            label: 'Doanh thu (VNĐ)',
-          data: data.map(r => r.totalRevenue),
-          backgroundColor: 'rgba(59, 130, 246, 0.3)', // xanh nhẹ (blue-500 30%)
-          borderColor: 'rgba(37, 99, 235, 0.8)',      // xanh đậm hơn 1 chút
-          borderWidth: 0.8,                           // 🌟 border mảnh hơn
-          borderRadius: 6,                            // Bo góc cột mềm mại
-          barPercentage: 0.6,                         // Thu hẹp cột cho gọn
-          categoryPercentage: 0.7                     // Khoảng cách giữa nhóm
-          }
-        ]
+        labels: [],
+        datasets: []
       },
       options: {
         plugins: {
-          title: { display: true, text: 'Doanh thu theo trạm - tháng hiện tại' },
-          legend: { display: false }
-        },
-        scales: {
-          y: { beginAtZero: true, title: { display: true, text: 'VNĐ' } },
-          x: { title: { display: true, text: 'Trạm sạc' } }
+          title: { display: true, text: 'Doanh thu theo trạm' }
         }
       }
     });
+    return;
   }
+
+  // ✔️ Có dữ liệu → vẽ như cũ
+  this.chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(r => r.stationName),
+      datasets: [
+        {
+          label: 'Doanh thu (VNĐ)',
+          data: data.map(r => r.totalRevenue),
+          backgroundColor: 'rgba(59, 130, 246, 0.3)',
+          borderColor: 'rgba(37, 99, 235, 0.8)',
+          borderWidth: 0.8,
+          borderRadius: 6,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: 'Doanh thu theo trạm - tháng hiện tại' },
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'VNĐ' } },
+        x: { title: { display: true, text: 'Trạm sạc' } }
+      }
+    }
+  });
+}
+
   renderPieChart() {
     const ctxPie = document.getElementById('revenuePie') as HTMLCanvasElement;
     if (!ctxPie) return;
@@ -147,4 +221,26 @@ export class Revenue {
       },
     });
   }
+  private formatDateToAPI(date: string): string {
+  return date.replace(/-/g, '/'); // yyyy-MM-dd → yyyy/MM/dd
+}
+
+  applyDateFilter() {
+  if (!this.startDate || !this.endDate) {
+    this.toast.warning('Vui lòng chọn đủ khoảng thời gian!');
+    return;
+  }
+
+  // Kiểm tra hợp lệ (ngày bắt đầu <= ngày kết thúc)
+  const start = new Date(this.startDate);
+  const end = new Date(this.endDate);
+  if (start > end) {
+    this.toast.warning('Ngày bắt đầu không được sau ngày kết thúc!');
+    return;
+  }
+
+  // Tải lại dữ liệu và vẽ biểu đồ
+  this.loadDoanhThu();
+  this.loadDoanhThuGoi();
+}
 }

@@ -27,8 +27,12 @@ export class InitService {
         this.router.navigate(['/nhan-vien-tram/trang-chu']);
         this.presenceService.createHubConnection();
       }
-    //signalR 
+      if (this.accountService.currentAccount()?.roles.includes('Driver')  && !currentUrl.startsWith('/quan-tri-vien')) {
+        this.router.navigate(['/']);
         this.reservationService.createHubConnection(account);
+      }
+    //signalR 
+        
 
     return of(null)
   }
