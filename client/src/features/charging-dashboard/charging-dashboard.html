@@ -228,3 +228,9 @@
   }
   }
 </div>
+@if (showRegisterSuggestion()) {
+  <app-register-suggestion 
+    [plate]="vehicleInfo?.plate || ''"
+    (close)="handleCloseSuggestion()">
+  </app-register-suggestion>
+}

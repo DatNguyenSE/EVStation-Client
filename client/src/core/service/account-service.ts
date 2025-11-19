@@ -53,6 +53,10 @@ import { ReportService } from './report-service';
       return this.http.post<Account>(this.baseUrl+'account/register',creds) //.pipe(...): Cho phép bạn xử lý dữ liệu trả về trước khi gửi ra ngoài.
     }
 
+    registerAndSyncGuest(model: any) {
+      return this.http.post(this.baseUrl + 'account/register-and-sync-guest', model);
+    }
+
     logout() {
       localStorage.removeItem('account');
       this.currentAccount.set(null);
