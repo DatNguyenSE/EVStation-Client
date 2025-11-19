@@ -77,5 +77,9 @@ unBanDriver(userId : string){
   deactivateVehicle(vehicleId: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.baseUrl}vehicle/my/delete/${vehicleId}`);
   }
+
+  updateVehicleDocs(formData: FormData) {
+    return this.http.post<any>(this.baseUrl + 'vehicle/update-docs', formData);
+  }
   
 }
