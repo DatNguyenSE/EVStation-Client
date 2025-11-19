@@ -65,7 +65,15 @@ export class ReportService {
 
   // 🔌 Khởi tạo kết nối tới ReportHub
 createHubConnection(user: Account): void {
-   if (this.isConnected()) return;
+  if (this.isConnected()) return;
+
+  console.log('[ReportService] Attempting connection. User object:', user);
+    if (!user || !user.token) {
+      console.error('❌ [ReportService] Connection FAILED: Token is null or empty.');
+      return; // Dừng lại nếu không có token
+    }
+    console.log('[ReportService] Token (first 20 chars):', user.token.substring(0, 20));
+
   const hubUrl = `${this.hubUrl}notification`;
   this.hubConnection = new signalR.HubConnectionBuilder()
     .withUrl(hubUrl, {
@@ -119,49 +127,6 @@ reconnectIfNeeded(): void {
     this.createHubConnection(user);
   }
 }
-
-
-//   // 🧰 Lắng nghe sự kiện công việc mới (nếu admin muốn thấy phản hồi)
-//  private listenForNotifications(): void {
-//   this.hubConnection.on('NewReportReceived', (notification) => {
-//     console.log('🧰 New task notification:', notification);
-
-//     // 🔹 Lưu thông báo vào localStorage để giữ khi reload
-//     const stored = JSON.parse(localStorage.getItem('notifications') || '[]');
-
-//     const newNotification = { 
-//         message: notification, // 'notification' giờ là "Có báo cáo sự cố mớ..."
-//         receivedAt: new Date(), 
-//         read: false 
-//     };
-
-//     // const updated = [{ ...notification, read: false }, ...stored];
-//     const updated = [newNotification, ...stored];
-//     localStorage.setItem('notifications', JSON.stringify(updated));
-
-//     // 🔹 Cập nhật BehaviorSubject cho UI hiển thị real-time
-//     this.notificationsSource.next(updated);
-//   });
-
-//   this.hubConnection.on('FixCompleted', (message: string) => {
-//     console.log('✅ Fix completed notification received:', message);
-
-//     // Bạn cũng có thể thêm nó vào danh sách thông báo
-//     const stored = JSON.parse(localStorage.getItem('notifications') || '[]');
-//     const newNotification = {
-//       message: message, // Nội dung sẽ là "Sự cố..."
-//       receivedAt: new Date(),
-//       read: false
-//     };
-
-//     const updated = [newNotification, ...stored];
-//     localStorage.setItem('notifications', JSON.stringify(updated));
-
-//     // Đẩy thông báo để component cập nhật
-//     this.notificationsSource.next(updated);
-//   });
-// }
-
 
   getAdminUnreadCount(): number {
     const stored = JSON.parse(localStorage.getItem('admin_notifications') || '[]');

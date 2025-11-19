@@ -14,6 +14,7 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { AccountService } from '../../core/service/account-service';
 import { ReplaySubject } from 'rxjs';
 import { Activity } from 'botframework-schema';
+import { environment } from '../../environments/environment.development';
 
 @Component({
   selector: 'app-dashboard',
@@ -47,6 +48,10 @@ export class Dashboard implements OnInit {
     name: 'EV Charging Bot'
   };
 
+  isChatOpen = signal(false);
+  isBotLoading = signal(true);
+  isBotConnectionError = signal(false);
+
   get totalPages() { return this.pagination().totalPages; }
   get currentPage() { return this.pagination().currentPage; }
   get hasPreviousPage() { return this.currentPage > 1; }
@@ -67,11 +72,9 @@ export class Dashboard implements OnInit {
     const acc = this.accountService.currentAccount();
     const token = acc?.token ?? '';
     // Use http(s) for negotiate endpoint; SignalR will upgrade to websocket automatically
-    const hubUrl = 'http://localhost:5000/hubs/bot';
-    
-    console.log('🔗 Using Bot Hub URL:', hubUrl);
-    console.log('🔗 Token available:', !!token);
+    const hubUrl = environment.hubUrl + 'bot';
 
+    // 1. Khởi tạo Hub Connection
     if (!this.hubConnection) {
       this.hubConnection = new HubConnectionBuilder()
         .withUrl(hubUrl, {
@@ -86,127 +89,116 @@ export class Dashboard implements OnInit {
     if (driver) {
       this.user.id = driver.id || this.user.id;
       this.user.name = driver.fullName || this.user.name;
-      console.log('🤖 [Dashboard] Updated user:', this.user);
     }
 
-    // Setup DirectLine BEFORE starting connection
+    // 2. "Giả lập" đối tượng DirectLine
     this._setupDirectLine();
 
-    // Start connection
-    this.startSignalRConnection();
-
-    // Register listener
-    console.log('📥 [listenForBotMessages] Listener registered');
+    // 3. Lắng nghe tin nhắn TỪ Bot
     this.listenForBotMessages();
+
+    // 4. Bắt đầu kết nối SignalR (và render UI khi thành công)
+    this.startSignalRConnection();
     
     // Render Web Chat
-    console.log('🎨 [Dashboard] About to call renderWebChatContainer()');
-    try {
-      this.renderWebChatContainer();
-      console.log('🎨 [Dashboard] renderWebChatContainer() call completed');
-    } catch (err) {
-      console.error('🎨 [Dashboard] renderWebChatContainer() threw error:', err);
-    }
+    // console.log('🎨 [Dashboard] About to call renderWebChatContainer()');
+    // try {
+    //   this.renderWebChatContainer();
+    //   console.log('🎨 [Dashboard] renderWebChatContainer() call completed');
+    // } catch (err) {
+    //   console.error('🎨 [Dashboard] renderWebChatContainer() threw error:', err);
+    // }
   }
 
   private _setupDirectLine() {
     console.log('🎨 [_setupDirectLine] Setting up custom DirectLine object');
 
-    const createObservable = (subject: any) => ({
-      subscribe: (observer: any) => {
-        console.log('🎨 [Observable.subscribe] Subscriber connected');
-        const subscription = subject.subscribe(observer);
-        return {
-          unsubscribe: () => {
-            console.log('🎨 [Observable] Subscriber disconnected');
-            subscription.unsubscribe();
-          }
-        };
-      }
+    // Tạo một Observable từ Subject
+    const createObservable = (subject: ReplaySubject<any>) => ({
+      subscribe: (observer: any) => subject.subscribe(observer)
     });
 
-    // Create connectionStatus with initial CONNECTED state (value 2)
+    // Web Chat cần connectionStatus$ để biết trạng thái (2 = Connected)
     const connectionStatusSubject = new ReplaySubject<number>(1);
-    connectionStatusSubject.next(2); // 2 = CONNECTED in Web Chat
+    connectionStatusSubject.next(2);
 
     this.directLine = {
       activity$: createObservable(this.activitySubject),
       connectionStatus$: createObservable(connectionStatusSubject),
+
+      //Hàm Web Chat gọi khi NGƯỜI DÙNG gửi tin nhắn
       postActivity: (activity: Activity) => {
-        console.log('📤 [postActivity] User sent:', activity);
-        console.log('📤 [postActivity] activity.type:', activity.type, 'activity.text:', activity.text);
+        console.log('📤 [User] Gửi:', activity.text);
         const id = activity.id || Math.random().toString(36).substr(2, 9);
 
-        // Build an activity object to push into activitySubject so Web Chat shows it as sent
+        // Hiển thị tin nhắn gửi đi lên UI ngay lập tức
         const outgoing: Activity = {
-          ...activity,
-          id,
+          ...activity, id,
           from: activity.from || this.user,
           recipient: activity.recipient || this.bot,
           timestamp: activity.timestamp || new Date(),
           channelId: activity.channelId || 'signalr'
         } as Activity;
+        this.activitySubject.next(outgoing);
 
         // Optimistically emit the outgoing activity so the UI displays it (prevents "failed to send")
-        try {
-          this.activitySubject.next(outgoing);
-          console.log('📤 [postActivity] Optimistically pushed outgoing activity to activitySubject', outgoing.id);
-        } catch (emitErr) {
-          console.error('❌ [postActivity] Error pushing outgoing activity to subject:', emitErr);
-        }
+        // try {
+        //   this.activitySubject.next(outgoing);
+        //   console.log('📤 [postActivity] Optimistically pushed outgoing activity to activitySubject', outgoing.id);
+        // } catch (emitErr) {
+        //   console.error('❌ [postActivity] Error pushing outgoing activity to subject:', emitErr);
+        // }
 
         if (activity.type === 'message' && activity.text) {
-          console.log('📤 [postActivity] Sending message via SignalR:', activity.text);
           this.hubConnection.invoke('SendMessage', activity.text)
-            .then((result: any) => {
-              console.log('✅ [postActivity] SignalR.SendMessage succeeded, result:', result);
-            })
-            .catch((err: any) => {
-              console.error('❌ [postActivity] SignalR.SendMessage error:', err);
-              // Optionally, emit an activity update indicating failure (left as future improvement)
+            .catch(err => {
+              console.error('❌ [Bot] Lỗi gửi tin nhắn:', err);
+              // TODO: Có thể gửi 1 activity lỗi về UI
             });
-        } else {
-          console.log('📤 [postActivity] Skipping send - not a message');
         }
 
-        console.log('📤 [postActivity] Returning activity ID:', id);
+        // Trả về một object "giống" Observable để Web Chat không báo lỗi
+        return { subscribe: (obs: any) => (obs.next || obs)(id) };
 
         // Web Chat may expect postActivity to return an Observable-like with subscribe().
         // Return a small object implementing subscribe so Web Chat can subscribe without error.
-        return {
-          subscribe: (observer: any) => {
-            try {
-              if (typeof observer === 'function') {
-                observer(id);
-              } else {
-                observer.next && observer.next(id);
-                observer.complete && observer.complete();
-              }
-            } catch (err) {
-              console.warn('📤 [postActivity] subscribe handler threw:', err);
-            }
-            return { unsubscribe: () => {} };
-          }
-        };
+        // return {
+        //   subscribe: (observer: any) => {
+        //     try {
+        //       if (typeof observer === 'function') {
+        //         observer(id);
+        //       } else {
+        //         observer.next && observer.next(id);
+        //         observer.complete && observer.complete();
+        //       }
+        //     } catch (err) {
+        //       console.warn('📤 [postActivity] subscribe handler threw:', err);
+        //     }
+        //     return { unsubscribe: () => {} };
+        //   }
+        // };
       }
     };
   }
 
   private startSignalRConnection() {
-    console.log('🔗 [startSignalRConnection] Attempting to start connection');
+    console.log('🔗 [Bot] Đang bắt đầu kết nối SignalR...');
     this.hubConnection.start()
       .then(() => {
-        console.log('✅ Bot Hub Connection started');
-        console.log('🔗 Hub connection state:', this.hubConnection.state);
-        console.log('🔗 Hub connection ID:', this.hubConnection.connectionId);
+        console.log('✅ [Bot] Kết nối SignalR thành công!');
+        // Chỉ render WebChat SAU KHI SignalR kết nối
+        this.renderWebChatContainer();
       })
-      .catch((err: any) => console.error('❌ Error while starting Bot Hub connection:', err));
+      .catch((err: any) => {
+        console.error('❌ [Bot] Lỗi kết nối SignalR:', err);
+        this.isBotConnectionError.set(true);
+        this.isBotLoading.set(false);
+      });
   }
 
   private listenForBotMessages() {
     this.hubConnection.on('ReceiveMessage', (message: string) => {
-      console.log('📥 [listenForBotMessages] Bot sent:', message);
-      console.log('📥 [listenForBotMessages] activitySubject observers count:', (this.activitySubject as any).observers?.length || 0);
+      console.log('📥 [Bot] Nhận:', message);
 
       const activity = {
         type: 'message',
@@ -218,54 +210,38 @@ export class Dashboard implements OnInit {
         channelId: 'signalr'
       } as Activity;
 
-      console.log('📥 [listenForBotMessages] Pushing activity to subject, activity:', activity);
       this.activitySubject.next(activity);
-      console.log('✅ [listenForBotMessages] Activity pushed successfully');
     });
   }
 
   private renderWebChatContainer() {
-    console.log('🎨 [renderWebChatContainer] starting');
     const tryRender = async () => {
       try {
-        console.log('🎨 [tryRender] iteration start');
         const container = document.getElementById('webchat');
-        console.log('🎨 [tryRender] container found:', !!container);
         if (!container) {
-          console.warn('🎨 [tryRender] container #webchat not found, will retry');
+          console.warn('🎨 [Bot] Chưa tìm thấy #webchat, thử lại sau 250ms');
           setTimeout(tryRender, 250);
           return;
         }
 
         let WebChat = (window as any).WebChat;
-        console.log('🎨 [tryRender] window.WebChat exists:', !!WebChat);
 
         // Nếu global WebChat chưa có, thử dynamic import từ package (bundled)
         if (!WebChat) {
-          console.log('🎨 [tryRender] Attempting dynamic import of botframework-webchat...');
           try {
+            console.log('🎨 [Bot] Đang import động botframework-webchat...');
             const mod = await import('botframework-webchat');
-            console.log('🎨 [tryRender] Dynamic import resolved, mod type:', typeof mod);
             WebChat = (mod && (mod as any).default) ? (mod as any).default : mod;
-            // expose cho debug
-            (window as any).WebChat = WebChat;
-            console.log('🎨 [tryRender] WebChat assigned from import, renderWebChat exists:', typeof WebChat?.renderWebChat);
+            (window as any).WebChat = WebChat; // Lưu lại
           } catch (impErr) {
-            console.error('🎨 [tryRender] Dynamic import error:', impErr);
-            setTimeout(tryRender, 500);
+            console.error('❌ [Bot] Lỗi import động:', impErr);
+            setTimeout(tryRender, 500); // Đợi lâu hơn nếu lỗi
             return;
           }
         }
 
         if (WebChat && typeof WebChat.renderWebChat === 'function') {
-          console.log('🎨 [tryRender] WebChat.renderWebChat is callable, attempting render...');
-          console.log('🎨 [tryRender] directLine:', this.directLine);
-          console.log('🎨 [tryRender] directLine.activity$:', this.directLine?.activity$);
-          console.log('🎨 [tryRender] directLine.activity$.subscribe:', typeof this.directLine?.activity$?.subscribe);
-          console.log('🎨 [tryRender] directLine.postActivity:', typeof this.directLine?.postActivity);
-          
           try {
-            console.log('🎨 [tryRender] Calling WebChat.renderWebChat...');
             WebChat.renderWebChat(
               {
                 directLine: this.directLine,
@@ -278,10 +254,12 @@ export class Dashboard implements OnInit {
               },
               container
             );
-            console.log('✅ [tryRender] Web Chat rendered successfully');
+            console.log('✅ [Bot] Render Web Chat thành công!');
+            this.isBotLoading.set(false); // Báo hiệu bot đã sẵn sàng
           } catch (renderErr) {
-            console.error('❌ [tryRender] renderWebChat threw error:', renderErr);
-            // Still continue - Web Chat may have partially rendered
+            console.error('❌ [Bot] Lỗi renderWebChat:', renderErr);
+            this.isBotConnectionError.set(true);
+            this.isBotLoading.set(false);
           }
           
           // debug sau render - WAIT LONGER for UI to fully render
@@ -323,7 +301,7 @@ export class Dashboard implements OnInit {
             }
           }, 1000); // INCREASED WAIT from 200ms to 1000ms
         } else {
-          console.log('🎨 [tryRender] WebChat.renderWebChat not available, retrying...');
+          console.warn('🎨 [Bot] WebChat.renderWebChat không tồn tại, thử lại...');
           setTimeout(tryRender, 250);
         }
       } catch (err) {
@@ -331,7 +309,6 @@ export class Dashboard implements OnInit {
       }
     };
 
-    console.log('🎨 [renderWebChatContainer] calling tryRender()');
     tryRender();
   }
 
@@ -403,7 +380,7 @@ export class Dashboard implements OnInit {
       }
     });
   }
-
+ 
   viewSessionDetail(id: number) {
     this.router.navigate(['/phien-sac', id]);
   }

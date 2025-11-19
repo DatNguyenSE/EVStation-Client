@@ -208,11 +208,39 @@
       </ng-template>
     </section>
   </main>
+
+  <button
+    *ngIf="!isChatOpen()"
+    (click)="isChatOpen.set(true)"
+    class="btn btn-primary btn-circle btn-lg fixed bottom-5 right-5 z-40 shadow-xl transition-all hover:scale-110"
+    [disabled]="isBotLoading() || isBotConnectionError()"
+    [title]="isBotLoading() ? 'Đang kết nối...' : isBotConnectionError() ? 'Lỗi kết nối' : 'Hỗ trợ'"
+  >
+    <span *ngIf="isBotLoading()" class="loading loading-spinner"></span>
+    <i
+      *ngIf="!isBotLoading() && isBotConnectionError()"
+      class="fa-solid fa-exclamation-triangle"
+    ></i>
+    <i *ngIf="!isBotLoading() && !isBotConnectionError()" class="fa-solid fa-comments"></i>
+  </button>
+
   <div
     *ngIf="directLine"
-    class="fixed bottom-5 right-5 z-50 h-[500px] w-[350px] overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-xl"
+    [hidden]="!isChatOpen()"
+    class="fixed bottom-5 right-5 z-50 h-[500px] w-[350px] overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-xl flex flex-col"
   >
-    <!-- Render Web Chat into this container. Replaced custom <bot-chat> element with a div target -->
-    <div id="webchat" class="h-full w-full"></div>
+    <div class="bg-base-200 p-3 flex justify-between items-center shadow-sm">
+      <h3 class="font-bold text-base-content ml-2">Hỗ trợ (Bot)</h3>
+
+      <button
+        (click)="isChatOpen.set(false)"
+        class="btn btn-sm btn-circle hover:bg-base-300"
+        title="Đóng"
+      >
+        <i class="fa-solid fa-times text-lg text-base-content">X</i>
+      </button>
+    </div>
+
+    <div id="webchat" class="flex-1 w-full overflow-hidden"></div>
   </div>
 </div>
