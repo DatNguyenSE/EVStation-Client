@@ -116,7 +116,7 @@ export class Report {
         this.cdr.detectChanges();
       },
       error: err => {
-        console.error('❌ Lỗi khi tải danh sách báo cáo:', err);
+        console.error('Lỗi khi tải danh sách báo cáo:', err);
       }
     });
   }
@@ -130,7 +130,7 @@ export class Report {
       this.showDetailModal = true;
     });
       },
-      error: err => console.error('❌ Lỗi khi tải chi tiết báo cáo:', err)
+      error: err => console.error('Lỗi khi tải chi tiết báo cáo:', err)
     });
   }
 
@@ -175,8 +175,8 @@ evaluateReport(id: number): void {
 
       },
       error: err => {
-        console.error('❌ Lỗi khi giao việc:', err);
-        this.toast.error('Không thể giao việc. Vui lòng thử lại!');
+        console.error(' Lỗi khi giao việc:', err);
+        // this.toast.error('Không thể giao việc. Vui lòng thử lại!');
       }
     });
   }
@@ -188,7 +188,7 @@ evaluateReport(id: number): void {
         this.toast.success(res.message);
         this.loadReports();
       },
-      error: err => console.error('❌ Lỗi khi đóng báo cáo:', err)
+      error: err => console.error('Lỗi khi đóng báo cáo:', err)
     });
   }
    getInProgressCount(): number {

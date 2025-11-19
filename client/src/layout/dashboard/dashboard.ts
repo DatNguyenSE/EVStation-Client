@@ -67,7 +67,7 @@ export class Dashboard implements OnInit {
   }
 
   private initializeBotConnection() {
-    console.log('🤖 [Dashboard] initializeBotConnection() called');
+    // console.log(' [Dashboard] initializeBotConnection() called');
     
     const acc = this.accountService.currentAccount();
     const token = acc?.token ?? '';
@@ -101,17 +101,17 @@ export class Dashboard implements OnInit {
     this.startSignalRConnection();
     
     // Render Web Chat
-    // console.log('🎨 [Dashboard] About to call renderWebChatContainer()');
+    // console.log('[Dashboard] About to call renderWebChatContainer()');
     // try {
     //   this.renderWebChatContainer();
-    //   console.log('🎨 [Dashboard] renderWebChatContainer() call completed');
+    //   console.log(' [Dashboard] renderWebChatContainer() call completed');
     // } catch (err) {
-    //   console.error('🎨 [Dashboard] renderWebChatContainer() threw error:', err);
+    //   console.error(' [Dashboard] renderWebChatContainer() threw error:', err);
     // }
   }
 
   private _setupDirectLine() {
-    console.log('🎨 [_setupDirectLine] Setting up custom DirectLine object');
+    // console.log(' [_setupDirectLine] Setting up custom DirectLine object');
 
     // Tạo một Observable từ Subject
     const createObservable = (subject: ReplaySubject<any>) => ({
@@ -128,7 +128,7 @@ export class Dashboard implements OnInit {
 
       //Hàm Web Chat gọi khi NGƯỜI DÙNG gửi tin nhắn
       postActivity: (activity: Activity) => {
-        console.log('📤 [User] Gửi:', activity.text);
+        // console.log(' [User] Gửi:', activity.text);
         const id = activity.id || Math.random().toString(36).substr(2, 9);
 
         // Hiển thị tin nhắn gửi đi lên UI ngay lập tức
@@ -144,15 +144,15 @@ export class Dashboard implements OnInit {
         // Optimistically emit the outgoing activity so the UI displays it (prevents "failed to send")
         // try {
         //   this.activitySubject.next(outgoing);
-        //   console.log('📤 [postActivity] Optimistically pushed outgoing activity to activitySubject', outgoing.id);
+        //   console.log(' [postActivity] Optimistically pushed outgoing activity to activitySubject', outgoing.id);
         // } catch (emitErr) {
-        //   console.error('❌ [postActivity] Error pushing outgoing activity to subject:', emitErr);
+        //   console.error('[postActivity] Error pushing outgoing activity to subject:', emitErr);
         // }
 
         if (activity.type === 'message' && activity.text) {
           this.hubConnection.invoke('SendMessage', activity.text)
             .catch(err => {
-              console.error('❌ [Bot] Lỗi gửi tin nhắn:', err);
+              console.error(' [Bot] Lỗi gửi tin nhắn:', err);
               // TODO: Có thể gửi 1 activity lỗi về UI
             });
         }
@@ -172,7 +172,7 @@ export class Dashboard implements OnInit {
         //         observer.complete && observer.complete();
         //       }
         //     } catch (err) {
-        //       console.warn('📤 [postActivity] subscribe handler threw:', err);
+        //       console.warn(' [postActivity] subscribe handler threw:', err);
         //     }
         //     return { unsubscribe: () => {} };
         //   }
@@ -182,10 +182,10 @@ export class Dashboard implements OnInit {
   }
 
   private startSignalRConnection() {
-    console.log('🔗 [Bot] Đang bắt đầu kết nối SignalR...');
+    // console.log(' [Bot] Đang bắt đầu kết nối SignalR...');
     this.hubConnection.start()
       .then(() => {
-        console.log('✅ [Bot] Kết nối SignalR thành công!');
+        // console.log(' [Bot] Kết nối SignalR thành công!');
         // Chỉ render WebChat SAU KHI SignalR kết nối
         this.renderWebChatContainer();
       })
@@ -198,7 +198,7 @@ export class Dashboard implements OnInit {
 
   private listenForBotMessages() {
     this.hubConnection.on('ReceiveMessage', (message: string) => {
-      console.log('📥 [Bot] Nhận:', message);
+      // console.log(' [Bot] Nhận:', message);
 
       const activity = {
         type: 'message',
@@ -219,7 +219,7 @@ export class Dashboard implements OnInit {
       try {
         const container = document.getElementById('webchat');
         if (!container) {
-          console.warn('🎨 [Bot] Chưa tìm thấy #webchat, thử lại sau 250ms');
+          // console.warn(' [Bot] Chưa tìm thấy #webchat, thử lại sau 250ms');
           setTimeout(tryRender, 250);
           return;
         }
@@ -229,12 +229,12 @@ export class Dashboard implements OnInit {
         // Nếu global WebChat chưa có, thử dynamic import từ package (bundled)
         if (!WebChat) {
           try {
-            console.log('🎨 [Bot] Đang import động botframework-webchat...');
+            // console.log(' [Bot] Đang import động botframework-webchat...');
             const mod = await import('botframework-webchat');
             WebChat = (mod && (mod as any).default) ? (mod as any).default : mod;
             (window as any).WebChat = WebChat; // Lưu lại
           } catch (impErr) {
-            console.error('❌ [Bot] Lỗi import động:', impErr);
+            console.error(' [Bot] Lỗi import động:', impErr);
             setTimeout(tryRender, 500); // Đợi lâu hơn nếu lỗi
             return;
           }
@@ -254,58 +254,58 @@ export class Dashboard implements OnInit {
               },
               container
             );
-            console.log('✅ [Bot] Render Web Chat thành công!');
+            // console.log(' [Bot] Render Web Chat thành công!');
             this.isBotLoading.set(false); // Báo hiệu bot đã sẵn sàng
           } catch (renderErr) {
-            console.error('❌ [Bot] Lỗi renderWebChat:', renderErr);
+            console.error(' [Bot] Lỗi renderWebChat:', renderErr);
             this.isBotConnectionError.set(true);
             this.isBotLoading.set(false);
           }
           
           // debug sau render - WAIT LONGER for UI to fully render
           setTimeout(() => {
-            console.log('🎨 [tryRender] After render - container children:', container.childElementCount, 'innerHTML length:', container.innerHTML?.length ?? 0);
+            // console.log(' [tryRender] After render - container children:', container.childElementCount, 'innerHTML length:', container.innerHTML?.length ?? 0);
               // Try to find send button - broaden detection and enumerate buttons for diagnosis
               const textarea = container.querySelector('textarea') || container.querySelector('input[type="text"]');
-              console.log('🎨 [tryRender] Textarea/Input found:', !!textarea);
+              // console.log('[tryRender] Textarea/Input found:', !!textarea);
 
               const buttons = Array.from(container.querySelectorAll('button')) as HTMLButtonElement[];
-              console.log('🎨 [tryRender] Found buttons count:', buttons.length);
+              // console.log(' [tryRender] Found buttons count:', buttons.length);
               buttons.forEach((b, i) => {
-                console.log(`🎨 [tryRender] button[${i}] class=`, b.className, 'aria-label=', b.getAttribute('aria-label'), 'title=', b.title, 'type=', b.type, 'innerText=', (b.innerText || '').trim());
+                // console.log(` [tryRender] button[${i}] class=`, b.className, 'aria-label=', b.getAttribute('aria-label'), 'title=', b.title, 'type=', b.type, 'innerText=', (b.innerText || '').trim());
                 // If button contains an SVG (common for send icon), log svg details
                 const svg = b.querySelector('svg');
-                if (svg) console.log(`🎨 [tryRender] button[${i}] contains SVG, svg classes:`, svg.getAttribute('class'));
+                // if (svg) console.log(` [tryRender] button[${i}] contains SVG, svg classes:`, svg.getAttribute('class'));
               });
 
               // Heuristic: try common webchat send button selectors
               const sendButton = container.querySelector('.webchat__send-box__button, .webchat-send__button, button.send, button[aria-label*="Gửi"], button[aria-label*="Send"]') as HTMLButtonElement | null;
-              console.log('🎨 [tryRender] Heuristic send button found:', !!sendButton);
+              // console.log(' [tryRender] Heuristic send button found:', !!sendButton);
 
               // Add a delegated click logger to capture clicks and show event targets (non-invasive)
               const clickLogger = (ev: MouseEvent) => {
                 try {
                   const t = ev.target as HTMLElement;
-                  console.log('🎨 [tryRender] CLICK event on element:', t.tagName, 'class=', t.className, 'aria-label=', t.getAttribute?.('aria-label'));
+                  // console.log(' [tryRender] CLICK event on element:', t.tagName, 'class=', t.className, 'aria-label=', t.getAttribute?.('aria-label'));
                 } catch (e) {
-                  console.log('🎨 [tryRender] CLICK event (error reading target)');
+                  // console.log(' [tryRender] CLICK event (error reading target)');
                 }
               };
               container.removeEventListener('click', clickLogger as any);
               container.addEventListener('click', clickLogger as any);
             
             if (sendButton) {
-              console.log('🎨 [tryRender] ✅ Web Chat UI is ready for interaction');
+              // console.log(' [tryRender]  Web Chat UI is ready for interaction');
             } else {
-              console.warn('🎨 [tryRender] ⚠️ Send button not found - Web Chat may not be fully initialized');
+              // console.warn(' [tryRender]  Send button not found - Web Chat may not be fully initialized');
             }
           }, 1000); // INCREASED WAIT from 200ms to 1000ms
         } else {
-          console.warn('🎨 [Bot] WebChat.renderWebChat không tồn tại, thử lại...');
+          // console.warn('[Bot] WebChat.renderWebChat không tồn tại, thử lại...');
           setTimeout(tryRender, 250);
         }
       } catch (err) {
-        console.error('🎨 [tryRender] Caught error:', err);
+        console.error('[tryRender] Caught error:', err);
       }
     };
 
@@ -316,7 +316,7 @@ export class Dashboard implements OnInit {
     this.isLoadingHistory = true;
     this.chargingService.getHistory(page, this.pagination().pageSize).subscribe({
       next: (res) => {
-        this.paginatedHistory = res?.sessions ?? []; // ✅ đảm bảo không undefined
+        this.paginatedHistory = res?.sessions ?? []; //  đảm bảo không undefined
         this.pagination.set(res?.pagination ?? {
           currentPage: 1, pageSize: 5, totalPages: 1, totalCount: 0
         });
@@ -325,7 +325,7 @@ export class Dashboard implements OnInit {
       },
       error: (err) => {
         console.error("Lỗi tải lịch sử sạc:", err);
-        this.paginatedHistory = []; // ✅ fallback
+        this.paginatedHistory = []; //  fallback
         this.isLoadingHistory = false;
         this.cdf.detectChanges();
       }
