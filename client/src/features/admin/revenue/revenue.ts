@@ -26,7 +26,7 @@ export class Revenue {
   totalPackageRevenue = 0;
   startDate = '';
   endDate = '';
-  granularity = 'Day';
+  granularity = 'Month';
   chart: any;
   pieChart: any;
   ngOnInit() {

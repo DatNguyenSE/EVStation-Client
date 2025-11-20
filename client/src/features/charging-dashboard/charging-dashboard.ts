@@ -400,7 +400,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
       },
       error: err => {
         console.error('Lỗi lấy thông tin trụ:', err);
-        this.errorMessage.set('Không thể tải thông tin trụ sạc.');
+        this.errorMessage.set(err.error?.message || 'Không thể lấy thông tin trụ.');
       }
     });
   }
@@ -441,7 +441,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
         },
         error: err => {
           console.error('Lỗi khi lấy reservation/vehicle:', err);
-          this.errorMessage.set('Không thể lấy thông tin đặt chỗ hoặc xe.');
+          this.errorMessage.set(err.error?.message || 'Không thể lấy thông tin đặt chỗ hoặc xe.');
         }
       });
   }
