@@ -53,18 +53,30 @@ export class PricingConfig {
     })
   }
    editPrices(price: Pricing) {
-  this.editPrice = { ...price }; // sao chép dữ liệu ra để chỉnh sửa
-}
+      this.editPrice = { ...price }; // sao chép dữ liệu ra để chỉnh sửa
+    }
 
+    isTimeBased(priceType: string | undefined): boolean {
+      return priceType === 'OccupancyFee' || priceType === 'OverstayFee';
+    }
 
   // updatePrice
   updatePrice(){
     if(!this.editPrice) return;
 
-     if (!this.editPrice.id) {
-    this.toast.error('Không thể cập nhật vì thiếu ID!');
-    return;
-  }
+    if (!this.editPrice.id) {
+      this.toast.error('Không thể cập nhật vì thiếu ID!');
+      return;
+    }
+
+    if (this.isTimeBased(this.editPrice.priceType)) {
+        this.editPrice.pricePerKwh = 0; 
+        // Dữ liệu lấy từ ô input sẽ vào editPrice.pricePerMinute
+    } else {
+        (this.editPrice.pricePerMinute as any) = null;
+        // Dữ liệu lấy từ ô input sẽ vào editPrice.pricePerKwh
+    }
+
     this.priceSvc.updatePricing(this.editPrice.id,this.editPrice).subscribe({
       next : (res) =>{
         const index = this.price.findIndex(d => d.id === this.editPrice!.id);
@@ -75,9 +87,12 @@ export class PricingConfig {
         }
         this.toast.success(`Đã cập nhật thành công bảng giá`);
         
-        this.cdf.detectChanges();
         this.editPrice = null;
-
+        this.cdf.detectChanges();
+      },
+      error: (err) => {
+          // Nên thêm hiển thị lỗi để biết tại sao backend từ chối
+          this.toast.error(err.error || 'Có lỗi xảy ra khi cập nhật');
       }
     })
   }

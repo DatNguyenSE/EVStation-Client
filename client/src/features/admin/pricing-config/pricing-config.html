@@ -62,12 +62,25 @@
       <input type="text" [(ngModel)]="e.name"
              class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
              placeholder="Tên gói" />
-      <input type="text" [(ngModel)]="e.priceType"
-             class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
+      
+      <input type="text" [(ngModel)]="e.priceType" readonly
+             class="border border-gray-300 bg-gray-100 text-gray-500 rounded-lg p-2 w-full outline-none"
              placeholder="Loại giá" />
-      <input type="number" [(ngModel)]="e.pricePerKwh"
-             class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
-             placeholder="Giá / kWh" />
+
+      <ng-container *ngIf="isTimeBased(e.priceType)">
+          <label class="text-xs font-bold text-yellow-700 ml-1">Giá / Phút (VNĐ)</label>
+          <input type="number" [(ngModel)]="e.pricePerMinute"
+                 class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
+                 placeholder="Nhập giá theo phút..." />
+      </ng-container>
+
+      <ng-container *ngIf="!isTimeBased(e.priceType)">
+          <label class="text-xs font-bold text-green-700 ml-1">Giá / kWh (VNĐ)</label>
+          <input type="number" [(ngModel)]="e.pricePerKwh"
+                 class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-yellow-400 outline-none"
+                 placeholder="Nhập giá theo kWh..." />
+      </ng-container>
+
     </div>
 
     <div class="mt-6 flex justify-end gap-3">
