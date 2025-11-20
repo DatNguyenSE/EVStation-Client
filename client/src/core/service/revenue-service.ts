@@ -11,12 +11,15 @@ export class RevenueService {
    private baseUrl = 'https://localhost:5001/api';
 
    loadRevenue(startDate:string,endDate:string,granularity:string = 'Month') : Observable<Revenues[]>{
-    return this.http.get<Revenues[]>(`${this.baseUrl}/revenue?startDate=${startDate}&endDate=${endDate}&granularity=${granularity}`);
+    const noCache = Date.now();
+    return this.http.get<Revenues[]>(`${this.baseUrl}/revenue?startDate=${startDate}&endDate=${endDate}&granularity=${granularity}&noCache=${noCache}`);
    }
     loadPackageRevenue(startDate: string, endDate: string): Observable<RevenuesPack> {
+      const noCache = Date.now();
     let params = new HttpParams()
       .set('startDate', startDate)
-      .set('endDate', endDate);
+      .set('endDate', endDate)
+      .set('noCache', noCache);
 
     return this.http.get<RevenuesPack>(`${this.baseUrl}/revenue/packages`, { params });
   }
