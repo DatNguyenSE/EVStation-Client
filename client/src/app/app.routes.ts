@@ -40,6 +40,7 @@ import { OpReport } from '../features/operator/op-report/op-report';
 import { Technicain } from '../features/technicain/technicain';
 import { Manager } from '../features/manager/manager';
 import { Assignment } from '../features/admin/assignment/assignment';
+import { GuestRegisterComponent } from '../features/guest-register/guest-register'; // Check đường dẫn
 
 
 export const routes: Routes = [
@@ -140,6 +141,7 @@ export const routes: Routes = [
     { path: 'tin-tuc', component: News },
     { path: 'confirm-email', component: ConfirmEmail },
     { path:'quet-ma',component: QrCodeComponent},
+    { path: 'auth/register-guest', component: GuestRegisterComponent },
     { 
         path: 'thongtinsac/:idPost',
         component: ChargingDashboard,
