@@ -1,0 +1,55 @@
+.notification-container {
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge {
+  background: red;
+  padding: 4px 10px;
+  color: white;
+  border-radius: 12px;
+}
+
+.notification-list {
+  margin-top: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.notification-list li {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-list li.unread {
+  background: #f3f8ff;
+  border-left: 4px solid #3b82f6;
+}
+
+.message {
+  font-weight: 500;
+}
+
+.time {
+  font-size: 12px;
+  opacity: 0.7;
+}
+/* Highlight thẻ chưa đọc */
+.unread {
+  border-left: 4px solid #3b82f6; /* màu xanh */
+  background-color: #f0f7ff;       /* nhấn mạnh background */
+  transition: background 0.3s, border 0.3s;
+}
+
+/* Hover effect smooth */
+li:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s;
+}

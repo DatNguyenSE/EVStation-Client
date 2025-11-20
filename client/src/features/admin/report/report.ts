@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ReportService } from '../../../core/service/report-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { ToastService } from '../../../core/service/toast-service';
 
 @Component({
@@ -13,7 +14,7 @@ import { ToastService } from '../../../core/service/toast-service';
   styleUrl: './report.css',
 })
 export class Report {
-  // 🧩 Services
+
   reportService = inject(ReportService);
   private cdr = inject(ChangeDetectorRef);
   toast = inject(ToastService);
@@ -75,18 +76,6 @@ export class Report {
   // 🚀 Lifecycle
   ngOnInit(): void {
     this.loadReports();
-
-    const notiSub = this.reportService.adminNotifications$.subscribe(noti => {
-      // ✅ Dùng setTimeout để tránh ExpressionChangedAfterItHasBeenCheckedError
-      setTimeout(() => {
-        this.notifications = noti;
-        this.unreadCount = this.reportService.getAdminUnreadCount();
-
-        this.loadReports();
-        this.cdr.detectChanges();
-      });
-    });
-    this.subs.push(notiSub);
   }
 
   // 📄 Mở chi tiết
@@ -120,6 +109,7 @@ export class Report {
       }
     });
   }
+  
 
   // 🔍 Xem báo cáo cụ thể (nếu cần)
   viewReport(id: number): void {
@@ -147,7 +137,7 @@ evaluateReport(id: number): void {
 }
 
 
-  // 👷‍♂️ Popup giao việc
+  //  Popup giao việc
   openAssignModal(report: Reports): void {
     this.selectedReportForAssign = report;
     this.showAssignModal = true;
@@ -187,6 +177,7 @@ evaluateReport(id: number): void {
       next: res => {
         this.toast.success(res.message);
         this.loadReports();
+        this.reportService.loadReportsAdmin();
       },
       error: err => console.error('❌ Lỗi khi đóng báo cáo:', err)
     });

@@ -1,8 +1,13 @@
-import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal, effect, untracked, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { ReportService } from '../../core/service/report-service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Reports } from '../../_models/report'; 
+import { AccountService } from '../../core/service/account-service';
+import { ReportService } from '../../core/service/report-service';
+
+// Định nghĩa kiểu dữ liệu cho UI
+export type NotificationUI = Reports & { read: boolean };
 
 @Component({
   selector: 'app-notification',
@@ -11,54 +16,73 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './notification.html',
   styleUrl: './notification.css'
 })
-export class Notification implements OnInit, OnDestroy {
-  private reportService = inject(ReportService);
+export class Notification implements OnInit {
 
-  notifications: any[] = [];
-  unreadCount = 0;
-  isDropdownOpen = false;
-  private subs: Subscription[] = [];
+  reportService = inject(ReportService);
+  protected accountService = inject(AccountService);
+  protected router = inject(Router);
+
+  // 1. Signal chứa danh sách thông báo
+  notificationItems = signal<NotificationUI[]>([]);
+
+  // 2. Computed: Tự động tính số lượng tin chưa đọc
+  // Sửa lỗi "Parser Error" trong HTML
+  unreadCount = computed(() => 
+    this.notificationItems().filter(item => !item.read).length
+  );
+
+  constructor() {
+    // EFFECT: Đồng bộ dữ liệu từ Service -> UI
+    effect(() => {
+      const rawReports = this.reportService.notificationsReport();
+      
+      // Dùng untracked để lấy giá trị hiện tại mà KHÔNG gây vòng lặp vô hạn
+      const currentItems = untracked(() => this.notificationItems());
+
+      const uiReports: NotificationUI[] = rawReports.map(report => {
+        // Tìm xem thông báo này đã tồn tại trong danh sách cũ chưa
+        const existingItem = currentItems.find(x => x.id === report.id);
+        
+        return {
+          ...report,
+          // Logic quan trọng: 
+          // Nếu tin cũ đã đọc (true) thì giữ nguyên true.
+          // Nếu là tin mới hoàn toàn thì mặc định là false (chưa đọc).
+          read: existingItem ? existingItem.read : false 
+        };
+      });
+
+      this.notificationItems.set(uiReports);
+    }, { allowSignalWrites: true });
+  }
 
   ngOnInit(): void {
-    console.log('🔔 Notification component loaded!');
-
-    // ✅ Load dữ liệu từ localStorage trước (để hiện ngay khi reload trang)
-    const stored = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
-    this.notifications = stored;
-    this.unreadCount = this.reportService.getAdminUnreadCount();
-
-    // 🔔 Lắng nghe realtime từ ReportService (SignalR push event)
-    const sub = this.reportService.adminNotifications$.subscribe(noti => {
-      console.log('📬 Notifications cập nhật:', noti);
-      this.notifications = noti;
-      this.unreadCount = this.reportService.getAdminUnreadCount();
-    });
-
-    this.subs.push(sub);
-  }
-
-  /** 🔄 Toggle mở/đóng dropdown khi click vào chuông */
-  toggleDropdown(): void {
-    this.isDropdownOpen = !this.isDropdownOpen;
-  }
-
-  /** ✅ Đánh dấu tất cả đã đọc */
-  markAllAsRead(): void {
-    this.reportService.markAdminAllAsRead();
-    this.unreadCount = 0;
-  }
-
-  /** ❌ Đóng dropdown khi click ra ngoài */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    // Nếu click ra ngoài phần tử có class .notification-wrapper thì đóng dropdown
-    if (!target.closest('.notification-wrapper')) {
-      this.isDropdownOpen = false;
+    const role = this.accountService.currentAccount()?.roles?.[0] || '';
+    if (role?.includes('admin')) {
+      this.reportService.loadReportsAdmin();
     }
   }
 
-  ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
+  // Đánh dấu tất cả là đã đọc
+  markAllAsRead() {
+    this.notificationItems.update(items =>
+      items.map(item => ({ ...item, read: true }))
+    );
+  }
+
+  // Đánh dấu 1 cái là đã đọc (hàm nội bộ)
+  private markAsRead(id: number) {
+    this.notificationItems.update(items =>
+      items.map(item => item.id === id ? { ...item, read: true } : item)
+    );
+  }
+
+  // Hàm xử lý khi click vào 1 dòng thông báo
+  goToReports(report: NotificationUI) {
+    // 1. Đánh dấu tin này là đã đọc
+    this.markAsRead(report.id);
+    
+    // 2. Chuyển hướng trang
+    this.router.navigate(['/quan-tri-vien/bao-cao']);
   }
 }

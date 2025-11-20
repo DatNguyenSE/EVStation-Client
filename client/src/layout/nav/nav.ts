@@ -9,6 +9,7 @@ import { BusyService } from '../../core/service/busy-service';
 import { ReservationService } from '../../core/service/reservation-service';
 import { HasRoleDirective } from '../../shared/_directive/has-role.directive';
 import { ReportService } from '../../core/service/report-service';
+import { Reports } from '../../_models/report';
 
 
 @Component({
@@ -31,7 +32,6 @@ export class Nav implements OnInit {
   reportService = inject(ReportService)
   showBalance = signal<boolean>(false);
   reservationService = inject(ReservationService);
-  unreadCount = 0;
    private sub: any;
 
   /**  Lấy danh sách menu theo role hiện tại */
@@ -84,6 +84,7 @@ currentRole = this.accountService.currentAccount()?.roles[0];
     // lắng nghe currentAccount thay đổi (login/logout)
     effect(() => {
       const acc = this.accountService.currentAccount();
+      
       if (acc?.roles.includes('Driver')) {
         // login -> load lại data
         console.log('User roles:', this.accountService.currentAccount()?.roles);
@@ -102,9 +103,7 @@ currentRole = this.accountService.currentAccount()?.roles[0];
       }
     });
   }
-   updateUnread() {
-    this.unreadCount = this.reportService.getAdminUnreadCount();
-  }
+
 
  ngOnInit(): void {
   document.documentElement.setAttribute('data-theme', this.selectedTheme());
@@ -114,8 +113,9 @@ currentRole = this.accountService.currentAccount()?.roles[0];
   // this.reportService.reconnectIfNeeded();
 
   // 🔔 Lắng nghe realtime từ ReportService
-  this.reportService.adminNotifications$.subscribe(() => this.updateUnread());
-  this.updateUnread();
+  if(role.includes('Admin')){
+  this.reportService.loadReportsAdmin()
+  }
 }
 
 
