@@ -28,10 +28,6 @@ export class App {
     if (stored) {
       const account = JSON.parse(stored);
       this.accountService.setCurrentAccount(account);
-     
-      if (!this.reportService.isConnected()) {
-        this.reportService.createHubConnection(account);
-      }
     }
   }
   

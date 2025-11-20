@@ -1,40 +1,74 @@
-    <div class="bg-white p-6 rounded-2xl shadow-md mt-6 border border-gray-200">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-5 flex items-center gap-2">
-        📊 Doanh thu tháng hiện tại
-    </h2>
-
-    <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 text-gray-600 text-sm sm:text-base"
-    >
-        <p>
-        <span class="font-medium">Từ ngày:</span>
-        <span class="text-gray-800">{{ startDate | date: 'dd/MM/yyyy' }}</span>
-        <span class="mx-1">—</span>
-        <span class="font-medium">Đến ngày:</span>
-        <span class="text-gray-800">{{ endDate | date: 'dd/MM/yyyy' }}</span>
-        </p>
-
-        <p>
-        <span class="font-medium">Tổng doanh thu:</span>
-        <span class="text-blue-600 font-semibold text-lg">
-            {{ totalRevenueSum | number: '1.0-0' }} VNĐ
-        </span>
-        </p>
-    </div>
-
-    <div class="w-full overflow-x-auto">
-        <canvas id="revenueChart" class="w-full h-80"></canvas>
-    </div>
-
-  <div class="bg-white p-6 rounded-2xl shadow-md mt-8 border border-gray-200 max-w-md mx-auto">
-  <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2 justify-center">
-     Cơ cấu doanh thu toàn hệ thống
+<div class="bg-white p-6 rounded-2xl shadow-md mt-6 border border-gray-200">
+  <h2 class="text-2xl font-semibold text-gray-800 mb-5 flex items-center gap-2">
+    Doanh thu
   </h2>
 
-  <div class="flex justify-center">
-    <canvas id="revenuePie" class="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px]"></canvas>
+  <!-- Bộ lọc ngày -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div class="flex items-center gap-3">
+      <label class="font-medium text-gray-700">Từ ngày:</label>
+      <input
+        type="date"
+        [(ngModel)]="startDate"
+        class="border border-gray-300 rounded-lg p-2 focus:ring focus:ring-blue-200"
+      />
+
+      <label class="font-medium text-gray-700">Đến ngày:</label>
+      <input
+        type="date"
+        [(ngModel)]="endDate"
+        class="border border-gray-300 rounded-lg p-2 focus:ring focus:ring-blue-200"
+      />
+    </div>
+
+    <button
+      (click)="applyDateFilter()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+    >
+      Lọc
+    </button>
   </div>
-</div>
- 
-    
+
+  <!-- Thông tin tổng quan -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 text-gray-600 text-sm sm:text-base"
+  >
+    <p>
+      <span class="font-medium">Từ ngày:</span>
+      <span class="text-gray-800">{{ startDate | date: 'dd/MM/yyyy' }}</span>
+      <span class="mx-1">—</span>
+      <span class="font-medium">Đến ngày:</span>
+      <span class="text-gray-800">{{ endDate | date: 'dd/MM/yyyy' }}</span>
+    </p>
+
+    <p>
+      <span class="font-medium">Tổng doanh thu:</span>
+      <span class="text-blue-600 font-semibold text-lg">
+        {{ totalRevenueSum | number: '1.0-0' }} VNĐ
+      </span>
+    </p>
+  </div>
+
+  <!-- Biểu đồ doanh thu -->
+  <div class="w-full overflow-x-auto">
+    <canvas id="revenueChart" class="w-full h-80"></canvas>
+  </div>
+
+  <!-- Biểu đồ tròn -->
+  <div
+    class="bg-white p-6 rounded-2xl shadow-md mt-8 border border-gray-200 max-w-md mx-auto"
+  >
+    <h2
+      class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2 justify-center"
+    >
+      Cơ cấu doanh thu toàn hệ thống
+    </h2>
+
+    <div class="flex justify-center">
+      <canvas
+        id="revenuePie"
+        class="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px]"
+      ></canvas>
+    </div>
+  </div>
 </div>

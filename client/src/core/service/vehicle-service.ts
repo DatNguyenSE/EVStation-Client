@@ -72,6 +72,4 @@ export class VehicleService {
   rejectVehicle(vehicleId: number): Observable<{message: string}> {
     return this.http.post<{message: string}>(`${this.baseurl}/vehicle/${vehicleId}/reject`, {});
   }
-
-
 }

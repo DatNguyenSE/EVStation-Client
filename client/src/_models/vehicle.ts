@@ -17,8 +17,8 @@ export interface Vehicles  {
   plate: string;
   registrationStatus: string;
 
-  
-
+  vehicleRegistrationFrontUrl?: string;
+  vehicleRegistrationBackUrl?: string;
 };
 export interface VehiclePending {
   vehicleId: number;

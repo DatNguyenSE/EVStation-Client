@@ -12,12 +12,13 @@ import { ValidateScanResponse } from '../../_models/charging';
 import { Vehicles } from '../../_models/vehicle';
 import { DriverService } from '../../core/service/driver-service';
 import { PresenceService } from '../../core/service/presence-service';
+import { RegisterSuggestionComponent } from '../register-suggestion/register-suggestion';
 
 
 @Component({
   selector: 'app-charging-dashboard',
   standalone: true,
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule, DecimalPipe, RegisterSuggestionComponent],
   templateUrl: './charging-dashboard.html',
   styleUrl: './charging-dashboard.css',
     changeDetection: ChangeDetectionStrategy.OnPush  //  thêm dòng này xóa lỗi Change Detection
@@ -35,6 +36,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
   protected isReservationExpired = signal(false);
 
+  protected showRegisterSuggestion = signal(false);
 
   // protected confirmed = signal(false);
   protected isCompleted = signal(false);
@@ -75,6 +77,7 @@ export class ChargingDashboard implements OnInit, OnDestroy {
   private errorStopPostSub?: Subscription;
   private countdownInterval?: any;
   private graceCountdownInterval?: any;
+  protected currentReceipt: any = null;
 
   // Bắt đầu đếm ngược
   private startCountdown() {
@@ -620,20 +623,16 @@ export class ChargingDashboard implements OnInit, OnDestroy {
 
         console.log(`${this.sessionId} EndSession successfully`);
         this.toast.success('Đã kết thúc phiên sạc thành công');
-        // this.toast.success('Hóa đơn đã được gửi đến email của bạn');
-        const hasIdleFees = (receipt.idleFee && receipt.idleFee > 0) || 
-                            (receipt.overstayFee && receipt.overstayFee > 0);
-        const isCashPayment = receipt.paymentMethod === 'Tiền mặt';
-        const isPackagePayment = receipt.paymentMethod === 'Gói thuê bao';
-        const hasWalletTransaction = (!isCashPayment && !isPackagePayment) || (isPackagePayment && hasIdleFees); 
         
-        if (hasWalletTransaction) {
-          setTimeout(() => { window.location.href = '/bien-lai'; }, 3000);
+        // --- LOGIC MỚI Ở ĐÂY ---
+        if (receipt.shouldSuggestRegistration) {
+          // 1. Nếu cần gợi ý đăng ký -> Lưu receipt lại và Hiện Popup
+          this.currentReceipt = receipt;
+          this.showRegisterSuggestion.set(true);
         } else {
-          this.toast.success('Cảm ơn bạn đã sử dụng dịch vụ!');
-          setTimeout(() => { window.location.href = '/'; }, 2000);
-        }
-        
+          // 2. Nếu không -> Chuyển trang luôn
+          this.navigateAfterComplete(receipt);
+        }        
       },
       error: (err) => {
         console.error('End session failed', err);
@@ -642,6 +641,28 @@ export class ChargingDashboard implements OnInit, OnDestroy {
     });
   }
 
+  navigateAfterComplete(receipt: any) {
+    const hasIdleFees = (receipt.idleFee && receipt.idleFee > 0) || 
+                        (receipt.overstayFee && receipt.overstayFee > 0);
+    // Logic check payment method cũ của bạn
+    const isCashPayment = receipt.paymentMethod === 'Tiền mặt';
+    const isPackagePayment = receipt.paymentMethod === 'Gói thuê bao';
+    const hasWalletTransaction = (!isCashPayment && !isPackagePayment) || (isPackagePayment && hasIdleFees); 
+
+    if (hasWalletTransaction) {
+      setTimeout(() => { window.location.href = '/bien-lai'; }, 1000);
+    } else {
+      this.toast.success('Cảm ơn bạn đã sử dụng dịch vụ!');
+      setTimeout(() => { window.location.href = '/'; }, 1000);
+    }
+  }
+
+  handleCloseSuggestion() {
+    this.showRegisterSuggestion.set(false);
+    if (this.currentReceipt) {
+      this.navigateAfterComplete(this.currentReceipt);
+    }
+  }
 
   ngOnDestroy() {
     this.stopCountdown(); 

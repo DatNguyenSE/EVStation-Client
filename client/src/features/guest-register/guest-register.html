@@ -1,0 +1,133 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-inter">
+  <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-3xl shadow-xl border border-blue-100">
+    
+    <div class="text-center">
+      <div class="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+        <i class="i-ph-car-profile text-2xl text-blue-600"></i>
+      </div>
+      <h2 class="text-3xl font-extrabold text-gray-900">Đăng ký thành viên</h2>
+      
+      @if (plateFromUrl()) {
+        <div class="mt-2 bg-green-50 border border-green-200 text-green-800 px-4 py-2 rounded-lg inline-block">
+          <p class="text-sm font-medium">
+            Liên kết với xe: <span class="font-bold text-lg ml-1">{{ plateFromUrl() }}</span>
+          </p>
+        </div>
+      }
+      <p class="mt-2 text-sm text-gray-600">
+        Tạo tài khoản để quản lý lịch sử sạc và thanh toán dễ dàng hơn.
+      </p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      
+      @if (validationErrors().length > 0) {
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="i-ph-warning-circle text-red-500"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Có lỗi xảy ra:</h3>
+              <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+                @for (error of validationErrors(); track error) {
+                  <li>{{ error }}</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="rounded-md shadow-sm space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập</label>
+          <input formControlName="username" type="text" 
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+            [class.border-red-500]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+            placeholder="Nhập tên đăng nhập">
+
+            @if (registerForm.get('username')?.invalid && registerForm.get('username')?.touched) {
+                <div class="text-red-500 text-xs mt-1">
+                @if (registerForm.get('username')?.hasError('required')) { 
+                    Tên đăng nhập là bắt buộc 
+                }
+                @if (registerForm.get('username')?.hasError('userTaken')) { 
+                    Tên đăng nhập này đã có người dùng, vui lòng chọn tên khác.
+                }
+                </div>
+            }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+          <input formControlName="fullName" type="text" 
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+            placeholder="Nguyễn Văn A">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input formControlName="email" type="email" 
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+            [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            placeholder="email@example.com">
+
+            @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                <div class="text-red-500 text-xs mt-1">
+                @if (registerForm.get('email')?.hasError('required')) { Email là bắt buộc }
+                @if (registerForm.get('email')?.hasError('email')) { Email không đúng định dạng }
+                @if (registerForm.get('email')?.hasError('emailTaken')) { 
+                    Email này đã được đăng ký, vui lòng dùng email khác hoặc đăng nhập.
+                }
+                </div>
+            }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ngày sinh</label>
+          <input formControlName="dateOfBirth" type="date" 
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+          <input formControlName="password" type="password" 
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+            [class.border-red-500]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+            placeholder="******">
+
+            @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                <div class="text-red-500 text-xs mt-1 space-y-1">
+                @if (registerForm.get('password')?.hasError('required')) { 
+                    <p>• Mật khẩu không được để trống</p> 
+                }
+                @if (registerForm.get('password')?.hasError('minlength')) { 
+                    <p>• Mật khẩu phải dài ít nhất 12 ký tự</p> 
+                }
+                @if (registerForm.get('password')?.hasError('pattern')) { 
+                    <p>• Phải chứa ít nhất 1 chữ hoa, 1 số và 1 ký tự đặc biệt</p> 
+                }
+                </div>
+            }
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" [disabled]="isSubmitting()"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-200">
+          @if (isSubmitting()) {
+            <span class="animate-pulse">Đang xử lý...</span>
+          } @else {
+            Đăng ký và Liên kết
+          }
+        </button>
+      </div>
+      
+      <div class="text-center mt-4">
+        <a routerLink="/" class="text-sm text-gray-500 hover:text-blue-600">Quay về trang chủ</a>
+      </div>
+
+    </form>
+  </div>
+</div>

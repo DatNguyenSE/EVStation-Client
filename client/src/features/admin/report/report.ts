@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ReportService } from '../../../core/service/report-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { ToastService } from '../../../core/service/toast-service';
 
 @Component({
@@ -13,7 +14,7 @@ import { ToastService } from '../../../core/service/toast-service';
   styleUrl: './report.css',
 })
 export class Report {
-  // 🧩 Services
+
   reportService = inject(ReportService);
   private cdr = inject(ChangeDetectorRef);
   toast = inject(ToastService);
@@ -51,6 +52,10 @@ export class Report {
 
   openEvaluateModal(report: Reports): void {
     this.selectedReportForEvaluate = report;
+    console.log('Opening evaluate modal for report:', report);
+  this.selectedReportForEvaluate = report;
+  this.showEvaluateModal = true;
+  console.log('showEvaluateModal:', this.showEvaluateModal);
     this.showEvaluateModal = true;
   }
 
@@ -71,18 +76,6 @@ export class Report {
   // 🚀 Lifecycle
   ngOnInit(): void {
     this.loadReports();
-
-    const notiSub = this.reportService.adminNotifications$.subscribe(noti => {
-      // ✅ Dùng setTimeout để tránh ExpressionChangedAfterItHasBeenCheckedError
-      setTimeout(() => {
-        this.notifications = noti;
-        this.unreadCount = this.reportService.getAdminUnreadCount();
-
-        this.loadReports();
-        this.cdr.detectChanges();
-      });
-    });
-    this.subs.push(notiSub);
   }
 
   // 📄 Mở chi tiết
@@ -90,7 +83,10 @@ export class Report {
     this.reportService.getReportsById(id).subscribe({
       next: res => {
         this.selectedReport = res;
-        setTimeout(() => this.showDetailModal = true);
+        setTimeout(() => {
+          this.showDetailModal = true;
+           this.cdr.detectChanges();
+        },0) ;
       },
       error: err => console.error(err)
     });
@@ -109,10 +105,11 @@ export class Report {
         this.cdr.detectChanges();
       },
       error: err => {
-        console.error('❌ Lỗi khi tải danh sách báo cáo:', err);
+        console.error('Lỗi khi tải danh sách báo cáo:', err);
       }
     });
   }
+  
 
   // 🔍 Xem báo cáo cụ thể (nếu cần)
   viewReport(id: number): void {
@@ -123,7 +120,7 @@ export class Report {
       this.showDetailModal = true;
     });
       },
-      error: err => console.error('❌ Lỗi khi tải chi tiết báo cáo:', err)
+      error: err => console.error('Lỗi khi tải chi tiết báo cáo:', err)
     });
   }
 
@@ -140,7 +137,7 @@ evaluateReport(id: number): void {
 }
 
 
-  // 👷‍♂️ Popup giao việc
+  //  Popup giao việc
   openAssignModal(report: Reports): void {
     this.selectedReportForAssign = report;
     this.showAssignModal = true;
@@ -168,8 +165,8 @@ evaluateReport(id: number): void {
 
       },
       error: err => {
-        console.error('❌ Lỗi khi giao việc:', err);
-        this.toast.error('Không thể giao việc. Vui lòng thử lại!');
+        console.error(' Lỗi khi giao việc:', err);
+        // this.toast.error('Không thể giao việc. Vui lòng thử lại!');
       }
     });
   }
@@ -180,10 +177,23 @@ evaluateReport(id: number): void {
       next: res => {
         this.toast.success(res.message);
         this.loadReports();
+        this.reportService.loadReportsAdmin();
       },
-      error: err => console.error('❌ Lỗi khi đóng báo cáo:', err)
+      error: err => console.error('Lỗi khi đóng báo cáo:', err)
     });
   }
+   getInProgressCount(): number {
+    return this.reports.filter(r => r.status === 'InProgress').length;
+  }
+
+  getCriticalCount(): number {
+    return this.reports.filter(r => r.severity === 'Critical').length;
+  }
+
+  getClosedCount(): number {
+    return this.reports.filter(r => r.status === 'Closed').length;
+  }
+
 
   // 🧹 Cleanup
   ngOnDestroy(): void {

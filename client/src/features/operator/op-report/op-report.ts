@@ -55,6 +55,7 @@ export class OpReport {
     this.loading = true;
     this.reportSvc.uploadReport(formData).subscribe({
       next: (res) => {
+       
         this.toast.success('Gửi báo cáo thành công!');
         this.resetForm();
 

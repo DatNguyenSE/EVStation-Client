@@ -45,30 +45,38 @@ export class Operator implements OnInit {
   // =================== Lấy dữ liệu từ server ===================
   getAssignments() {
     const staffId = this.accountService.currentAccount()?.id || '';
-    this.operatorService.getAssignment(staffId).subscribe({
-      next: res => {
-        this.StationInfo.set(res.station);
-        this.StaffInfo.set(res.staff);
+   this.operatorService.getAssignment(staffId).subscribe({
+  next: res => {
+    if (!res) {
+      console.warn('No assignment found for staff:', staffId);
+      this.StationInfo.set(undefined);
+      this.StaffInfo.set(undefined);
+      this.chargingPostSession.set([]);
+      return;
+    }
 
-        const stationId = res.station.id;
-        if (stationId) {
-          this.stationService.getStationByid(stationId).subscribe({
-            next: stationRes => {
-              // Map post để thêm sessionId, startTime, plateInput
-              const mappedPosts: PostWithSession[] = stationRes.chargingPosts.map(post => ({
-                ...post,
-                sessionId: undefined,
-                startTime: post.status === 'charging' ? new Date().toISOString() : undefined,
-                plateInput: ''
-              }));
-              this.chargingPostSession.set(mappedPosts);
-            },
-            error: err => console.error('Lỗi khi lấy trụ sạc:', err)
-          });
-        }
-      },
-      error: err => console.error('Lỗi khi phân công nhân viên', err)
-    });
+    this.StationInfo.set(res.station);
+    this.StaffInfo.set(res.staff);
+
+    const stationId = res.station?.id;
+    if (stationId) {
+      this.stationService.getStationByid(stationId).subscribe({
+        next: stationRes => {
+          const mappedPosts: PostWithSession[] = stationRes.chargingPosts.map(post => ({
+            ...post,
+            sessionId: undefined,
+            startTime: post.status === 'charging' ? new Date().toISOString() : undefined,
+            plateInput: ''
+          }));
+          this.chargingPostSession.set(mappedPosts);
+        },
+        error: err => console.error('Lỗi khi lấy trụ sạc:', err)
+      });
+    }
+  },
+  error: err => console.error('Lỗi khi phân công nhân viên', err)
+});
+
   }
 
   getSessionInfo(sessionId: number) {

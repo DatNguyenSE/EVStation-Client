@@ -10,7 +10,7 @@ export interface Reports {
   maintenanceEndTime?: string | null;
   fixedAt?: string | null;
   fixedNote?: string | null;
-
+  postCode? : string
   createImageUrl?: string | null;
   completedImageUrl?: string | null;
 
