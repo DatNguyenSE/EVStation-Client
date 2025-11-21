@@ -42,6 +42,8 @@ import { Manager } from '../features/manager/manager';
 import { Assignment } from '../features/admin/assignment/assignment';
 import { GuestRegisterComponent } from '../features/guest-register/guest-register'; // Check đường dẫn
 import { adminGuard } from '../core/_guards/admin-guard';
+import { ReceiptManager } from '../features/manager/receipt/receipt';
+import { ReceipDetailManager } from '../features/manager/receip-detail-manager/receip-detail-manager';
 
 
 export const routes: Routes = [
@@ -126,10 +128,10 @@ export const routes: Routes = [
             { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
             { path: 'trang-chu', component: Manager },
             //  {path:'quan-ly-nhan-vien',component:OpReport},
-            { path:'bien-lai', component: ReceiptPending },
+            { path:'bien-lai', component: ReceiptManager },
             { path: 'thong-bao', component: Notification },
-            {path:'bao-cao',component:OpReport}
-
+            {path:'bao-cao',component:OpReport},
+            {path:'bien-lai/:id',component:ReceipDetailManager},
         ]
     },
 

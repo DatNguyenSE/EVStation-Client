@@ -100,14 +100,6 @@ export class Dashboard implements OnInit {
     // 4. Bắt đầu kết nối SignalR (và render UI khi thành công)
     this.startSignalRConnection();
     
-    // Render Web Chat
-    // console.log('[Dashboard] About to call renderWebChatContainer()');
-    // try {
-    //   this.renderWebChatContainer();
-    //   console.log(' [Dashboard] renderWebChatContainer() call completed');
-    // } catch (err) {
-    //   console.error(' [Dashboard] renderWebChatContainer() threw error:', err);
-    // }
   }
 
   private _setupDirectLine() {
@@ -141,14 +133,6 @@ export class Dashboard implements OnInit {
         } as Activity;
         this.activitySubject.next(outgoing);
 
-        // Optimistically emit the outgoing activity so the UI displays it (prevents "failed to send")
-        // try {
-        //   this.activitySubject.next(outgoing);
-        //   console.log(' [postActivity] Optimistically pushed outgoing activity to activitySubject', outgoing.id);
-        // } catch (emitErr) {
-        //   console.error('[postActivity] Error pushing outgoing activity to subject:', emitErr);
-        // }
-
         if (activity.type === 'message' && activity.text) {
           this.hubConnection.invoke('SendMessage', activity.text)
             .catch(err => {
@@ -158,25 +142,7 @@ export class Dashboard implements OnInit {
         }
 
         // Trả về một object "giống" Observable để Web Chat không báo lỗi
-        return { subscribe: (obs: any) => (obs.next || obs)(id) };
-
-        // Web Chat may expect postActivity to return an Observable-like with subscribe().
-        // Return a small object implementing subscribe so Web Chat can subscribe without error.
-        // return {
-        //   subscribe: (observer: any) => {
-        //     try {
-        //       if (typeof observer === 'function') {
-        //         observer(id);
-        //       } else {
-        //         observer.next && observer.next(id);
-        //         observer.complete && observer.complete();
-        //       }
-        //     } catch (err) {
-        //       console.warn(' [postActivity] subscribe handler threw:', err);
-        //     }
-        //     return { unsubscribe: () => {} };
-        //   }
-        // };
+        return { subscribe: (obs: any) => (obs.next || obs)(id) };  
       }
     };
   }
@@ -185,8 +151,6 @@ export class Dashboard implements OnInit {
     // console.log(' [Bot] Đang bắt đầu kết nối SignalR...');
     this.hubConnection.start()
       .then(() => {
-        // console.log(' [Bot] Kết nối SignalR thành công!');
-        // Chỉ render WebChat SAU KHI SignalR kết nối
         this.renderWebChatContainer();
       })
       .catch((err: any) => {
@@ -229,7 +193,6 @@ export class Dashboard implements OnInit {
         // Nếu global WebChat chưa có, thử dynamic import từ package (bundled)
         if (!WebChat) {
           try {
-            // console.log(' [Bot] Đang import động botframework-webchat...');
             const mod = await import('botframework-webchat');
             WebChat = (mod && (mod as any).default) ? (mod as any).default : mod;
             (window as any).WebChat = WebChat; // Lưu lại
@@ -254,7 +217,6 @@ export class Dashboard implements OnInit {
               },
               container
             );
-            // console.log(' [Bot] Render Web Chat thành công!');
             this.isBotLoading.set(false); // Báo hiệu bot đã sẵn sàng
           } catch (renderErr) {
             console.error(' [Bot] Lỗi renderWebChat:', renderErr);
@@ -264,44 +226,24 @@ export class Dashboard implements OnInit {
           
           // debug sau render - WAIT LONGER for UI to fully render
           setTimeout(() => {
-            // console.log(' [tryRender] After render - container children:', container.childElementCount, 'innerHTML length:', container.innerHTML?.length ?? 0);
-              // Try to find send button - broaden detection and enumerate buttons for diagnosis
               const textarea = container.querySelector('textarea') || container.querySelector('input[type="text"]');
-              // console.log('[tryRender] Textarea/Input found:', !!textarea);
-
               const buttons = Array.from(container.querySelectorAll('button')) as HTMLButtonElement[];
-              // console.log(' [tryRender] Found buttons count:', buttons.length);
               buttons.forEach((b, i) => {
-                // console.log(` [tryRender] button[${i}] class=`, b.className, 'aria-label=', b.getAttribute('aria-label'), 'title=', b.title, 'type=', b.type, 'innerText=', (b.innerText || '').trim());
-                // If button contains an SVG (common for send icon), log svg details
                 const svg = b.querySelector('svg');
-                // if (svg) console.log(` [tryRender] button[${i}] contains SVG, svg classes:`, svg.getAttribute('class'));
-              });
+              });              
 
-              // Heuristic: try common webchat send button selectors
               const sendButton = container.querySelector('.webchat__send-box__button, .webchat-send__button, button.send, button[aria-label*="Gửi"], button[aria-label*="Send"]') as HTMLButtonElement | null;
-              // console.log(' [tryRender] Heuristic send button found:', !!sendButton);
 
-              // Add a delegated click logger to capture clicks and show event targets (non-invasive)
               const clickLogger = (ev: MouseEvent) => {
                 try {
                   const t = ev.target as HTMLElement;
-                  // console.log(' [tryRender] CLICK event on element:', t.tagName, 'class=', t.className, 'aria-label=', t.getAttribute?.('aria-label'));
                 } catch (e) {
-                  // console.log(' [tryRender] CLICK event (error reading target)');
                 }
               };
               container.removeEventListener('click', clickLogger as any);
               container.addEventListener('click', clickLogger as any);
-            
-            if (sendButton) {
-              // console.log(' [tryRender]  Web Chat UI is ready for interaction');
-            } else {
-              // console.warn(' [tryRender]  Send button not found - Web Chat may not be fully initialized');
-            }
-          }, 1000); // INCREASED WAIT from 200ms to 1000ms
+          }, 1000); 
         } else {
-          // console.warn('[Bot] WebChat.renderWebChat không tồn tại, thử lại...');
           setTimeout(tryRender, 250);
         }
       } catch (err) {

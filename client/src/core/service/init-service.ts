@@ -30,9 +30,10 @@ export class InitService {
         this.router.navigate(['/nhan-vien-tram/trang-chu']);
         this.presenceService.createHubConnection();
       }
-      if (this.accountService.currentAccount()?.roles.includes('Driver')  && !currentUrl.startsWith('/quan-tri-vien')) {
+      if (this.accountService.currentAccount()?.roles.includes('Driver')) {
         this.router.navigate(['/']);
         this.reservationService.createHubConnection(account);
+        this.reportService.createHubConnection(account);
       }
       if (this.accountService.currentAccount()?.roles.includes('Technician')  && !currentUrl.startsWith('/nhan-vien-ky-thuat')) {
         this.router.navigate(['/nhan-vien-ky-thuat/cong-viec']);

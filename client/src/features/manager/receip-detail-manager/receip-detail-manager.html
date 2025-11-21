@@ -1,0 +1,146 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+  <div class="max-w-4xl mx-auto">
+    
+    <button (click)="goBack()" class="btn btn-ghost gap-2 mb-6 text-gray-600 hover:bg-gray-200">
+      <i class="bi bi-arrow-left"></i> Quay lại danh sách
+    </button>
+
+    <div *ngIf="isLoading" class="flex justify-center py-12">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error shadow-sm">
+      <i class="bi bi-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div *ngIf="!isLoading && receipt" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      
+      <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-start">
+        <div>
+          <div class="flex items-center gap-3 mb-1">
+            <h1 class="text-2xl font-bold text-gray-800">Biên lai #{{ receipt.id }}</h1>
+            <span class="badge font-semibold" [ngClass]="{
+                'badge-success badge-outline': receipt.status === 'Paid',
+                'badge-error badge-outline': receipt.status === 'Refunded',
+                'badge-warning badge-outline': receipt.status === 'Cancelled',
+                'badge-ghost': receipt.status === 'Pending'
+              }">
+              {{ receipt.status }}
+            </span>
+          </div>
+          <p class="text-gray-500 text-sm">Ngày tạo: {{ receipt.createAt | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+      </div>
+
+      <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-6">
+          
+          <div>
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Khách hàng</h3>
+            <div class="flex items-center gap-3">
+              <div class="avatar placeholder">
+                <div class="bg-neutral-focus text-neutral-content rounded-full w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-600">
+                  <span class="text-lg font-bold uppercase">{{ receipt.appUserName?.charAt(0) || 'U' }}</span>
+                </div>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800">{{ receipt.appUserName || 'Khách vãng lai' }}</p>
+                <p class="text-xs text-gray-500" *ngIf="receipt.appUserId">ID: {{ receipt.appUserId }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Chi tiết phiên sạc</h3>
+            <div class="bg-gray-50 rounded-lg border border-gray-100 overflow-hidden">
+              <div *ngFor="let session of receipt.chargingSessions" class="p-3 border-b border-gray-100 last:border-0 text-sm">
+                <div class="flex justify-between mb-1">
+                  <span class="text-gray-500">Mã trụ/Cổng:</span>
+                  <span class="font-medium text-gray-800">{{ session.chargingPostCode }}</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-gray-500">Thời gian:</span>
+                  <span class="text-gray-800">{{ session.startTime | date:'HH:mm' }} - {{ session.endTime | date:'HH:mm' }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-500">Tiêu thụ:</span>
+                  <span class="font-medium text-blue-600">{{ session.energyUsed | number:'1.0-2' }} kWh</span>
+                </div>
+              </div>
+              
+              <div *ngIf="!receipt.chargingSessions || receipt.chargingSessions.length === 0" class="p-4 text-center text-gray-400 italic">
+                Không có dữ liệu phiên sạc chi tiết.
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+             <div class="flex justify-between text-sm">
+                <span class="text-blue-600 font-medium">Gói áp dụng:</span>
+                <span class="font-bold text-blue-800">{{ receipt.pricingName }}</span>
+             </div>
+             <div class="flex justify-between text-sm mt-2" *ngIf="receipt.packageName">
+                <span class="text-blue-600 font-medium">Gói đăng ký:</span>
+                <span class="text-blue-800">{{ receipt.packageName }}</span>
+             </div>
+           </div>
+
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Chi tiết thanh toán</h3>
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            
+            <div class="space-y-3 text-sm border-b border-gray-100 pb-4 mb-4">
+              
+              <div class="flex justify-between">
+                <span class="text-gray-600">Đơn giá (Snapshot):</span>
+                <span class="font-medium">{{ receipt.pricePerKwhSnapshot | number }} ₫ / kWh</span>
+              </div>
+              
+              <div class="flex justify-between">
+                <span class="text-gray-600">Tổng điện năng:</span>
+                <span class="font-medium">{{ receipt.energyConsumed | number:'1.0-2' }} kWh</span>
+              </div>
+
+              <div class="flex justify-between text-gray-500 italic">
+                <span>Chi phí điện:</span>
+                <span>{{ receipt.energyCost | number }} ₫</span>
+              </div>
+
+              <div class="flex justify-between text-orange-600" *ngIf="receipt.idleFee > 0">
+                <span>Phí chiếm chỗ (Idle):</span>
+                <span>+ {{ receipt.idleFee | number }} ₫</span>
+              </div>
+              
+              <div class="flex justify-between text-orange-600" *ngIf="receipt.overstayFee > 0">
+                <span>Phí quá giờ (Overstay):</span>
+                <span>+ {{ receipt.overstayFee | number }} ₫</span>
+              </div>
+
+              <div class="flex justify-between text-green-600" *ngIf="receipt.discountAmount > 0">
+                <span>Giảm giá:</span>
+                <span>- {{ receipt.discountAmount | number }} ₫</span>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-gray-800 text-lg">Tổng cộng</span>
+              <span class="font-bold text-green-600 text-2xl">{{ receipt.totalCost | number }} ₫</span>
+            </div>
+
+             <div class="mt-4 pt-4 border-t border-gray-100 text-right text-sm text-gray-500" *ngIf="receipt.paymentMethod">
+              Thanh toán qua: <span class="font-semibold text-gray-700">{{ receipt.paymentMethod }}</span>
+            </div>
+            
+            <div class="mt-1 text-right text-xs text-gray-400" *ngIf="receipt.confirmedByStaffName">
+                Xác nhận bởi: {{ receipt.confirmedByStaffName }} lúc {{ receipt.confirmedAt | date:'dd/MM/yyyy HH:mm' }}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

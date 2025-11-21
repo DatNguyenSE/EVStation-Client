@@ -21,7 +21,4 @@ export class ManagerService {
     `${this.baseUrl}revenue?stationId=${stationId}&startDate=${startDate}&endDate=${endDate}&granularity=${granularity}`);
 
        }
-
-
-  
 }

@@ -144,6 +144,7 @@ export interface WalletTransactionSummaryDto {
  * Tương ứng với C# ReceiptFilterParams
  */
 export interface ReceiptFilterParams {
+  stationId?: number;
   status?: ReceiptStatus;
   startDate?: string; // DateTime? -> string?
   endDate?: string; // DateTime? -> string?

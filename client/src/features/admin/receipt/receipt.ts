@@ -5,6 +5,7 @@ import { ReceiptFilterParams, ReceiptSummaryDto } from '../../../_models/receipt
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { clearHttpCache } from '../../../core/interceptors/loading-interceptor';
 import { FormsModule } from '@angular/forms';
+import { StationService } from '../../../core/service/station-service';
 
 @Component({
   selector: 'app-receipt',
@@ -14,11 +15,14 @@ import { FormsModule } from '@angular/forms';
 })
 export class ReceiptAdmin implements OnInit {
   private receiptService = inject(ReceiptService);
+  private stationService = inject(StationService);
   private cdr = inject(ChangeDetectorRef); 
   private router = inject(Router);
   private route = inject(ActivatedRoute);   
 
   receipts: ReceiptSummaryDto[] = [];
+  stations: any[] = [];
+
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
@@ -26,6 +30,7 @@ export class ReceiptAdmin implements OnInit {
   isLoading = false;
 
   filter: ReceiptFilterParams = {
+    stationId: undefined,
     status: undefined,
     startDate: undefined,
     endDate: undefined,
@@ -33,8 +38,8 @@ export class ReceiptAdmin implements OnInit {
   };
 
   ngOnInit() {
-    // load lần đầu
     this.loadReceipts();
+    this.loadStations();
 
     // reload khi có query param ?refresh=...
     this.route.queryParams.subscribe((params) => {
@@ -43,6 +48,15 @@ export class ReceiptAdmin implements OnInit {
         clearHttpCache(); // xoá cache cũ
         this.loadReceipts(this.currentPage);
       }
+    });
+  }
+
+  loadStations() {
+    this.stationService.getStations().subscribe({
+      next: (res) => {
+         this.stations = res; 
+      },
+      error: (err) => console.error('Lỗi tải trạm:', err)
     });
   }
 
@@ -72,6 +86,7 @@ export class ReceiptAdmin implements OnInit {
 
   resetFilter() {
   this.filter = {
+    stationId: undefined,
     status: undefined,
     startDate: undefined,
     endDate: undefined,

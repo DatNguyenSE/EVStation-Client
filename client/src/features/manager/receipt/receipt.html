@@ -3,27 +3,32 @@
 >
   <div class="w-full max-w-6xl">
     <div class="max-w-7xl mx-auto px-4 py-8">
-      <div [class]="'flex justify-between items-center mb-6'">
-        <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <i class="bi bi-receipt-cutoff text-blue-600"></i>
-          Quản lý biên lai
-        </h2>
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+            <i class="bi bi-receipt-cutoff text-green-600"></i>
+            <!-- Đổi màu xanh lá cho khác Admin -->
+            Quản lý doanh thu
+          </h2>
+          <!-- Hiển thị tên trạm đang quản lý -->
+          <p class="text-gray-500 mt-1 text-sm" *ngIf="assignedStationName">
+            Đang xem dữ liệu tại:
+            <span class="font-bold text-blue-600 uppercase">{{ assignedStationName }}</span>
+          </p>
+        </div>
       </div>
 
+      <!-- Filter Box -->
       <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 mb-6">
+        <!-- Grid chỉ còn 4 cột vì bỏ chọn Station -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Trạm sạc</label>
-            <select [(ngModel)]="filter.stationId" class="select select-bordered w-full">
-              <option [ngValue]="undefined">Tất cả trạm</option>
-              <option *ngFor="let s of stations" [value]="s.id">{{ s.name }}</option>
-            </select>
-          </div>
+          <!-- Không còn dropdown chọn Trạm ở đây -->
 
           <div>
             <label class="block text-sm font-medium text-gray-600 mb-1">Trạng thái</label>
             <select [(ngModel)]="filter.status" class="select select-bordered w-full">
-              <option value="">Tất cả</option>
+              <option [ngValue]="undefined">Tất cả</option>
               <option value="Paid">Đã thanh toán</option>
               <option value="Refunded">Đã hoàn tiền</option>
               <option value="Pending">Đang chờ</option>
@@ -40,40 +45,41 @@
             <input type="date" [(ngModel)]="filter.endDate" class="input input-bordered w-full" />
           </div>
 
-          <!-- <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Tên người dùng</label>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Tên khách hàng</label>
             <input
               type="text"
               [(ngModel)]="filter.appUserName"
-              placeholder="Nhập tên người dùng"
+              placeholder="Nhập tên..."
               class="input input-bordered w-full"
             />
-          </div> -->
+          </div>
         </div>
 
         <div class="flex justify-end gap-3 mt-4">
           <button class="btn btn-ghost btn-sm" (click)="resetFilter()">Đặt lại</button>
           <button class="btn btn-primary btn-sm" (click)="applyFilter()">
-            <i class="bi bi-funnel-fill"></i>
-            Lọc
+            <i class="bi bi-funnel-fill"></i> Lọc
           </button>
         </div>
       </div>
 
+      <!-- Loading -->
       <div *ngIf="isLoading" class="text-center text-gray-500 py-12">
-        <span class="loading loading-spinner loading-lg text-blue-500"></span>
-        <p class="mt-2 text-lg">Đang tải dữ liệu...</p>
+        <span class="loading loading-spinner loading-lg text-green-500"></span>
       </div>
 
+      <!-- Empty State -->
       <div
         *ngIf="!isLoading && receipts.length === 0"
-        class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl"
+        class="text-center py-16 bg-gray-50 rounded-xl"
       >
-        <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-700">Không tìm thấy biên lai</h3>
-        <p class="text-gray-500">Hãy thử thay đổi bộ lọc của bạn.</p>
+        <i class="bi bi-clipboard-x text-5xl text-gray-400 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700">Chưa có dữ liệu</h3>
+        <p class="text-gray-500">Trạm này chưa phát sinh biên lai nào theo bộ lọc.</p>
       </div>
 
+      <!-- Table (Giữ nguyên như Admin) -->
       <div
         *ngIf="!isLoading && receipts.length > 0"
         class="bg-white rounded-xl shadow-sm border border-gray-100"
@@ -82,25 +88,23 @@
           <table class="table w-full">
             <thead>
               <tr class="bg-gray-50">
-                <th class="font-semibold text-gray-700">ID Biên lai</th>
-                <th class="font-semibold text-gray-700">Gói dịch vụ</th>
-                <th class="font-semibold text-gray-700">Ngày tạo</th>
-                <th class="font-semibold text-gray-700">Trạng thái</th>
-                <th class="font-semibold text-gray-700 text-right">Tổng chi phí</th>
-                <th class="font-semibold text-gray-700"></th>
+                <th>ID</th>
+                <th>Khách hàng</th>
+                <th>Gói</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Thành tiền</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let r of receipts" class="hover:bg-gray-50">
-                <td>
-                  <div class="font-semibold text-gray-800">#{{ r.id }}</div>
-                  <div class="text-xs text-gray-500">{{ r.appUserName }}</div>
-                </td>
-                <td class="text-gray-700">{{ r.pricingName }}</td>
-                <td class="text-gray-700">{{ r.createAt | date : 'dd/MM/yyyy' }}</td>
+                <td class="font-bold text-gray-600">#{{ r.id }}</td>
+                <td>{{ r.appUserName }}</td>
+                <td>{{ r.pricingName }}</td>
+                <td>{{ r.createAt | date : 'dd/MM/yyyy HH:mm' }}</td>
                 <td>
                   <span
-                    class="badge badge-sm font-semibold"
+                    class="badge badge-sm"
                     [ngClass]="{
                       'badge-success badge-outline': r.status === 'Paid',
                       'badge-error badge-outline': r.status === 'Refunded',
@@ -110,13 +114,10 @@
                     {{ r.status }}
                   </span>
                 </td>
-                <td class="font-semibold text-blue-700 text-right">{{ r.totalCost | number }} ₫</td>
+                <td class="font-bold text-green-700 text-right">{{ r.totalCost | number }} ₫</td>
                 <td class="text-right">
-                  <button
-                    class="btn btn-ghost btn-sm text-blue-600"
-                    [routerLink]="['/quan-tri-vien/bien-lai', r.id]"
-                  >
-                    Xem
+                  <button class="btn btn-ghost btn-sm text-blue-600" (click)="viewDetail(r.id)">
+                    Xem chi tiết
                   </button>
                 </td>
               </tr>
@@ -125,12 +126,13 @@
         </div>
       </div>
 
-      <div *ngIf="totalPages > 1 && !isLoading" class="flex justify-center items-center mt-8 gap-4">
+      <!-- Pagination (Giữ nguyên) -->
+      <div *ngIf="totalPages > 1 && !isLoading" class="flex justify-center mt-8">
         <div class="join">
           <button class="join-item btn btn-sm" [disabled]="currentPage === 1" (click)="prevPage()">
             «
           </button>
-          <button class="join-item btn btn-sm">Trang {{ currentPage }} / {{ totalPages }}</button>
+          <button class="join-item btn btn-sm">Trang {{ currentPage }}</button>
           <button
             class="join-item btn btn-sm"
             [disabled]="currentPage === totalPages"
