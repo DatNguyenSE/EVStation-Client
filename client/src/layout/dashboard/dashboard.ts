@@ -10,10 +10,10 @@ import { ChargingSessionHistory } from '../../_models/session';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { PaginationMeta } from '../../core/service/transaction-service';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+// import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { AccountService } from '../../core/service/account-service';
-import { ReplaySubject } from 'rxjs';
-import { Activity } from 'botframework-schema';
+// import { ReplaySubject } from 'rxjs';
+// import { Activity } from 'botframework-schema';
 import { environment } from '../../environments/environment.development';
 
 @Component({
@@ -35,6 +35,7 @@ export class Dashboard implements OnInit {
   paginatedHistory: ChargingSessionHistory[] = [];
   isLoadingHistory = true;
 
+  /*
   // Bot-related properties
   hubConnection!: HubConnection;
   directLine: any;
@@ -47,10 +48,11 @@ export class Dashboard implements OnInit {
     id: 'bot-1',
     name: 'EV Charging Bot'
   };
-
+  
   isChatOpen = signal(false);
   isBotLoading = signal(true);
   isBotConnectionError = signal(false);
+  */
 
   get totalPages() { return this.pagination().totalPages; }
   get currentPage() { return this.pagination().currentPage; }
@@ -63,9 +65,10 @@ export class Dashboard implements OnInit {
     this.loadChargeHistory(1);
     
     // Initialize bot connection
-    this.initializeBotConnection();
+    // this.initializeBotConnection();
   }
 
+  /*
   private initializeBotConnection() {
     // console.log(' [Dashboard] initializeBotConnection() called');
     
@@ -96,12 +99,12 @@ export class Dashboard implements OnInit {
 
     // 3. Lắng nghe tin nhắn TỪ Bot
     this.listenForBotMessages();
-
+    
     // 4. Bắt đầu kết nối SignalR (và render UI khi thành công)
     this.startSignalRConnection();
     
   }
-
+  
   private _setupDirectLine() {
     // console.log(' [_setupDirectLine] Setting up custom DirectLine object');
 
@@ -231,7 +234,7 @@ export class Dashboard implements OnInit {
               buttons.forEach((b, i) => {
                 const svg = b.querySelector('svg');
               });              
-
+              
               const sendButton = container.querySelector('.webchat__send-box__button, .webchat-send__button, button.send, button[aria-label*="Gửi"], button[aria-label*="Send"]') as HTMLButtonElement | null;
 
               const clickLogger = (ev: MouseEvent) => {
@@ -250,10 +253,11 @@ export class Dashboard implements OnInit {
         console.error('[tryRender] Caught error:', err);
       }
     };
-
+    
     tryRender();
   }
-
+  
+  */
   loadChargeHistory(page: number) {
     this.isLoadingHistory = true;
     this.chargingService.getHistory(page, this.pagination().pageSize).subscribe({

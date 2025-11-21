@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Payments } from '../../_models/payment';
+import { ManualTopUpDto, Payments } from '../../_models/payment';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,14 +10,18 @@ export class PaymentService {
   private http = inject(HttpClient);
   private baseUrl = `https://localhost:5001/api`;
   
- topUp(payment: Payments) {
+  topUp(payment: Payments) {
     return this.http.post<{ paymentUrl: string }>(`${this.baseUrl}/wallet/top-up`, payment);
   }
-   vnpayreturn(params: any) {
-  const queryString = new URLSearchParams(params).toString();
-  return this.http.get<{ message: string; data?: any }>(
-    `${this.baseUrl}/wallet/vnpay-return?${queryString}`
-  );
-}
 
+  vnpayreturn(params: any) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.http.get<{ message: string; data?: any }>(
+      `${this.baseUrl}/wallet/vnpay-return?${queryString}`
+    );
+  }
+
+  manualTopUp(model: ManualTopUpDto) {
+    return this.http.post(this.baseUrl + '/wallet/manual-topup', model);
+  }
 }

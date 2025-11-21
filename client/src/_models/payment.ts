@@ -15,3 +15,8 @@ export interface TransactionDto {
   createdAt: Date;
   status: string;
 }
+
+export interface ManualTopUpDto {
+  driverUserName: string;
+  amount: number;
+}

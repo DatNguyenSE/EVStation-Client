@@ -1,0 +1,97 @@
+<div class="min-h-screen w-full flex items-center justify-center bg-slate-50 p-4 font-sans mt-5">
+  
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl shadow-blue-100 overflow-hidden border border-slate-100 transition-all transform hover:scale-[1.01] duration-300">
+    
+    <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-8 py-8 text-center relative overflow-hidden">
+      <div class="absolute top-[-50%] left-[-20%] w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-[-20%] right-[-10%] w-40 h-40 bg-blue-400 opacity-20 rounded-full blur-2xl"></div>
+
+      <div class="relative z-10 flex flex-col items-center">
+        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20 mb-4 shadow-lg">
+           <i class="bi bi-wallet2 text-3xl text-white drop-shadow-md"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-white tracking-tight">Nạp Tiền Tại Quầy</h3>
+        <p class="text-blue-100 text-sm font-medium mt-1 opacity-90">Manager Top-up System</p>
+      </div>
+    </div>
+  
+    <div class="p-8 space-y-8">
+      
+      <div class="form-control w-full group">
+        <label class="label px-1">
+          <span class="label-text font-bold text-slate-600 uppercase text-xs tracking-wider">Tài khoản khách hàng</span>
+        </label>
+        <div class="relative transition-all duration-300 focus-within:transform focus-within:-translate-y-1">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="bi bi-person-vcard text-xl text-slate-400 group-focus-within:text-blue-600 transition-colors"></i>
+          </div>
+          <input 
+            type="text" 
+            [(ngModel)]="topUpModel.driverUserName"
+            placeholder="Nhập Username..."
+            class="input w-full pl-12 h-14 text-lg font-medium bg-slate-50 border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all"
+            [disabled]="isLoading"
+          >
+          <div *ngIf="topUpModel.driverUserName.length > 3" class="absolute inset-y-0 right-0 pr-4 flex items-center animate-pulse">
+            <i class="bi bi-check-circle-fill text-green-500 text-xl"></i>
+          </div>
+        </div>
+      </div>
+  
+      <div class="bg-blue-50/60 p-6 rounded-2xl border border-blue-100/50">
+        <label class="block text-center text-xs font-bold text-blue-600 uppercase tracking-wider mb-4">Số tiền cần nạp</label>
+        
+        <div class="relative flex items-center justify-center mb-6">
+          <input 
+            type="number" 
+            [(ngModel)]="topUpModel.amount"
+            placeholder="0"
+            class="w-full bg-transparent text-center text-5xl font-extrabold text-blue-700 focus:outline-none placeholder-blue-200/70 tracking-tight no-spinner"
+            [disabled]="isLoading"
+          >
+          <span class="absolute right-0 top-1/2 -translate-y-1/2 text-sm font-bold text-blue-400 bg-white px-2 py-1 rounded-md shadow-sm">VNĐ</span>
+        </div>
+        
+        <div class="flex items-center gap-4 mb-4">
+            <div class="h-px bg-blue-200 flex-1"></div>
+            <span class="text-xs text-blue-400 font-medium">Chọn nhanh</span>
+            <div class="h-px bg-blue-200 flex-1"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button 
+            *ngFor="let m of quickAmounts" 
+            (click)="selectAmount(m)"
+            type="button"
+            class="btn border-0 h-12 rounded-xl font-bold text-base transition-all duration-200 relative overflow-hidden"
+            [ngClass]="{
+                'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-[1.02]': topUpModel.amount === m,
+                'bg-white text-slate-600 hover:bg-blue-100 hover:text-blue-700': topUpModel.amount !== m
+            }"
+          >
+            <span class="relative z-10">+ {{ m | number }}</span>
+          </button>
+        </div>
+      </div>
+  
+      <button 
+        (click)="onSubmit()"
+        [disabled]="isLoading || !topUpModel.driverUserName || topUpModel.amount <= 0"
+        class="btn btn-primary w-full h-14 text-lg font-bold rounded-xl shadow-xl shadow-blue-600/20 border-0 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all transform active:scale-95 disabled:opacity-70 disabled:scale-100"
+      >
+        <ng-container *ngIf="!isLoading">
+            Xác nhận giao dịch <i class="bi bi-arrow-right-circle-fill ml-2"></i>
+        </ng-container>
+        <span *ngIf="isLoading" class="loading loading-dots loading-md"></span>
+      </button>
+
+    </div>
+  </div>
+  
+  <div class="fixed bottom-6 text-center w-full pointer-events-none opacity-60">
+    <p class="text-xs text-slate-400 font-medium flex items-center justify-center gap-1">
+        <i class="bi bi-shield-lock-fill"></i> EVoltStation Secure Payment
+    </p>
+  </div>
+
+</div>

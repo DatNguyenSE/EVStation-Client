@@ -44,6 +44,7 @@ import { GuestRegisterComponent } from '../features/guest-register/guest-registe
 import { adminGuard } from '../core/_guards/admin-guard';
 import { ReceiptManager } from '../features/manager/receipt/receipt';
 import { ReceipDetailManager } from '../features/manager/receip-detail-manager/receip-detail-manager';
+import { ManagerTopup } from '../features/manager/manager-topup/manager-topup';
 
 
 export const routes: Routes = [
@@ -130,8 +131,9 @@ export const routes: Routes = [
             //  {path:'quan-ly-nhan-vien',component:OpReport},
             { path:'bien-lai', component: ReceiptManager },
             { path: 'thong-bao', component: Notification },
-            {path:'bao-cao',component:OpReport},
-            {path:'bien-lai/:id',component:ReceipDetailManager},
+            {path:'bao-cao', component: OpReport},
+            {path:'bien-lai/:id', component: ReceipDetailManager},
+            {path:'nap-tien', component: ManagerTopup},
         ]
     },
 

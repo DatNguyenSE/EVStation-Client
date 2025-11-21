@@ -1,6 +1,9 @@
 <div class="min-h-screen bg-gray-50 font-sans flex flex-col">
-  <div class="w-full max-w-6xl mx-auto px-4 py-10">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Lịch sử Giao dịch</h2>
+  <div class="w-full max-w-7xl mx-auto px-4 py-10">
+    
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Lịch sử Giao dịch</h2>
+        </div>
 
     <div *ngIf="isLoading" class="text-center py-16 text-gray-500">
       <span class="loading loading-spinner loading-lg text-blue-500"></span>
@@ -11,74 +14,89 @@
       {{ errorMessage }}
     </div>
 
-    <div *ngIf="!isLoading && transactions.length === 0" class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl">
+    <div *ngIf="!isLoading && transactions.length === 0" class="text-center text-gray-500 py-16 bg-gray-50 rounded-xl border border-dashed border-gray-300">
       <i class="bi bi-inbox text-5xl text-gray-400 mb-4"></i>
       <h3 class="text-xl font-semibold text-gray-700">Không có giao dịch</h3>
       <p class="text-gray-500">Tất cả giao dịch của bạn sẽ xuất hiện ở đây.</p>
     </div>
 
-    <div *ngIf="!isLoading && transactions.length > 0" class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <div *ngIf="!isLoading && transactions.length > 0" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="table w-full">
-          <thead>
-            <tr class="bg-gray-50">
-              <th class="font-semibold text-gray-700">Loại</th>
-              <th class="font-semibold text-gray-700 text-right">Số dư trước</th>
-              <th class="font-semibold text-gray-700 text-right">Số tiền</th>
-              <th class="font-semibold text-gray-700 text-right">Số dư sau</th>
-              <th class="font-semibold text-gray-700">Mô tả</th>
-              <th class="font-semibold text-gray-700">Ngày</th>
-              <th class="font-semibold text-gray-700">Trạng thái</th>
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="font-bold text-gray-700 py-4 px-4 text-sm uppercase tracking-wider">Loại</th>
+              <th class="font-bold text-gray-700 py-4 px-4 text-right text-sm uppercase tracking-wider whitespace-nowrap">Số dư trước</th>
+              <th class="font-bold text-gray-700 py-4 px-4 text-right text-sm uppercase tracking-wider whitespace-nowrap">Số tiền</th>
+              <th class="font-bold text-gray-700 py-4 px-4 text-right text-sm uppercase tracking-wider whitespace-nowrap">Số dư sau</th>
+              <th class="font-bold text-gray-700 py-4 px-4 text-sm uppercase tracking-wider min-w-[300px]">Mô tả</th>
+              <th class="font-bold text-gray-700 py-4 px-4 text-sm uppercase tracking-wider whitespace-nowrap">Ngày</th>
+              <th class="font-bold text-gray-700 py-4 px-4 text-sm uppercase tracking-wider text-center">Trạng thái</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let t of transactions" class="hover:bg-gray-50">
-              <td>
-                <span class="badge badge-sm font-semibold" [ngClass]="{
-                    'bg-green-200 text-green-800':
-                      t.transactionType === 'Topup' || t.transactionType === 'Refund',
-                    'bg-red-200 text-red-800':
-                      t.transactionType !== 'Topup' && t.transactionType !== 'Refund'
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let t of transactions" class="hover:bg-blue-50 transition-colors duration-200">
+              
+              <td class="py-4 px-4">
+                <span class="badge badge-sm font-semibold border-0 px-3 py-2 h-auto" [ngClass]="{
+                    'bg-green-100 text-green-700': t.transactionType === 'Topup' || t.transactionType === 'Refund',
+                    'bg-red-100 text-red-700': t.transactionType !== 'Topup' && t.transactionType !== 'Refund'
                   }">
                   {{ t.transactionType }}
                 </span>
               </td>
-              <td class="text-right text-gray-600">{{ t.balanceBefore | number }} ₫</td>
-              <td class="text-right font-semibold" [ngClass]="
+
+              <td class="text-right text-gray-500 font-medium py-4 px-4 whitespace-nowrap">
+                {{ t.balanceBefore | number }} ₫
+              </td>
+
+              <td class="text-right font-bold text-base py-4 px-4 whitespace-nowrap" [ngClass]="
                   t.transactionType === 'Topup' || t.transactionType === 'Refund'
                     ? 'text-green-600'
-                    : 'text-red-600'
+                    : 'text-red-500'
                 ">
                 {{ t.transactionType === 'Topup' || t.transactionType === 'Refund' ? '+' : '-' }}
                 {{ t.amount | number }} ₫
               </td>
-              <td class="text-right font-bold text-gray-800">{{ t.balanceAfter | number }} ₫</td>
-              <td class="text-gray-600">{{ t.description || '---' }}</td>
-              <td class="text-gray-600">{{ t.createdAt | date : 'short' }}</td>
-              <td>
-                <span class="badge badge-sm font-semibold border" [ngClass]="{
-    'bg-green-50 text-green-700 border-green-400': t.status === 'Completed',
-    'bg-yellow-50 text-yellow-700 border-yellow-400': t.status === 'Pending',
-    'bg-red-50 text-red-700 border-red-400': t.status === 'Failed'
-  }">
+
+              <td class="text-right font-bold text-gray-800 py-4 px-4 whitespace-nowrap">
+                {{ t.balanceAfter | number }} ₫
+              </td>
+
+              <td class="text-gray-600 py-4 px-4 leading-relaxed text-sm">
+                {{ t.description || '---' }}
+              </td>
+
+              <td class="text-gray-500 py-4 px-4 whitespace-nowrap text-sm">
+                {{ t.createdAt | date : 'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td class="py-4 px-4 text-center">
+                <span class="badge badge-md font-medium border" [ngClass]="{
+                    'bg-green-50 text-green-600 border-green-200': t.status === 'Success',
+                    'bg-yellow-50 text-yellow-600 border-yellow-200': t.status === 'Pending',
+                    'bg-red-50 text-red-600 border-red-200': t.status === 'Failed'
+                  }">
                   {{ t.status }}
                 </span>
               </td>
+
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
-  <div *ngIf="hasMultiplePages" class="w-full mt-auto">
-    <div class="max-w-6xl mx-auto flex justify-center items-center py-6 px-4">
-      <div class="join">
-        <button class="join-item btn btn-sm" [disabled]="pageNumber === 1" (click)="prevPage()">
-          «
+
+  <div *ngIf="hasMultiplePages" class="w-full mt-auto bg-white border-t border-gray-200">
+    <div class="max-w-7xl mx-auto flex justify-center items-center py-4 px-4">
+      <div class="join grid grid-cols-3 gap-2">
+        <button class="join-item btn btn-outline btn-sm" [disabled]="pageNumber === 1" (click)="prevPage()">
+          <i class="bi bi-chevron-left"></i> Trước
         </button>
-        <button class="join-item btn btn-sm">Trang {{ pageNumber }} / {{ meta.totalPages }}</button>
-        <button class="join-item btn btn-sm" [disabled]="pageNumber === meta.totalPages" (click)="nextPage()">
-          »
+        <button class="join-item btn btn-sm btn-ghost pointer-events-none">Trang {{ pageNumber }} / {{ meta.totalPages }}</button>
+        <button class="join-item btn btn-outline btn-sm" [disabled]="pageNumber === meta.totalPages" (click)="nextPage()">
+          Sau <i class="bi bi-chevron-right"></i>
         </button>
       </div>
     </div>
