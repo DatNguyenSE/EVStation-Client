@@ -44,7 +44,7 @@ export class Nav implements OnInit {
         { label: 'Biên lai', link: '/bien-lai' }
       ],
       Admin: [
-        { label: 'Quản lý tài xế', link: '/quan-tri-vien/quan-ly-tai-xe' },
+        { label: 'Quản lý người dùng', link: '/quan-tri-vien/quan-ly-tai-xe' },
         { label: 'Quản lý trạm sạc', link: '/quan-tri-vien/quan-ly-tram' },
         {label:  'Quản Lí Giá Tiền và Gói' , link:'/quan-tri-vien/quan-ly-gia-tien-va-goi'},
          {label:  'Phân Trạm' , link:'/quan-tri-vien/phan-tram'},
