@@ -1,23 +1,113 @@
 <div class="p-6 bg-gray-50 min-h-screen space-y-8 mt-15">
-
-  <!-- 🧾 DANH SÁCH BÁO CÁO -->
   <div class="bg-white shadow rounded-lg p-6">
-    <!-- Header + nút reload -->
-   <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
       <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-5 border-b border-gray-200">
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
           <div class="bg-emerald-500 p-2 rounded-lg">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
             </svg>
           </div>
           Danh sách báo cáo trạm sạc
         </h2>
       </div>
 
+      <div class="p-4 bg-white border-b border-gray-100">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Mã trụ</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg
+                  class="h-4 w-4 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                [(ngModel)]="filterParams.postCode"
+                (keyup.enter)="onSearch()"
+                placeholder="Nhập mã trụ..."
+                class="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Trạng thái</label>
+            <select
+              [(ngModel)]="filterParams.status"
+              (change)="onSearch()"
+              class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+            >
+              <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Mức độ</label>
+            <select
+              [(ngModel)]="filterParams.severity"
+              (change)="onSearch()"
+              class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+            >
+              <option *ngFor="let opt of severityOptions" [value]="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="flex items-end gap-2">
+            <button
+              (click)="onSearch()"
+              class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              Tìm kiếm
+            </button>
+            <button
+              (click)="onReset()"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div *ngIf="reports.length === 0" class="text-center py-16">
-        <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        <svg
+          class="w-20 h-20 text-gray-300 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
         <p class="text-gray-400 text-lg">Chưa có báo cáo nào</p>
       </div>
@@ -26,58 +116,114 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gradient-to-r from-emerald-50 to-blue-50">
             <tr>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">ID</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Trạm sạc</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Mô tả</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Trạng thái</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Mức độ</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Kỹ thuật viên</th>
-              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Thao tác</th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                ID
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Mã trụ
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Mô tả
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Trạng thái
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Mức độ
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Kỹ thuật viên
+              </th>
+              <th
+                class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+              >
+                Thao tác
+              </th>
             </tr>
           </thead>
 
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let r of reports" class="hover:bg-blue-50/50 transition-colors duration-150">
+            <tr
+              *ngFor="let r of reports"
+              class="hover:bg-blue-50/50 transition-colors duration-150"
+            >
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="text-sm font-bold text-emerald-600">#{{ r.id }}</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  <svg
+                    class="w-4 h-4 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
-                  <span class="text-sm font-medium text-gray-700">{{ r.postId }}</span>
+                  <span class="text-sm font-medium text-gray-700">{{ r.postCode }}</span>
                 </div>
               </td>
               <td class="px-6 py-4">
                 <p class="text-sm text-gray-700 max-w-xs truncate">{{ r.description }}</p>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-                      [ngClass]="{
-                        'bg-gray-100 text-gray-700': r.status === 'New',
-                        'bg-blue-100 text-blue-700': r.status === 'Pending',
-                        'bg-yellow-100 text-yellow-700': r.status === 'InProgress',
-                        'bg-green-100 text-green-700': r.status === 'Closed'
-                      }">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-gray-100 text-gray-700': r.status === 'New',
+                    'bg-blue-100 text-blue-700': r.status === 'Pending',
+                    'bg-yellow-100 text-yellow-700': r.status === 'InProgress',
+                    'bg-green-100 text-green-700': r.status === 'Closed'
+                  }"
+                >
                   {{ r.status }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold"
-                      [ngClass]="{
-                        'bg-red-100 text-red-700': r.severity === 'Critical',
-                        'bg-orange-100 text-orange-700': r.severity === 'Normal'
-                      }">
-                  <svg *ngIf="r.severity === 'Critical'" class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold"
+                  [ngClass]="{
+                    'bg-red-100 text-red-700': r.severity === 'Critical',
+                    'bg-orange-100 text-orange-700': r.severity === 'Normal'
+                  }"
+                >
+                  <svg
+                    *ngIf="r.severity === 'Critical'"
+                    class="w-3 h-3 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                   {{ r.severity }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  <div
+                    class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  >
                     {{ r.technicianName ? r.technicianName.charAt(0).toUpperCase() : '?' }}
                   </div>
                   <span class="text-sm text-gray-700">{{ r.technicianName || 'Chưa giao' }}</span>
@@ -85,33 +231,66 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-center">
                 <div class="flex justify-center gap-2 flex-wrap">
-                  <button class="inline-flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                          (click)="openDetail(r.id)">
+                  <button
+                    class="inline-flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                    (click)="openDetail(r.id)"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
                     </svg>
                     Chi tiết
                   </button>
-                  <button class="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                          (click)="openEvaluateModal(r)">
+                  <button
+                    class="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                    (click)="openEvaluateModal(r)"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                      />
                     </svg>
                     Đánh giá
                   </button>
-                  <button class="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                          (click)="openAssignModal(r)">
+                  <button
+                    class="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                    (click)="openAssignModal(r)"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                      />
                     </svg>
                     Giao việc
                   </button>
-                  
-                  <button class="inline-flex items-center gap-1 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
-                          (click)="closeReport(r.id)">
+
+                  <button
+                    class="inline-flex items-center gap-1 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-3 py-2 rounded-lg text-xs font-medium hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
+                    (click)="closeReport(r.id)"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     Đóng
                   </button>
@@ -121,154 +300,268 @@
           </tbody>
         </table>
       </div>
+
+      <div
+        *ngIf="paginationConfig && reports.length > 0"
+        class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4"
+      >
+        <span class="text-sm text-gray-700">
+          Hiển thị
+          <span class="font-semibold text-gray-900">
+            {{ (paginationConfig.pageNumber - 1) * paginationConfig.pageSize + 1 }}
+          </span>
+          đến
+          <span class="font-semibold text-gray-900">
+            {{
+              paginationConfig.pageNumber * paginationConfig.pageSize >
+              paginationConfig.totalItemCount
+                ? paginationConfig.totalItemCount
+                : paginationConfig.pageNumber * paginationConfig.pageSize
+            }}
+          </span>
+          của
+          <span class="font-semibold text-gray-900">{{ paginationConfig.totalItemCount }}</span>
+          báo cáo
+        </span>
+
+        <div class="inline-flex shadow-sm rounded-md isolate">
+          <button
+            (click)="changePage(paginationConfig.pageNumber - 1)"
+            [disabled]="paginationConfig.pageNumber === 1"
+            class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Trước
+          </button>
+
+          <span
+            class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 border-t border-b border-gray-300 focus:z-10"
+          >
+            Trang {{ paginationConfig.pageNumber }} / {{ paginationConfig.pageCount }}
+          </span>
+
+          <button
+            (click)="changePage(paginationConfig.pageNumber + 1)"
+            [disabled]="paginationConfig.pageNumber === paginationConfig.pageCount"
+            class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            Sau
+            <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<div
+  *ngIf="showAssignModal"
+  class="fixed inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative animate-fadeIn">
+    <button
+      (click)="closeAssignModal()"
+      class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg"
+    >
+      ✕
+    </button>
 
+    <h3 class="text-xl font-semibold mb-4 text-gray-800">Giao việc cho kỹ thuật viên</h3>
+    <p class="text-gray-600 mb-3">
+      Báo cáo:
+      <strong
+        >#{{ selectedReportForAssign?.id }} - {{ selectedReportForAssign?.description }}</strong
+      >
+    </p>
 
-  <!-- 🧑‍🔧 POPUP GIAO VIỆC -->
-  <div *ngIf="showAssignModal"
-       class="fixed inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative animate-fadeIn">
-      <button (click)="closeAssignModal()"
-              class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg">✕</button>
+    <label class="block mb-3">
+      <span class="text-gray-700 text-sm">Chọn ID kỹ thuật viên:</span>
+      <input
+        type="text"
+        [(ngModel)]="technicianId"
+        placeholder="Nhập ID kỹ thuật viên"
+        class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200"
+      />
+    </label>
 
-      <h3 class="text-xl font-semibold mb-4 text-gray-800">Giao việc cho kỹ thuật viên</h3>
-      <p class="text-gray-600 mb-3">
-        Báo cáo: <strong>#{{ selectedReportForAssign?.id }} - {{ selectedReportForAssign?.description }}</strong>
-      </p>
+    <div class="flex justify-end gap-3 mt-4">
+      <button
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        (click)="assignTechnician(selectedReportForAssign!.id)"
+      >
+        Giao việc
+      </button>
+      <button
+        class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+        (click)="closeAssignModal()"
+      >
+        Hủy
+      </button>
+    </div>
+  </div>
+</div>
 
-      <label class="block mb-3">
-        <span class="text-gray-700 text-sm">Chọn ID kỹ thuật viên:</span>
-        <input type="text"
-               [(ngModel)]="technicianId"
-               placeholder="Nhập ID kỹ thuật viên"
-               class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200">
+<div
+  *ngIf="showDetailModal"
+  class="fixed inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 relative animate-fadeIn">
+    <button
+      (click)="closeModal()"
+      class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg"
+    >
+      ✕
+    </button>
+
+    <h3 class="text-xl font-semibold mb-3 text-gray-800">
+      Chi tiết báo cáo #{{ selectedReport?.id }}
+    </h3>
+
+    <p><strong>Mô tả:</strong> {{ selectedReport?.description }}</p>
+    <p><strong>Trạng thái:</strong> {{ selectedReport?.status }}</p>
+    <p><strong>Độ nghiêm trọng:</strong> {{ selectedReport?.severity }}</p>
+    <p><strong>Nhân viên:</strong> {{ selectedReport?.staff?.fullName || '-' }}</p>
+    <p><strong>Kỹ thuật viên:</strong> {{ selectedReport?.technician?.fullName || '-' }}</p>
+
+    <hr class="my-4" />
+
+    <h4 class="font-medium text-gray-700 mb-2">Hình ảnh báo cáo</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div
+        *ngIf="selectedReport?.createImageUrl; else noBefore"
+        class="border rounded-lg overflow-hidden shadow-sm group relative"
+      >
+        <img
+          [src]="selectedReport!.createImageUrl"
+          alt="Ảnh khi tạo báo cáo"
+          class="w-full h-56 object-cover cursor-pointer transition-transform group-hover:scale-105"
+          (click)="openImagePreview(selectedReport!.createImageUrl)"
+        />
+        <div class="p-2 text-sm text-gray-600 text-center bg-gray-50">Trước khi sửa</div>
+      </div>
+      <ng-template #noBefore>
+        <div class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-400">
+          Chưa có ảnh trước khi sửa
+        </div>
+      </ng-template>
+
+      <div
+        *ngIf="selectedReport?.completedImageUrl; else noAfter"
+        class="border rounded-lg overflow-hidden shadow-sm group relative"
+      >
+        <img
+          [src]="selectedReport!.completedImageUrl"
+          alt="Ảnh sau khi hoàn thành"
+          class="w-full h-56 object-cover cursor-pointer transition-transform group-hover:scale-105"
+          (click)="openImagePreview(selectedReport!.completedImageUrl)"
+        />
+        <div class="p-2 text-sm text-gray-600 text-center bg-gray-50">Sau khi sửa</div>
+      </div>
+      <ng-template #noAfter>
+        <div class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-400">
+          Chưa có ảnh hoàn thành
+        </div>
+      </ng-template>
+    </div>
+
+    <hr class="my-4" />
+
+    <p class="text-sm text-gray-500">Tạo lúc: {{ selectedReport?.createAt | date : 'short' }}</p>
+    <p *ngIf="selectedReport?.fixedAt" class="text-sm text-gray-500">
+      Hoàn thành: {{ selectedReport?.fixedAt | date : 'short' }}
+    </p>
+  </div>
+
+  <div
+    *ngIf="previewImageUrl"
+    class="fixed inset-0 bg-black/80 flex justify-center items-center z-[60] animate-fadeIn"
+  >
+    <img
+      [src]="previewImageUrl"
+      alt="Preview"
+      class="max-h-[90vh] max-w-[90vw] rounded shadow-lg"
+    />
+    <button
+      (click)="closeImagePreview()"
+      class="absolute top-4 right-6 text-white text-3xl hover:text-gray-300"
+    >
+      ✕
+    </button>
+  </div>
+</div>
+
+<div
+  *ngIf="showEvaluateModal"
+  class="fixed inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative animate-fadeIn">
+    <button
+      (click)="closeEvaluateModal()"
+      class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg"
+    >
+      ✕
+    </button>
+
+    <h3 class="text-xl font-semibold mb-4 text-gray-800">
+      Đánh giá tình trạng trụ (#{{ selectedReportForEvaluate?.id }})
+    </h3>
+
+    <hr class="my-4" />
+
+    <div class="space-y-3">
+      <label class="inline-flex items-center">
+        <input type="checkbox" [(ngModel)]="evaluation.isCritical" class="mr-2" />
+        <span class="font-medium text-gray-700">Nghiêm trọng</span>
       </label>
 
-      <div class="flex justify-end gap-3 mt-4">
-        <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                (click)="assignTechnician(selectedReportForAssign!.id)">
-          Giao việc
-        </button>
-        <button class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-                (click)="closeAssignModal()">Hủy</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 🔍 POPUP CHI TIẾT -->
-  <div *ngIf="showDetailModal"
-       class="fixed inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 relative animate-fadeIn">
-      <button (click)="closeModal()"
-              class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg">✕</button>
-
-      <h3 class="text-xl font-semibold mb-3 text-gray-800">
-        Chi tiết báo cáo #{{ selectedReport?.id }}
-      </h3>
-
-      <p><strong>Mô tả:</strong> {{ selectedReport?.description }}</p>
-      <p><strong>Trạng thái:</strong> {{ selectedReport?.status }}</p>
-      <p><strong>Độ nghiêm trọng:</strong> {{ selectedReport?.severity }}</p>
-      <p><strong>Nhân viên:</strong> {{ selectedReport?.staff?.fullName || '-' }}</p>
-      <p><strong>Kỹ thuật viên:</strong> {{ selectedReport?.technician?.fullName || '-' }}</p>
-
-      <hr class="my-4">
-
-      <!-- 🖼️ Hình ảnh trước và sau -->
-      <h4 class="font-medium text-gray-700 mb-2">Hình ảnh báo cáo</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div *ngIf="selectedReport?.createImageUrl; else noBefore"
-             class="border rounded-lg overflow-hidden shadow-sm group relative">
-          <img [src]="selectedReport!.createImageUrl"
-               alt="Ảnh khi tạo báo cáo"
-               class="w-full h-56 object-cover cursor-pointer transition-transform group-hover:scale-105"
-               (click)="openImagePreview(selectedReport!.createImageUrl)">
-          <div class="p-2 text-sm text-gray-600 text-center bg-gray-50">Trước khi sửa</div>
-        </div>
-        <ng-template #noBefore>
-          <div class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-400">
-            Chưa có ảnh trước khi sửa
-          </div>
-        </ng-template>
-
-        <div *ngIf="selectedReport?.completedImageUrl; else noAfter"
-             class="border rounded-lg overflow-hidden shadow-sm group relative">
-          <img [src]="selectedReport!.completedImageUrl"
-               alt="Ảnh sau khi hoàn thành"
-               class="w-full h-56 object-cover cursor-pointer transition-transform group-hover:scale-105"
-               (click)="openImagePreview(selectedReport!.completedImageUrl)">
-          <div class="p-2 text-sm text-gray-600 text-center bg-gray-50">Sau khi sửa</div>
-        </div>
-        <ng-template #noAfter>
-          <div class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-400">
-            Chưa có ảnh hoàn thành
-          </div>
-        </ng-template>
-      </div>
-
-      <hr class="my-4">
-
-      <p class="text-sm text-gray-500">Tạo lúc: {{ selectedReport?.createAt | date:'short' }}</p>
-      <p *ngIf="selectedReport?.fixedAt" class="text-sm text-gray-500">
-        Hoàn thành: {{ selectedReport?.fixedAt | date:'short' }}
-      </p>
-    </div>
-
-    <!-- 🖼️ Popup xem ảnh full -->
-    <div *ngIf="previewImageUrl"
-         class="fixed inset-0 bg-black/80 flex justify-center items-center z-[60] animate-fadeIn">
-      <img [src]="previewImageUrl" alt="Preview" class="max-h-[90vh] max-w-[90vw] rounded shadow-lg">
-      <button (click)="closeImagePreview()"
-              class="absolute top-4 right-6 text-white text-3xl hover:text-gray-300">✕</button>
-    </div>
-  </div>
-
-
-  <!-- 🧩 POPUP ĐÁNH GIÁ TÌNH TRẠNG TRỤ -->
-  <div *ngIf="showEvaluateModal"
-       class="fixed inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative animate-fadeIn">
-      <button (click)="closeEvaluateModal()"
-              class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-lg">✕</button>
-
-      <h3 class="text-xl font-semibold mb-4 text-gray-800">
-        Đánh giá tình trạng trụ (#{{ selectedReportForEvaluate?.id }})
-      </h3>
-
-      <hr class="my-4">
-
-      <!-- 🧩 Form đánh giá -->
-      <div class="space-y-3">
-        <label class="inline-flex items-center">
-          <input type="checkbox" [(ngModel)]="evaluation.isCritical" class="mr-2">
-          <span class="font-medium text-gray-700">Nghiêm trọng</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="text-gray-700 text-sm">Bắt đầu bảo trì:</span>
+          <input
+            type="datetime-local"
+            [(ngModel)]="evaluation.maintenanceStartTime"
+            class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200"
+          />
         </label>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label class="block">
-            <span class="text-gray-700 text-sm">Bắt đầu bảo trì:</span>
-            <input type="datetime-local"
-                   [(ngModel)]="evaluation.maintenanceStartTime"
-                   class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200">
-          </label>
-
-          <label class="block">
-            <span class="text-gray-700 text-sm">Kết thúc bảo trì:</span>
-            <input type="datetime-local"
-                   [(ngModel)]="evaluation.maintenanceEndTime"
-                   class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200">
-          </label>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-3 mt-6">
-        <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                (click)="evaluateReport(selectedReportForEvaluate!.id)">Lưu</button>
-        <button class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-                (click)="closeEvaluateModal()">Hủy</button>
+        <label class="block">
+          <span class="text-gray-700 text-sm">Kết thúc bảo trì:</span>
+          <input
+            type="datetime-local"
+            [(ngModel)]="evaluation.maintenanceEndTime"
+            class="border rounded w-full p-2 mt-1 focus:ring focus:ring-blue-200"
+          />
+        </label>
       </div>
     </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        (click)="evaluateReport(selectedReportForEvaluate!.id)"
+      >
+        Lưu
+      </button>
+      <button
+        class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+        (click)="closeEvaluateModal()"
+      >
+        Hủy
+      </button>
+    </div>
   </div>
+</div>

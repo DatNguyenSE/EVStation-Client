@@ -2,10 +2,11 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { AssignResponse, EvaluateReportRequest, EvaluateResponse, Reports, Task } from '../../_models/report';
+import { AssignResponse, EvaluateReportRequest, EvaluateResponse, ReportFilterParams, Reports, Task } from '../../_models/report';
 import { Account } from '../../_models/user';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ToastService } from './toast-service';
+import { PaginatedResult } from '../../_models/receipt';
 
 @Injectable({
   providedIn: 'root'
@@ -23,17 +24,22 @@ export class ReportService {
   taskCompleted$ = this.taskCompletedSource.asObservable();
   toast = inject(ToastService);
 
-  getReports() {
-    const noCache = Date.now()
-    return this.http.get<Reports[]>(`${this.baseUrl}reports?noCache=${noCache}`, {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
+  getReports(filter: ReportFilterParams): Observable<PaginatedResult<Reports>> {
+    const page = (filter.pageNumber && !isNaN(filter.pageNumber)) ? filter.pageNumber : 1;
+    const size = (filter.pageSize && !isNaN(filter.pageSize)) ? filter.pageSize : 10;
+    let params = new HttpParams()
+      .set('pageNumber', filter.pageNumber.toString())
+      .set('pageSize', filter.pageSize.toString());
 
-  }
+    if (filter.postCode) params = params.set('postCode', filter.postCode);
+    if (filter.technicianId) params = params.set('technicianId', filter.technicianId);
+    if (filter.status) params = params.set('status', filter.status);
+    if (filter.severity) params = params.set('severity', filter.severity);
+    // ... set thêm các filter khác nếu cần
+
+  return this.http.get<PaginatedResult<Reports>>(`${this.baseUrl}reports`, { params });
+}
+
   getReportsById(id: number) {
     return this.http.get<Reports>(`${this.baseUrl}reports/${id}`);
   }

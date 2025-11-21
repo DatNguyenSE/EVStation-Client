@@ -62,3 +62,14 @@ export interface Task {
 export interface Repair{
   message : string;
 }
+
+export interface ReportFilterParams {
+  pageNumber: number;
+  pageSize: number;
+  postCode?: string;
+  technicianId?: string;
+  status?: string; // Hoặc Enum nếu bạn đã định nghĩa
+  severity?: string;
+  fromDate?: string; // Hoặc Date
+  toDate?: string;
+}
