@@ -34,7 +34,11 @@ export class InitService {
         this.router.navigate(['/']);
         this.reservationService.createHubConnection(account);
       }
-    //signalR 
+      if (this.accountService.currentAccount()?.roles.includes('Technician')  && !currentUrl.startsWith('/nhan-vien-ky-thuat')) {
+        this.router.navigate(['/nhan-vien-ky-thuat/cong-viec']);
+        this.reportService.createHubConnection(account);
+      }
+      //signalR 
         
 
     return of(null)

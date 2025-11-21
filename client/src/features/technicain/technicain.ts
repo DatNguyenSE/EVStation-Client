@@ -20,8 +20,10 @@ export class Technicain implements OnInit, OnDestroy{
   private reportService = inject(ReportService);
   protected stationService = inject(StationService);
   private technicainService = inject(TechnicainService);
+  private accountService = inject(AccountService);
   private toast = inject(ToastService);
   private cdf = inject(ChangeDetectorRef);
+
   isStarting = false;
   task : Task[] = [];
   startedTasks = new Set<number>();
@@ -30,16 +32,23 @@ export class Technicain implements OnInit, OnDestroy{
 
   ngOnInit(){
     this.getTask();
-    // (5) LẮNG NGHE SỰ KIỆN "TaskCompleted" TỪ SERVICE
+
+    // (1) LẮNG NGHE SỰ KIỆN: ADMIN GIAO VIỆC MỚI 
+    const newTaskSub = this.reportService.newTaskAssigned$.subscribe((message: string) => {
+       console.log('Có việc mới:', message);
+       // Tải lại danh sách để hiện công việc mới lên bảng
+       this.getTask();
+       this.cdf.detectChanges();
+    });
+    this.subs.push(newTaskSub);
+
+    // (2) LẮNG NGHE SỰ KIỆN: ADMIN XÁC NHẬN HOÀN TẤT
     const taskCompletedSub = this.reportService.taskCompleted$.subscribe((message: string) => {
-      // ✅ BẮT ĐƯỢC TIN NHẮN TỪ ADMIN!
       console.log('✅ Received confirmation from Admin:', message);
-      this.toast.success(message); // "Công việc của bạn tại trụ... đã được Admin xác nhận"
+      // this.toast.success(message); // Service đã hiện toast rồi nên component có thể bỏ dòng này nếu muốn đỡ lặp
       this.getTask(); 
       this.cdf.detectChanges();
     });
-
-    // (6) Thêm vào mảng để cleanup
     this.subs.push(taskCompletedSub);
   }
 

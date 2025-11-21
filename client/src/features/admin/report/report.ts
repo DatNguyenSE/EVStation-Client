@@ -103,6 +103,10 @@ export class Report {
   ngOnInit(): void {
     this.filterParams.pageNumber = 1;
     this.loadReports();
+    const signalSub = this.reportService.shouldRefreshReports$.subscribe(() => {
+      this.loadReports(); 
+    });
+    this.subs.push(signalSub);
   }
 
   // Tải danh sách
@@ -173,7 +177,7 @@ export class Report {
     this.previewImageUrl = null;
   }
 
-  // 📄 Mở chi tiết
+  // Mở chi tiết
   openDetail(id: number): void {
     this.reportService.getReportsById(id).subscribe({
       next: res => {
@@ -205,7 +209,7 @@ export class Report {
     });
   }
 
-  // 🧩 Đánh giá báo cáo
+  // Đánh giá báo cáo
   evaluateReport(id: number): void {
     this.reportService.evaluteReport(id, this.evaluation).subscribe({
       next: res => {
@@ -233,7 +237,7 @@ export class Report {
 
   assignTechnician(id: number): void {
     if (!this.technicianId.trim()) {
-      this.toast.warning('⚠️ Vui lòng nhập ID của kỹ thuật viên!');
+      this.toast.warning('Vui lòng nhập ID của kỹ thuật viên!');
       return;
     }
     this.reportService.assignTechnician(id, this.technicianId).subscribe({

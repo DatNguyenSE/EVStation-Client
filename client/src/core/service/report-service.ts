@@ -14,7 +14,12 @@ import { PaginatedResult } from '../../_models/receipt';
 export class ReportService {
   private hubConnection!: signalR.HubConnection;
   notificationsReport = signal<Reports[]>([])
-  // notifications$ = this.notificationsSource.asObservable();
+  
+  private shouldRefreshReportsSource = new Subject<void>();
+  shouldRefreshReports$ = this.shouldRefreshReportsSource.asObservable();
+
+  private newTaskAssignedSource = new Subject<string>();
+  newTaskAssigned$ = this.newTaskAssignedSource.asObservable();
 
   private hubUrl = environment.hubUrl;
   private baseUrl = 'https://localhost:5001/api/';
@@ -28,15 +33,14 @@ export class ReportService {
     const page = (filter.pageNumber && !isNaN(filter.pageNumber)) ? filter.pageNumber : 1;
     const size = (filter.pageSize && !isNaN(filter.pageSize)) ? filter.pageSize : 10;
     let params = new HttpParams()
-      .set('pageNumber', filter.pageNumber.toString())
-      .set('pageSize', filter.pageSize.toString());
+      .set('pageNumber', page.toString())
+      .set('pageSize', size.toString())
+      .set('_t', new Date().getTime().toString());
 
     if (filter.postCode) params = params.set('postCode', filter.postCode);
     if (filter.technicianId) params = params.set('technicianId', filter.technicianId);
     if (filter.status) params = params.set('status', filter.status);
     if (filter.severity) params = params.set('severity', filter.severity);
-    // ... set thêm các filter khác nếu cần
-
   return this.http.get<PaginatedResult<Reports>>(`${this.baseUrl}reports`, { params });
 }
 
@@ -58,16 +62,16 @@ export class ReportService {
     return this.http.post<Reports>(`${this.baseUrl}reports`, formData);
 
   }
-  isConnected(): boolean {
-    return this.hubConnection?.state === signalR.HubConnectionState.Connected;
-  }
 
   loadReportsAdmin() {
     return this.http.get<Reports[]>(`${this.baseUrl}reports/new`).subscribe({
       next : res => this.notificationsReport.set(res)
     });
   }
-
+  
+  isConnected(): boolean {
+    return this.hubConnection?.state === signalR.HubConnectionState.Connected;
+  }
 
   //  Khởi tạo kết nối tới ReportHub
   createHubConnection(user: Account): void {
@@ -96,13 +100,15 @@ export class ReportService {
       this.notificationsReport.update(list => [notificationReport, ...list]);
 
       this.toast.warning(`Có báo cáo sự cố mới tại trụ -${notificationReport.postId}`, 5000);
+      this.shouldRefreshReportsSource.next();
     });
 
-    this.hubConnection.on('FixCompleted', (notificationId: number) => {
-    console.log(' ADMIN Event: FixCompleted', notificationId);
+    this.hubConnection.on('FixCompleted', (message: string) => {
+      console.log(' ADMIN Event: FixCompleted', message);
 
-    this.loadReportsAdmin();
-    this.toast.success("Có công việc đã hoàn thành", 4000);
+      this.loadReportsAdmin();
+      this.toast.success(message, 4000);
+      this.shouldRefreshReportsSource.next();
     });
 
     // === SỰ KIỆN CHO TECHNICIAN ===
@@ -110,7 +116,17 @@ export class ReportService {
       console.log('🧑‍🔧 TECHNICIAN Event: TaskCompleted', message);
       // (Dòng này giờ sẽ chạy đúng vì 'taskCompletedSource' là rxjs Subject)
       this.taskCompletedSource.next(message);
-      this.toast.success(`Công việc của bạn đã được hoàn thành, cảm ơn`, 4000);
+      this.toast.success(message, 4000);
+    });
+
+    this.hubConnection.on('NewTaskAssigned', (message: string) => {
+      console.log('🧑‍🔧 TECHNICIAN Event: NewTaskAssigned', message);
+      
+      // 1. Hiện thông báo Toast ngay lập tức
+      this.toast.info(message, 5000);
+
+      // 2. Bắn tín hiệu sang Component để reload danh sách
+      this.newTaskAssignedSource.next(message);
     });
   }
 
