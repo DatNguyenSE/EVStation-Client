@@ -45,6 +45,7 @@ import { adminGuard } from '../core/_guards/admin-guard';
 import { ReceiptManager } from '../features/manager/receipt/receipt';
 import { ReceipDetailManager } from '../features/manager/receip-detail-manager/receip-detail-manager';
 import { ManagerTopup } from '../features/manager/manager-topup/manager-topup';
+import { staffGuard } from '../core/_guards/staff-guard';
 
 
 export const routes: Routes = [
@@ -101,7 +102,7 @@ export const routes: Routes = [
     {
         path: 'nhan-vien-tram',
         runGuardsAndResolvers: 'always',
-        canActivate: [authGuard] ,
+        canActivate: [staffGuard], 
         children: [
             { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
             { path: 'trang-chu', component: Operator },
@@ -113,7 +114,7 @@ export const routes: Routes = [
      {
         path: 'nhan-vien-ky-thuat',
         runGuardsAndResolvers: 'always',
-        canActivate: [authGuard] ,
+        canActivate: [staffGuard], 
         children: [
             { path: '', redirectTo: 'cong-viec', pathMatch: 'full' },
             { path: 'cong-viec', component: Technicain },
@@ -124,7 +125,7 @@ export const routes: Routes = [
     {
         path: 'quan-ly-tram',
         runGuardsAndResolvers: 'always',
-        canActivate: [authGuard] ,
+        canActivate: [staffGuard], 
         children: [
             { path: '', redirectTo: 'trang-chu', pathMatch: 'full' },
             { path: 'trang-chu', component: Manager },
