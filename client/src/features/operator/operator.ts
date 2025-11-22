@@ -161,7 +161,7 @@ export class Operator implements OnInit {
   console.log('🔍 SessionId:', sessionId);
   
   
-  // ✅ Gọi với tên parameter mới (nếu đổi)
+  // Gọi với tên parameter mới (nếu đổi)
   this.operatorService.UpdatePlateForWalkIn(sessionId, slot.plateInput).subscribe({
     next: (response) => {
       console.log(' Cập nhật biển số thành công:', response);
