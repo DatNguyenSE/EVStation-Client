@@ -6,20 +6,27 @@ export interface Reports {
   status: string;
   severity: string;
   createAt: string;
+
   maintenanceStartTime?: string | null;
   maintenanceEndTime?: string | null;
+
   fixedAt?: string | null;
   fixedNote?: string | null;
-  postCode? : string
+
+  // Thêm postCode
+  postCode?: string | null;
+
   createImageUrl?: string | null;
   completedImageUrl?: string | null;
 
-  postId:number;
-  technicianName:string;
-  post:Post;
+  postId: number;
+  technicianName: string;
+
+  post: Post;
   staff: Staff;
   technician?: Technician | null;
 }
+
 
 export interface Staff {
   id: string;

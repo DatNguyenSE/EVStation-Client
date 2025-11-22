@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, inject, OnInit, signal, effect, untracked
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Reports } from '../../_models/report'; 
+import { Reports } from '../../_models/report';
 import { AccountService } from '../../core/service/account-service';
 import { ReportService } from '../../core/service/report-service';
 
@@ -27,7 +27,7 @@ export class Notification implements OnInit {
 
   // 2. Computed: Tự động tính số lượng tin chưa đọc
   // Sửa lỗi "Parser Error" trong HTML
-  unreadCount = computed(() => 
+  unreadCount = computed(() =>
     this.notificationItems().filter(item => !item.read).length
   );
 
@@ -35,21 +35,18 @@ export class Notification implements OnInit {
     // EFFECT: Đồng bộ dữ liệu từ Service -> UI
     effect(() => {
       const rawReports = this.reportService.notificationsReport();
-      
+
       // Dùng untracked để lấy giá trị hiện tại mà KHÔNG gây vòng lặp vô hạn
       const currentItems = untracked(() => this.notificationItems());
 
       const uiReports: NotificationUI[] = rawReports.map(report => {
         // Tìm xem thông báo này đã tồn tại trong danh sách cũ chưa
         const existingItem = currentItems.find(x => x.id === report.id);
-        
+
         return {
-          ...report,
-          // Logic quan trọng: 
-          // Nếu tin cũ đã đọc (true) thì giữ nguyên true.
-          // Nếu là tin mới hoàn toàn thì mặc định là false (chưa đọc).
-          read: existingItem ? existingItem.read : false 
-        };
+  ...report, // <-- ĐÚNG: Chỉ lấy các trường của object report hiện tại
+  read: existingItem ? existingItem.read : false
+}
       });
 
       this.notificationItems.set(uiReports);
@@ -81,7 +78,7 @@ export class Notification implements OnInit {
   goToReports(report: NotificationUI) {
     // 1. Đánh dấu tin này là đã đọc
     this.markAsRead(report.id);
-    
+
     // 2. Chuyển hướng trang
     this.router.navigate(['/quan-tri-vien/bao-cao']);
   }
