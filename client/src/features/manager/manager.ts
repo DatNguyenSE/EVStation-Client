@@ -111,8 +111,11 @@ export class Manager {
   loadRevenue(stationId: number) {
     this.managerService.loadRevenuebystaion(this.startDate, this.endDate, 'Month', stationId).subscribe({
       next: (data) => {
-        this.revenues.set(data);
-        this.totalRevenue.set(data.reduce((sum, item) => sum + item.totalRevenue, 0)); // tính tổng tiền
+        this.revenues.set(data ?? []);
+        const list = data ?? [];
+     this.totalRevenue.set(
+      list.reduce((sum, item) => sum + item.totalRevenue, 0)
+    );
       },
       error: (err) => {
         this.error.set('Không thể tải doanh thu: ' + err.message);
