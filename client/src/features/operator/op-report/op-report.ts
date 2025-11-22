@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ReportService } from '../../../core/service/report-service';
 import { Reports } from '../../../_models/report';
 import { ToastService } from '../../../core/service/toast-service';
@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from '../../../core/service/account-service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-op-report',
@@ -19,6 +20,7 @@ export class OpReport {
   private accountSvc = inject(AccountService);
   private toast = inject(ToastService);
   private route = inject(Router)
+  private cdr = inject(ChangeDetectorRef);
 
   // State
   report: Reports = { postId: 0, description: '' } as Reports;
@@ -53,31 +55,38 @@ export class OpReport {
     }
 
     this.loading = true;
-    this.reportSvc.uploadReport(formData).subscribe({
-      next: (res) => {
-       
-        this.toast.success('Gửi báo cáo thành công!');
-        this.resetForm();
-
-        const acc= this.accountSvc.currentAccount();
-        const role = acc?.roles?.[0];
-        setTimeout(() =>{
-          if (role === 'Manager') {
-          this.route.navigate(['/quan-ly-tram/trang-chu']);
-        } else if (role === 'Operator') {
-          this.route.navigate(['/nhan-vien-tram/trang-chu']);
-        }else if (role === 'Technician') {
-          this.route.navigate(['/nhan-vien-ky-thuat/cong-viec']);
-        }
-        },2000);
+    this.reportSvc.uploadReport(formData)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges(); 
+        })
+      )
+      .subscribe({
+        next: (res) => {
         
-      },
-      error: (err) => {
-        console.error('Lỗi khi gửi báo cáo:', err);
-        this.toast.error('Gửi báo cáo thất bại. Vui lòng thử lại.');
-      },
-      complete: () => (this.loading = false),
-    });
+          this.toast.success('Gửi báo cáo thành công!');
+          this.resetForm();
+
+          const acc= this.accountSvc.currentAccount();
+          const role = acc?.roles?.[0];
+          setTimeout(() =>{
+            if (role === 'Manager') {
+            this.route.navigate(['/quan-ly-tram/trang-chu']);
+          } else if (role === 'Operator') {
+            this.route.navigate(['/nhan-vien-tram/trang-chu']);
+          }else if (role === 'Technician') {
+            this.route.navigate(['/nhan-vien-ky-thuat/cong-viec']);
+          }
+          },2000);
+          
+        },
+        error: (err) => {
+          console.error('Lỗi khi gửi báo cáo:', err);
+          // this.toast.error(err.error?.message || 'Gửi báo cáo thất bại. Vui lòng thử lại.');
+        },
+        complete: () => (this.loading = false),
+      });
   }
 
   /** Reset form sau khi gửi */
