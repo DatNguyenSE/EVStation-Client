@@ -42,7 +42,7 @@ git clone https://github.com/DatNguyenSE/EVStation-API.git
 2. Backend Setup (.NET)
 
 ```Bash
-cd EvoltStation_Backend
+cd EVStation-API
 
 # Update connection string in appsettings.json
 dotnet ef database update
@@ -52,7 +52,7 @@ dotnet run
 
 ```Bash
 
-cd EvoltStation_Frontend
+cd EVStation-Client
 npm install
 npm start
 ```
