@@ -36,7 +36,8 @@
 
 **1. Clone Repo**
 ```bash
-git clone [https://github.com/your-username/evolt-station.git](https://github.com/your-username/evolt-station.git)
+git clone https://github.com/DatNguyenSE/EVStation-Client.git
+git clone https://github.com/DatNguyenSE/EVStation-API.git
 ```
 2. Backend Setup (.NET)
 
